@@ -1,3 +1,7 @@
+//! This module defines the `PgOperator` model representing the
+//! `pg_catalog.pg_operator` system catalog table in `PostgreSQL`.
+//! It includes methods to access related information such as the
+//! associated function and operand/result types.
 use diesel::{PgConnection, Queryable, QueryableByName, Selectable};
 
 use super::{PgExtension, PgProc, PgType};
@@ -45,6 +49,7 @@ pub struct PgOperator {
 
 impl PgOperator {
     /// Returns the symbol of the operator.
+    #[must_use]
     pub fn symbol(&self) -> &str {
         &self.oprname
     }

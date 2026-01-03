@@ -4,7 +4,7 @@ diesel::table! {
     /// `pg_catalog.pg_range` — system catalog containing information about range types.
     /// Each row defines a range type and its properties.
     pg_catalog.pg_range (rngtypid) {
-        /// OID of the range type (references pg_type).
+        /// OID of the range type (references `pg_type`).
         rngtypid -> Oid,
         /// OID of the element (subtype) type.
         rngsubtype -> Oid,

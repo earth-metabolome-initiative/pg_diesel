@@ -7,7 +7,7 @@ use diesel::{Queryable, QueryableByName, Selectable};
 ///
 /// The `pg_largeobject` catalog contains the data pages of large objects. Each
 /// large object is broken into segments or "pages" small enough to be
-/// conveniently stored as rows in pg_largeobject. Each row holds one page
+/// conveniently stored as rows in `pg_largeobject`. Each row holds one page
 /// of a large object, identified by loid and pageno.
 ///
 /// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/catalog-pg-largeobject.html).

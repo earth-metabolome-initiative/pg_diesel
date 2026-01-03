@@ -11,9 +11,9 @@ use crate::{
 };
 
 #[derive(Default)]
-/// Builder for constructing a [`PgDatabase`] instance from PostgreSQL metadata.
+/// Builder for constructing a [`PgDatabase`] instance from `PostgreSQL` metadata.
 pub struct PgDieselDatabaseBuilder<'conn> {
-    /// Connection to the PostgreSQL database.
+    /// Connection to the `PostgreSQL` database.
     connection: Option<&'conn mut PgConnection>,
     /// The catalog (database) name to filter by.
     catalog: Option<String>,
@@ -44,7 +44,7 @@ pub enum PgDatabaseBuildError {
 }
 
 impl<'conn> PgDieselDatabaseBuilder<'conn> {
-    /// Sets the PostgreSQL connection to use for building the `PgDatabase`.
+    /// Sets the `PostgreSQL` connection to use for building the `PgDatabase`.
     pub fn connection(mut self, connection: &'conn mut PgConnection) -> Self {
         self.connection = Some(connection);
         self
@@ -114,9 +114,8 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
         let table_schemas = {
             if value.schemas.is_empty() {
                 return Err(PgDatabaseBuildError::MissingAttribute("schemas"));
-            } else {
-                value.schemas
             }
+            value.schemas
         };
 
         let mut generic_builder = GenericDBBuilder::new(table_catalog.clone());
@@ -201,7 +200,7 @@ mod tests {
             Ok(_) => panic!("Expected error"),
             Err(e) => match e {
                 PgDatabaseBuildError::DuplicateDenylistedType(t) => assert_eq!(t, "foo"),
-                _ => panic!("Unexpected error: {:?}", e),
+                _ => panic!("Unexpected error: {e:?}"),
             },
         }
     }
@@ -221,7 +220,7 @@ mod tests {
             Ok(_) => panic!("Expected error"),
             Err(e) => match e {
                 PgDatabaseBuildError::DuplicateDenylistedType(t) => assert_eq!(t, "foo"),
-                _ => panic!("Unexpected error: {:?}", e),
+                _ => panic!("Unexpected error: {e:?}"),
             },
         }
     }
@@ -264,7 +263,7 @@ mod tests {
         let result: Result<PgDieselDatabase, _> = builder.try_into();
         match result {
             Err(PgDatabaseBuildError::MissingAttribute(attr)) => assert_eq!(attr, "connection"),
-            _ => panic!("Unexpected result: {:?}", result),
+            _ => panic!("Unexpected result: {result:?}"),
         }
     }
 }

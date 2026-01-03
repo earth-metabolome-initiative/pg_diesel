@@ -18,8 +18,7 @@ pub(super) fn foreign_keys(
         columns::columns, constraint_column_usage::constraint_column_usage,
         key_column_usage::key_column_usage, table_constraints::table_constraints, tables::tables,
     };
-    Ok(
-        table_constraints::table
+    table_constraints::table
             .inner_join(
                 key_column_usage::table.on(table_constraints::constraint_name
                     .eq(key_column_usage::constraint_name)
@@ -59,8 +58,7 @@ pub(super) fn foreign_keys(
             .order_by(key_column_usage::constraint_name.asc())
             .select(KeyColumnUsage::as_select())
             .distinct()
-            .load::<KeyColumnUsage>(conn)?,
-    )
+            .load::<KeyColumnUsage>(conn)
 }
 
 pub(super) fn check_constraints(
@@ -70,7 +68,7 @@ pub(super) fn check_constraints(
     use crate::schema::information_schema::{
         check_constraints::check_constraints, constraint_column_usage::constraint_column_usage,
     };
-    Ok(check_constraints::table
+    check_constraints::table
         .inner_join(
             constraint_column_usage::table.on(constraint_column_usage::constraint_name
                 .eq(check_constraints::constraint_name)
@@ -97,7 +95,7 @@ pub(super) fn check_constraints(
                 ),
         )
         .select(CheckConstraint::as_select())
-        .load(conn)?)
+        .load(conn)
 }
 
 pub(super) fn table(
@@ -105,11 +103,11 @@ pub(super) fn table(
     conn: &mut PgConnection,
 ) -> Result<Table, diesel::result::Error> {
     use crate::schema::information_schema::tables::tables;
-    Ok(tables::table
+    tables::table
         .filter(tables::table_name.eq(&column.table_name))
         .filter(tables::table_schema.eq(&column.table_schema))
         .filter(tables::table_catalog.eq(&column.table_catalog))
-        .first::<Table>(conn)?)
+        .first::<Table>(conn)
 }
 
 pub(super) fn geometry_column(
@@ -118,12 +116,12 @@ pub(super) fn geometry_column(
 ) -> Result<Option<GeometryColumn>, diesel::result::Error> {
     use crate::schema::public::geometry_columns::geometry_columns;
 
-    Ok(geometry_columns::table
+    geometry_columns::table
         .filter(geometry_columns::f_table_name.eq(&column.table_name))
         .filter(geometry_columns::f_table_schema.eq(&column.table_schema))
         .filter(geometry_columns::f_geometry_column.eq(&column.column_name))
         .first::<GeometryColumn>(conn)
-        .optional()?)
+        .optional()
 }
 
 pub(super) fn geography_column(
@@ -132,12 +130,12 @@ pub(super) fn geography_column(
 ) -> Result<Option<GeographyColumn>, diesel::result::Error> {
     use crate::schema::public::geography_columns::geography_columns;
 
-    Ok(geography_columns::table
+    geography_columns::table
         .filter(geography_columns::f_table_name.eq(&column.table_name))
         .filter(geography_columns::f_table_schema.eq(&column.table_schema))
         .filter(geography_columns::f_geography_column.eq(&column.column_name))
         .first::<GeographyColumn>(conn)
-        .optional()?)
+        .optional()
 }
 
 pub(super) fn pg_type(
@@ -149,7 +147,7 @@ pub(super) fn pg_type(
         pg_type::pg_type,
     };
 
-    Ok(pg_type::table
+    pg_type::table
         .inner_join(pg_attribute::table.on(pg_attribute::atttypid.eq(pg_type::oid)))
         .inner_join(pg_class::table.on(pg_attribute::attrelid.eq(pg_class::oid)))
         .inner_join(pg_namespace::table.on(pg_class::relnamespace.eq(pg_namespace::oid)))
@@ -157,7 +155,7 @@ pub(super) fn pg_type(
         .filter(pg_namespace::nspname.eq(&column.table_schema))
         .filter(pg_attribute::attname.eq(&column.column_name))
         .select(PgType::as_select())
-        .first::<PgType>(conn)?)
+        .first::<PgType>(conn)
 }
 
 pub(super) fn pg_description(
@@ -169,7 +167,7 @@ pub(super) fn pg_description(
         pg_namespace::pg_namespace,
     };
 
-    Ok(pg_description::table
+    pg_description::table
         .inner_join(pg_attribute::table.on(pg_description::objoid.eq(pg_attribute::attrelid)))
         .inner_join(pg_class::table.on(pg_attribute::attrelid.eq(pg_class::oid)))
         .inner_join(pg_namespace::table.on(pg_class::relnamespace.eq(pg_namespace::oid)))
@@ -177,5 +175,5 @@ pub(super) fn pg_description(
         .filter(pg_namespace::nspname.eq(&column.table_schema))
         .filter(pg_attribute::attname.eq(&column.column_name))
         .select(PgDescription::as_select())
-        .first::<PgDescription>(conn)?)
+        .first::<PgDescription>(conn)
 }

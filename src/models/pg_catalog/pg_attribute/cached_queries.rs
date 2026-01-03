@@ -5,12 +5,13 @@ use diesel::{ExpressionMethods, PgConnection, QueryDsl, RunQueryDsl};
 
 use crate::models::{PgAttribute, PgType};
 
+/// Returns the type of the attribute.
 pub(super) fn pg_type(
     pg_attribute: &PgAttribute,
     conn: &mut PgConnection,
 ) -> Result<PgType, diesel::result::Error> {
     use crate::schema::pg_catalog::pg_type::pg_type;
-    Ok(pg_type::table
+    pg_type::table
         .filter(pg_type::oid.eq(pg_attribute.atttypid))
-        .first(conn)?)
+        .first(conn)
 }

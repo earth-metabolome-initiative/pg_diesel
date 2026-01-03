@@ -1,4 +1,4 @@
-//! Model for pg_catalog.pg_ts_parser table.
+//! Model for `pg_catalog.pg_ts_parser` table.
 
 use diesel::prelude::*;
 

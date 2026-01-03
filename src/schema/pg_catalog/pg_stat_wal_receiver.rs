@@ -29,9 +29,9 @@ diesel::table! {
         latest_end_time -> Nullable<Timestamp>,
         /// Replication slot name used by this WAL receiver.
         slot_name -> Nullable<Text>,
-        /// Host of the PostgreSQL instance this WAL receiver is connected to.
+        /// Host of the `PostgreSQL` instance this WAL receiver is connected to.
         sender_host -> Nullable<Text>,
-        /// Port number of the PostgreSQL instance this WAL receiver is connected to.
+        /// Port number of the `PostgreSQL` instance this WAL receiver is connected to.
         sender_port -> Nullable<Integer>,
         /// Connection string used by this WAL receiver.
         conninfo -> Nullable<Text>,

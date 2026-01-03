@@ -2,7 +2,7 @@
 
 diesel::table! {
     /// `pg_catalog.pg_ident_file_mappings` — view showing the contents of the user name mapping
-    /// file (pg_ident.conf). Each row represents one mapping from system user to database user.
+    /// file (`pg_ident.conf`). Each row represents one mapping from system user to database user.
     pg_catalog.pg_ident_file_mappings (map_number) {
         /// Mapping number (sequence in which mappings are processed).
         map_number -> Nullable<Integer>,
@@ -14,7 +14,7 @@ diesel::table! {
         map_name -> Nullable<Text>,
         /// System user name (can be a regular expression).
         sys_name -> Nullable<Text>,
-        /// PostgreSQL user name that the system user maps to.
+        /// `PostgreSQL` user name that the system user maps to.
         pg_username -> Nullable<Text>,
         /// Error message if the mapping is invalid.
         error -> Nullable<Text>,

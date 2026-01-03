@@ -1,7 +1,7 @@
-//! Trait for types that can resolve their PostgreSQL type information.
+//! Trait for types that can resolve their `PostgreSQL` type information.
 //!
 //! This module defines the [`PostgresType`] trait for database objects that
-//! have an associated PostgreSQL data type. The trait provides a way to obtain
+//! have an associated `PostgreSQL` data type. The trait provides a way to obtain
 //! complete [`PgType`] metadata, which is used for:
 //! - Diesel type mapping during schema generation
 //! - Type resolution in code generators
@@ -11,7 +11,7 @@ use diesel::PgConnection;
 
 use crate::models::PgType;
 
-/// Trait for database objects that can resolve their PostgreSQL type.
+/// Trait for database objects that can resolve their `PostgreSQL` type.
 ///
 /// This trait provides a unified interface for obtaining [`PgType`]
 /// information, whether from a direct type reference or by querying the

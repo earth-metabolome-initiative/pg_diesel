@@ -18,7 +18,7 @@ diesel::table! {
         default_character_set_schema -> Nullable<Text>,
         /// Name of the default character set.
         default_character_set_name -> Nullable<Text>,
-        /// SQL path for the schema (typically NULL in PostgreSQL).
+        /// SQL path for the schema (typically NULL in `PostgreSQL`).
         sql_path -> Nullable<Text>,
     }
 }

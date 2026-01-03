@@ -18,9 +18,9 @@ diesel::table! {
         collisdeterministic -> Bool,
         /// Encoding for which this collation is applicable (-1 for any).
         collencoding -> Integer,
-        /// LC_COLLATE setting for this collation.
+        /// `LC_COLLATE` setting for this collation.
         collcollate -> Nullable<Text>,
-        /// LC_CTYPE setting for this collation.
+        /// `LC_CTYPE` setting for this collation.
         collctype -> Nullable<Text>,
         /// Locale name for ICU collations.
         colllocale -> Nullable<Text>,

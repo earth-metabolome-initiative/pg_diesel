@@ -8,9 +8,9 @@ diesel::table! {
     /// A role is applicable if it has been granted to the current user either
     /// directly or through a chain of role grants.
     ///
-    /// See: https://www.postgresql.org/docs/current/infoschema-applicable-roles.html
+    /// See: <https://www.postgresql.org/docs/current/infoschema-applicable-roles.html>
     information_schema.applicable_roles (grantee, role_name) {
-        /// Name of the role to which the role identified in role_name was granted (the grantee).
+        /// Name of the role to which the role identified in `role_name` was granted (the grantee).
         grantee -> diesel::sql_types::Nullable<diesel::sql_types::Text>,
         /// Name of the role that is applicable to the grantee.
         role_name -> diesel::sql_types::Nullable<diesel::sql_types::Text>,

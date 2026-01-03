@@ -1,4 +1,4 @@
-//! Schema for pg_catalog.pg_timezone_names view.
+//! Schema for `pg_catalog.pg_timezone_names` view.
 
 diesel::table! {
     /// Timezone names

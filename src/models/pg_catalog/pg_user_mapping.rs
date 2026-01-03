@@ -1,4 +1,4 @@
-//! Model for pg_catalog.pg_user_mapping table.
+//! Model for `pg_catalog.pg_user_mapping` table.
 
 use diesel::prelude::*;
 

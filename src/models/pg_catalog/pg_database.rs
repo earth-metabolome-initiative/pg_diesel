@@ -38,9 +38,9 @@ pub struct PgDatabase {
     pub datminmxid: u32,
     /// Default tablespace for this database.
     pub dattablespace: u32,
-    /// LC_COLLATE setting for this database.
+    /// `LC_COLLATE` setting for this database.
     pub datcollate: String,
-    /// LC_CTYPE setting for this database.
+    /// `LC_CTYPE` setting for this database.
     pub datctype: String,
     /// Locale name if using ICU provider.
     pub datlocale: Option<String>,

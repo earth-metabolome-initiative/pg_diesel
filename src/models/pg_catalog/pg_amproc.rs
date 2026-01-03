@@ -1,4 +1,4 @@
-//! PostgreSQL access method support procedures catalog model.
+//! `PostgreSQL` access method support procedures catalog model.
 //!
 //! This module provides the `PgAmproc` struct for working with the
 //! `pg_catalog.pg_amproc` system catalog table.

@@ -6,7 +6,7 @@ use diesel::{Queryable, QueryableByName, Selectable};
 /// Represents a row from the `pg_config` view.
 ///
 /// The `pg_config` view provides compile-time configuration information about
-/// the PostgreSQL installation. Each row contains a configuration parameter
+/// the `PostgreSQL` installation. Each row contains a configuration parameter
 /// name and its corresponding value. This includes paths to installation
 /// directories, version information, and other build-time settings.
 ///

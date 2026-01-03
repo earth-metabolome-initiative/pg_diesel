@@ -8,7 +8,7 @@ diesel::table! {
         oid -> Oid,
         /// Name of the rule.
         rulename -> Text,
-        /// OID of the table/view this rule is for (references pg_class).
+        /// OID of the table/view this rule is for (references `pg_class`).
         ev_class -> Oid,
         /// Event type: '1' (SELECT), '2' (UPDATE), '3' (INSERT), '4' (DELETE).
         ev_type -> Text,

@@ -1,7 +1,7 @@
-//! Schema for pg_catalog.pg_transform table.
+//! Schema for `pg_catalog.pg_transform` table.
 
 diesel::table! {
-    use diesel::sql_types::*;
+    use diesel::sql_types::Oid;
 
     /// Type transformations
     ///

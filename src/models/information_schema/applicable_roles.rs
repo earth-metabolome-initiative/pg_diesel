@@ -1,4 +1,4 @@
-//! Model representing applicable roles in PostgreSQL.
+//! Model representing applicable roles in `PostgreSQL`.
 
 use diesel::{Queryable, QueryableByName, Selectable};
 
@@ -6,7 +6,7 @@ use diesel::{Queryable, QueryableByName, Selectable};
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::information_schema::applicable_roles::applicable_roles)]
 #[diesel(primary_key(grantee, role_name))]
-/// Represents a row in PostgreSQL's `applicable_roles` view.
+/// Represents a row in `PostgreSQL`'s `applicable_roles` view.
 ///
 /// Each row describes a **role that is applicable** to the current user.
 /// A role is considered applicable if it has been granted to the current user,
@@ -15,11 +15,11 @@ use diesel::{Queryable, QueryableByName, Selectable};
 /// user can exercise, including both direct role memberships and inherited
 /// role memberships through role hierarchies.
 ///
-/// Fields are nullable because PostgreSQL's information schema views can
+/// Fields are nullable because `PostgreSQL`'s information schema views can
 /// contain missing or context-dependent values.
 ///
 /// For more details:
-/// - PostgreSQL Catalog: [`pg_auth_members`](https://www.postgresql.org/docs/current/catalog-pg-auth-members.html)
+/// - `PostgreSQL` Catalog: [`pg_auth_members`](https://www.postgresql.org/docs/current/catalog-pg-auth-members.html)
 /// - Information Schema View: [`applicable_roles`](https://www.postgresql.org/docs/current/infoschema-applicable-roles.html)
 pub struct ApplicableRoles {
     /// Name of the role to which the role was granted (the grantee).

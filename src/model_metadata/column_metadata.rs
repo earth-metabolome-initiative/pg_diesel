@@ -5,12 +5,12 @@ use std::rc::Rc;
 use crate::models::{PgDescription, PgType, Table};
 
 #[derive(Clone, Debug)]
-/// Rich metadata about a PostgreSQL table column.
+/// Rich metadata about a `PostgreSQL` table column.
 ///
 /// This struct wraps a column model with additional metadata loaded from
 /// related system catalog tables, including:
 /// - The table that owns the column
-/// - The resolved PostgreSQL type ([`PgType`]) for the column
+/// - The resolved `PostgreSQL` type ([`PgType`]) for the column
 /// - Column description from `pg_catalog.pg_description`
 ///
 /// This metadata is constructed during
@@ -31,12 +31,13 @@ pub struct ColumnMetadata {
     table: Rc<Table>,
     /// The description of the column, if any.
     description: Option<PgDescription>,
-    /// The associated PgType.
+    /// The associated `PgType`.
     pg_type: PgType,
 }
 
 impl ColumnMetadata {
     /// Creates a new `ColumnMetadata` instance.
+    #[must_use]
     pub fn new(table: Rc<Table>, description: Option<PgDescription>, pg_type: PgType) -> Self {
         Self {
             table,
@@ -46,21 +47,25 @@ impl ColumnMetadata {
     }
 
     /// Returns the table the column belongs to.
+    #[must_use]
     pub fn table(&self) -> &Table {
         self.table.as_ref()
     }
 
     /// Returns the description of the column, if any.
+    #[must_use]
     pub fn description(&self) -> Option<&PgDescription> {
         self.description.as_ref()
     }
 
-    /// Returns the associated PgType.
+    /// Returns the associated [`PgType`].
+    #[must_use]
     pub fn pg_type(&self) -> &PgType {
         &self.pg_type
     }
 
     /// Returns the normalized data type of the column.
+    #[must_use]
     pub fn normalized_data_type(&self) -> String {
         self.pg_type.typname.clone()
     }
@@ -136,7 +141,7 @@ mod tests {
             description: "desc".to_string(),
         });
 
-        let metadata = ColumnMetadata::new(table.clone(), description.clone(), pg_type.clone());
+        let metadata = ColumnMetadata::new(Rc::clone(&table), description, pg_type);
 
         assert_eq!(metadata.table().table_name, "table");
         assert_eq!(metadata.description().unwrap().description, "desc");

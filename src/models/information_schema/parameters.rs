@@ -1,4 +1,4 @@
-//! Parameters model representing the information_schema.parameters view.
+//! Parameters model representing the `information_schema.parameters` view.
 
 use diesel::prelude::*;
 

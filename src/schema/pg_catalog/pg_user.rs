@@ -1,7 +1,7 @@
-//! Schema for pg_catalog.pg_user view.
+//! Schema for `pg_catalog.pg_user` view.
 
 diesel::table! {
-    use diesel::sql_types::*;
+    use diesel::sql_types::{Nullable, Text, Oid, Bool, Timestamp, Array};
 
     /// Database users
     ///

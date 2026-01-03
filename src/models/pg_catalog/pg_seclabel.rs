@@ -7,7 +7,7 @@ use diesel::{Queryable, QueryableByName, Selectable};
 ///
 /// The `pg_seclabel` catalog stores security labels on database objects.
 /// Security labels are used by label-based mandatory access control (MAC)
-/// systems like SELinux.
+/// systems like `SELinux`.
 ///
 /// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/catalog-pg-seclabel.html).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]

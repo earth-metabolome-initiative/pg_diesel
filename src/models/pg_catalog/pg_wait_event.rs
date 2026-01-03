@@ -1,4 +1,4 @@
-//! Model for pg_catalog.pg_wait_events view.
+//! Model for `pg_catalog.pg_wait_events` view.
 
 use diesel::prelude::*;
 

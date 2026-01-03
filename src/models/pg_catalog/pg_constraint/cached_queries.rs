@@ -5,6 +5,7 @@ use diesel::{ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, RunQueryDsl, 
 
 use crate::models::{PgConstraint, PgOperator, PgProc};
 
+/// Returns the functions associated with the constraint.
 pub(super) fn functions(
     pg_constraint: &PgConstraint,
     conn: &mut PgConnection,
@@ -12,7 +13,7 @@ pub(super) fn functions(
     use crate::schema::pg_catalog::{
         pg_constraint::pg_constraint, pg_depend::pg_depend, pg_proc::pg_proc,
     };
-    Ok(pg_constraint::table
+    pg_constraint::table
         // Join to pg_depend where the constraint's OID is recorded as the dependent.
         .inner_join(pg_depend::table.on(pg_constraint::oid.eq(pg_depend::objid)))
         // Then join to pg_proc using the referenced function OID.
@@ -21,9 +22,10 @@ pub(super) fn functions(
         .filter(pg_constraint::oid.eq(pg_constraint.oid))
         // Select all columns from pg_proc.
         .select(PgProc::as_select())
-        .load::<PgProc>(conn)?)
+        .load::<PgProc>(conn)
 }
 
+/// Returns the operators associated with the constraint.
 pub(super) fn operators(
     pg_constraint: &PgConstraint,
     conn: &mut PgConnection,
@@ -31,7 +33,7 @@ pub(super) fn operators(
     use crate::schema::pg_catalog::{
         pg_constraint::pg_constraint, pg_depend::pg_depend, pg_operator::pg_operator,
     };
-    Ok(pg_constraint::table
+    pg_constraint::table
         // Join to pg_depend where the constraint's OID is recorded as the dependent.
         .inner_join(pg_depend::table.on(pg_constraint::oid.eq(pg_depend::objid)))
         // Then join to pg_operator using the referenced operator OID.
@@ -40,5 +42,5 @@ pub(super) fn operators(
         .filter(pg_constraint::oid.eq(pg_constraint.oid))
         // Select all columns from pg_operator.
         .select(PgOperator::as_select())
-        .load::<PgOperator>(conn)?)
+        .load::<PgOperator>(conn)
 }

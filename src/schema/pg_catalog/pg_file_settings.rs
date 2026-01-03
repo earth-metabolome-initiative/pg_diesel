@@ -2,7 +2,7 @@
 
 diesel::table! {
     /// `pg_catalog.pg_file_settings` — view showing the contents of server configuration files.
-    /// Each row represents one setting from postgresql.conf, auto.conf, or included files.
+    /// Each row represents one setting from `postgresql.conf`, `auto.conf`, or included files.
     pg_catalog.pg_file_settings (sourcefile, sourceline, seqno) {
         /// Configuration file where this setting is defined.
         sourcefile -> Nullable<Text>,

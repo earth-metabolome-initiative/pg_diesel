@@ -13,9 +13,9 @@ diesel::table! {
         connamespace -> Oid,
         /// OID of the role that owns the conversion.
         conowner -> Oid,
-        /// Source encoding ID (from pg_encoding).
+        /// Source encoding ID (from `pg_encoding`).
         conforencoding -> Integer,
-        /// Destination encoding ID (to pg_encoding).
+        /// Destination encoding ID (to `pg_encoding`).
         contoencoding -> Integer,
         /// OID of the conversion function.
         conproc -> Oid,

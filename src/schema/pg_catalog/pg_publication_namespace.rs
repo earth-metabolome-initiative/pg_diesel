@@ -6,9 +6,9 @@ diesel::table! {
     pg_catalog.pg_publication_namespace (oid) {
         /// OID of this mapping entry.
         oid -> Oid,
-        /// OID of the publication (references pg_publication).
+        /// OID of the publication (references `pg_publication`).
         pnpubid -> Oid,
-        /// OID of the schema (references pg_namespace).
+        /// OID of the schema (references `pg_namespace`).
         pnnspid -> Oid,
     }
 }

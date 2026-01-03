@@ -5,7 +5,7 @@ use std::rc::Rc;
 use crate::models::{CheckConstraint, Column, KeyColumnUsage, PgDescription, PgIndex};
 
 #[derive(Clone, Debug)]
-/// Rich metadata about a PostgreSQL table.
+/// Rich metadata about a `PostgreSQL` table.
 ///
 /// This struct wraps a table model with additional metadata loaded from related
 /// system catalog tables, including:
@@ -27,6 +27,7 @@ pub struct TableMetadata {
 
 impl TableMetadata {
     /// Creates a new `TableMetadata` instance.
+    #[must_use]
     pub fn new(
         metadata: sql_traits::structs::TableMetadata<crate::models::Table>,
         description: Option<PgDescription>,
@@ -48,6 +49,7 @@ impl TableMetadata {
     }
 
     /// Returns a slice of Rc of columns of the table.
+    #[must_use]
     pub fn column_rc_slice(&self) -> &[Rc<Column>] {
         self.metadata.column_rc_slice()
     }
@@ -89,6 +91,7 @@ impl TableMetadata {
     }
 
     /// Returns the description of the table, if any.
+    #[must_use]
     pub fn description(&self) -> Option<&PgDescription> {
         self.description.as_ref()
     }

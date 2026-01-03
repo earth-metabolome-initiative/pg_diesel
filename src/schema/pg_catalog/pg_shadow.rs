@@ -2,7 +2,7 @@
 
 diesel::table! {
     /// `pg_catalog.pg_shadow` — view showing information about database users (superuser-only).
-    /// This view contains the same information as pg_user, but includes the password field.
+    /// This view contains the same information as `pg_user`, but includes the password field.
     /// Uses `usename` as a nominal primary key for Diesel compatibility.
     pg_catalog.pg_shadow (usename) {
         /// User name.

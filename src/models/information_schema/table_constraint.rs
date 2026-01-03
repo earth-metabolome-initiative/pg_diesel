@@ -57,18 +57,22 @@ pub enum ConstraintType {
 }
 
 impl ConstraintType {
+    /// Returns true if the constraint is a primary key.
     pub fn is_primary_key(&self) -> bool {
         matches!(self, ConstraintType::PrimaryKey)
     }
 
+    /// Returns true if the constraint is a foreign key.
     pub fn is_foreign_key(&self) -> bool {
         matches!(self, ConstraintType::ForeignKey)
     }
 
+    /// Returns true if the constraint is a unique constraint.
     pub fn is_unique(&self) -> bool {
         matches!(self, ConstraintType::Unique)
     }
 
+    /// Returns true if the constraint is a check constraint.
     pub fn is_check(&self) -> bool {
         matches!(self, ConstraintType::Check)
     }

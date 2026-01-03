@@ -242,6 +242,7 @@ impl Column {
     }
 
     /// Returns the data type associated with the column as a string.
+    #[must_use]
     pub fn data_type_str(&self) -> &str {
         if self.has_custom_type() {
             if let Some(udt_name) = &self.udt_name {
@@ -318,6 +319,7 @@ impl Column {
     }
 
     /// Returns whether the column has a date time type.
+    #[must_use]
     pub fn has_datetime_type(&self) -> bool {
         self.data_type.contains("timestamp")
     }
@@ -419,7 +421,7 @@ mod tests {
     #[test]
     fn test_display() {
         let col = dummy_column();
-        assert_eq!(format!("{}", col), "`schema.table.column`");
+        assert_eq!(format!("{col}"), "`schema.table.column`");
     }
 
     #[test]
@@ -480,6 +482,6 @@ mod tests {
         let mut col = dummy_column();
         col.data_type = "USER-DEFINED".to_string();
         col.udt_name = None;
-        col.data_type_str();
+        let _ = col.data_type_str();
     }
 }

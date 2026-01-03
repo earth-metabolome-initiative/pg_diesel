@@ -2,8 +2,8 @@
 //!
 //! The `information_schema` is a set of ANSI SQL standard views that provide
 //! metadata about database objects in a database-independent way. This module
-//! contains Diesel `table!`` macro definitions for all accessible
-//! information_schema views in PostgreSQL.
+//! contains Diesel `table!` macro definitions for all accessible
+//! `information_schema` views in `PostgreSQL`.
 //!
 //! ## Covered Views
 //!

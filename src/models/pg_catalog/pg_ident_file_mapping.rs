@@ -6,7 +6,7 @@ use diesel::{Queryable, QueryableByName, Selectable};
 /// Represents a row from the `pg_ident_file_mappings` view.
 ///
 /// The `pg_ident_file_mappings` view provides a summary of the contents of the
-/// user name mapping configuration file (pg_ident.conf). A row appears for each
+/// user name mapping configuration file (`pg_ident.conf`). A row appears for each
 /// non-empty, non-comment line in the file.
 ///
 /// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/view-pg-ident-file-mappings.html).
@@ -24,7 +24,7 @@ pub struct PgIdentFileMapping {
     pub map_name: Option<String>,
     /// System user name.
     pub sys_name: Option<String>,
-    /// PostgreSQL user name.
+    /// `PostgreSQL` user name.
     pub pg_username: Option<String>,
     /// Error message if the mapping is invalid.
     pub error: Option<String>,

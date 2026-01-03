@@ -1,12 +1,12 @@
-//! Diesel table! macro definitions for PostgreSQL system schemas.
+//! Diesel table! macro definitions for `PostgreSQL` system schemas.
 //!
 //! This module contains Diesel schema definitions (using the `table!` macro)
-//! for all PostgreSQL metadata tables and views. Each submodule corresponds to
-//! a PostgreSQL schema:
+//! for all `PostgreSQL` metadata tables and views. Each submodule corresponds to
+//! a `PostgreSQL` schema:
 //!
 //! - [`information_schema`]: ANSI SQL standard views for database metadata
-//! - [`pg_catalog`]: PostgreSQL system catalog tables and views
-//! - [`public`]: PostGIS extension tables for spatial metadata
+//! - [`pg_catalog`]: `PostgreSQL` system catalog tables and views
+//! - [`public`]: `PostGIS` extension tables for spatial metadata
 //!
 //! The schema definitions include:
 //! - Table names and primary keys

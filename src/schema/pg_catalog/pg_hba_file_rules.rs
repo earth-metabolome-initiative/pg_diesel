@@ -2,7 +2,7 @@
 
 diesel::table! {
     /// `pg_catalog.pg_hba_file_rules` — view showing the contents of the client authentication
-    /// configuration file (pg_hba.conf). Each row represents one rule from the file.
+    /// configuration file (`pg_hba.conf`). Each row represents one rule from the file.
     pg_catalog.pg_hba_file_rules (rule_number) {
         /// Rule number (sequence in which rules are processed).
         rule_number -> Nullable<Integer>,

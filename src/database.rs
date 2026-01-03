@@ -1,5 +1,5 @@
 //! Submodule providing the `PgDatabase` struct which holds data queried from
-//! the PostgreSQL information schema and implements the
+//! the `PostgreSQL` information schema and implements the
 //! [`DatabaseLike`](sql_traits::prelude::DatabaseLike) trait.
 
 use sql_traits::structs::GenericDB;
@@ -13,9 +13,9 @@ pub use pg_proc_metadata::PgProcMetadata;
 mod builder;
 pub use builder::PgDieselDatabaseBuilder;
 
-/// Type alias representing a PostgreSQL database with loaded metadata.
+/// Type alias representing a `PostgreSQL` database with loaded metadata.
 ///
-/// This is a specialization of [`GenericDB`] configured for PostgreSQL, using:
+/// This is a specialization of [`GenericDB`] configured for `PostgreSQL`, using:
 /// - [`Table`](crate::models::Table) from `information_schema.tables` as the
 ///   table type
 /// - [`Column`](crate::models::Column) from `information_schema.columns` as the

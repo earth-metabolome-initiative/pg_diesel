@@ -1,7 +1,7 @@
-//! Schema for pg_catalog.pg_ts_dict table.
+//! Schema for `pg_catalog.pg_ts_dict` table.
 
 diesel::table! {
-    use diesel::sql_types::*;
+    use diesel::sql_types::{Oid, Text, Nullable};
 
     /// Text search dictionaries
     ///

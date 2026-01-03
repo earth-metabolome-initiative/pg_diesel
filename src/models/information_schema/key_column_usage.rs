@@ -46,7 +46,7 @@ impl KeyColumnUsage {
     ///
     /// # Arguments
     ///
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///

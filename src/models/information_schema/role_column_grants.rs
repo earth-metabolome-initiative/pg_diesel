@@ -1,5 +1,5 @@
-//! RoleColumnGrants model representing the
-//! information_schema.role_column_grants view.
+//! `RoleColumnGrants` model representing the
+//! `information_schema.role_column_grants` view.
 
 use diesel::prelude::*;
 

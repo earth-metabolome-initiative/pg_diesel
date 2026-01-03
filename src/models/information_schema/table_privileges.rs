@@ -1,4 +1,4 @@
-//! TablePrivileges model representing the information_schema.table_privileges
+//! `TablePrivileges` model representing the `information_schema.table_privileges`
 //! view.
 use diesel::prelude::*;
 

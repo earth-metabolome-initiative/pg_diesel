@@ -26,6 +26,6 @@ pub struct Schemata {
     pub default_character_set_schema: Option<String>,
     /// Name of the default character set.
     pub default_character_set_name: Option<String>,
-    /// SQL path for the schema (typically NULL in PostgreSQL).
+    /// SQL path for the schema (typically NULL in `PostgreSQL`).
     pub sql_path: Option<String>,
 }

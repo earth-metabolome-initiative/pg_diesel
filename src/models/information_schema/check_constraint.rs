@@ -115,9 +115,7 @@ impl CheckConstraint {
             )
             .filter(pg_namespace::nspname.eq(&self.constraint_schema))
             .select(PgConstraint::as_select())
-            .first(conn)
-            .map_err(diesel::result::Error::from)
-    }
+            .first(conn)}
 
     /// Returns the table constraint associated with this check constraint
     ///
@@ -218,7 +216,7 @@ mod tests {
     #[test]
     fn test_display() {
         let constraint = dummy_check_constraint();
-        assert_eq!(format!("{}", constraint), "db.schema.constraint");
+        assert_eq!(format!("{constraint}"), "db.schema.constraint");
     }
 
     #[test]

@@ -1,7 +1,7 @@
-//! Metadata for PostgreSQL functions and procedures.
+//! Metadata for `PostgreSQL` functions and procedures.
 //!
 //! This module provides [`PgProcMetadata`], which encapsulates type information
-//! for a PostgreSQL function or procedure, including:
+//! for a `PostgreSQL` function or procedure, including:
 //! - Argument types (from `pg_proc.proargtypes`)
 //! - Return type (from `pg_proc.prorettype`)
 //!
@@ -13,7 +13,7 @@ use diesel::PgConnection;
 use crate::models::{PgProc, PgType};
 
 #[derive(Debug, Clone)]
-/// Struct collecting metadata about a PostgreSQL function represented by a
+/// Struct collecting metadata about a `PostgreSQL` function represented by a
 /// [`PgProc`](crate::models::PgProc) entry.
 pub struct PgProcMetadata {
     /// The argument types.
@@ -28,8 +28,8 @@ impl PgProcMetadata {
     ///
     /// # Arguments
     ///
-    /// * `pg_proc` - The PostgreSQL function to get metadata for.
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `pg_proc` - The `PostgreSQL` function to get metadata for.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///
@@ -51,11 +51,13 @@ impl PgProcMetadata {
     }
 
     /// Returns the argument types.
+    #[must_use] 
     pub fn argument_types(&self) -> &[PgType] {
         &self.argument_types
     }
 
     /// Returns the return type.
+    #[must_use] 
     pub fn return_type(&self) -> Option<&PgType> {
         self.return_type.as_ref()
     }
@@ -109,8 +111,8 @@ mod tests {
         let ret_type = dummy_pg_type();
 
         let metadata = PgProcMetadata {
-            argument_types: vec![arg_type.clone()],
-            return_type: Some(ret_type.clone()),
+            argument_types: vec![arg_type],
+            return_type: Some(ret_type),
         };
 
         assert_eq!(metadata.argument_types().len(), 1);

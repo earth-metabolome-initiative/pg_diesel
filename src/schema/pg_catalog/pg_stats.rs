@@ -1,8 +1,8 @@
 //! Submodule for the `pg_catalog.pg_stats` view schema.
 
 diesel::table! {
-    /// `pg_catalog.pg_stats` — view providing access to the information stored in pg_statistic.
-    /// This view presents the contents of pg_statistic in a more readable format.
+    /// `pg_catalog.pg_stats` — view providing access to the information stored in `pg_statistic`.
+    /// This view presents the contents of `pg_statistic` in a more readable format.
     /// Uses `schemaname` as a nominal primary key for Diesel compatibility.
     pg_catalog.pg_stats (schemaname) {
         /// Name of the schema containing the table.

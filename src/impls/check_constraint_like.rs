@@ -6,7 +6,7 @@
 //! check constraints.
 //!
 //! The implementation parses the check constraint expression from the
-//! `check_clause` field using the PostgreSQL SQL parser.
+//! `check_clause` field using the `PostgreSQL` SQL parser.
 
 use sql_traits::{
     structs::metadata::CheckMetadata,

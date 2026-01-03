@@ -1,7 +1,7 @@
-//! Implementations of [`HasOid`] for PostgreSQL catalog types.
+//! Implementations of [`HasOid`] for `PostgreSQL` catalog types.
 //!
 //! This module implements the [`HasOid`] trait for various model structs that
-//! have PostgreSQL Object Identifiers (OIDs). OIDs are unique identifiers for
+//! have `PostgreSQL` Object Identifiers (OIDs). OIDs are unique identifiers for
 //! database objects in the system catalogs.
 //!
 //! ## Implemented Types
@@ -100,9 +100,9 @@ mod tests {
     fn dummy_pg_constraint() -> PgConstraint {
         PgConstraint {
             oid: 2,
-            conname: "".to_string(),
+            conname: String::new(),
             connamespace: 0,
-            contype: "".to_string(),
+            contype: String::new(),
             condeferrable: false,
             condeferred: false,
             convalidated: false,
@@ -111,9 +111,9 @@ mod tests {
             conindid: 0,
             conparentid: 0,
             confrelid: 0,
-            confupdtype: "".to_string(),
-            confdeltype: "".to_string(),
-            confmatchtype: "".to_string(),
+            confupdtype: String::new(),
+            confdeltype: String::new(),
+            confmatchtype: String::new(),
             conislocal: false,
             coninhcount: 0,
             connoinherit: false,
@@ -131,10 +131,10 @@ mod tests {
     fn dummy_pg_operator() -> PgOperator {
         PgOperator {
             oid: 4,
-            oprname: "".to_string(),
+            oprname: String::new(),
             oprnamespace: 0,
             oprowner: 0,
-            oprkind: "".to_string(),
+            oprkind: String::new(),
             oprcanmerge: false,
             oprcanhash: false,
             oprleft: 0,
@@ -151,16 +151,16 @@ mod tests {
     fn dummy_pg_type() -> PgType {
         PgType {
             oid: 5,
-            typname: "".to_string(),
+            typname: String::new(),
             typnamespace: 0,
             typowner: 0,
             typlen: 0,
             typbyval: false,
-            typtype: "".to_string(),
-            typcategory: "".to_string(),
+            typtype: String::new(),
+            typcategory: String::new(),
             typispreferred: false,
             typisdefined: false,
-            typdelim: "".to_string(),
+            typdelim: String::new(),
             typrelid: 0,
             typelem: 0,
             typarray: 0,
@@ -173,8 +173,8 @@ mod tests {
             typanalyze: 0,
             #[cfg(feature = "postgres-14")]
             typsubscript: 0,
-            typalign: "".to_string(),
-            typstorage: "".to_string(),
+            typalign: String::new(),
+            typstorage: String::new(),
             typnotnull: false,
             typbasetype: 0,
             typtypmod: 0,
@@ -189,7 +189,7 @@ mod tests {
     fn dummy_pg_proc() -> PgProc {
         PgProc {
             oid: 6,
-            proname: "".to_string(),
+            proname: String::new(),
             pronamespace: 0,
             proowner: 0,
             prolang: 0,
@@ -197,13 +197,13 @@ mod tests {
             prorows: 0.0,
             provariadic: 0,
             prosupport: 0,
-            prokind: "".to_string(),
+            prokind: String::new(),
             prosecdef: false,
             proleakproof: false,
             proisstrict: false,
             proretset: false,
-            provolatile: "".to_string(),
-            proparallel: "".to_string(),
+            provolatile: String::new(),
+            proparallel: String::new(),
             pronargs: 0,
             pronargdefaults: 0,
             prorettype: 0,
@@ -211,7 +211,7 @@ mod tests {
             proallargtypes: None,
             proargmodes: None,
             proargnames: None,
-            prosrc: "".to_string(),
+            prosrc: String::new(),
             probin: None,
             #[cfg(feature = "postgres-14")]
             prosqlbody: None,
@@ -229,11 +229,11 @@ mod tests {
 
         let extension = PgExtension {
             oid: 3,
-            extname: "".to_string(),
+            extname: String::new(),
             extowner: 0,
             extnamespace: 0,
             extrelocatable: false,
-            extversion: "".to_string(),
+            extversion: String::new(),
             extconfig: None,
             extcondition: None,
         };
@@ -252,7 +252,7 @@ mod tests {
             objoid: 7,
             classoid: 0,
             objsubid: 0,
-            description: "".to_string(),
+            description: String::new(),
         };
         assert_eq!(desc.oid(), 7);
     }

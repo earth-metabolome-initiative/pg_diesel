@@ -6,7 +6,7 @@ use diesel::{Queryable, QueryableByName, Selectable};
 /// Represents a row from the `pg_language` table.
 ///
 /// The `pg_language` system catalog registers languages in which you can write
-/// functions or stored procedures. PostgreSQL has four built-in languages: SQL,
+/// functions or stored procedures. `PostgreSQL` has four built-in languages: SQL,
 /// C, internal, and plpgsql.
 ///
 /// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/catalog-pg-language.html).

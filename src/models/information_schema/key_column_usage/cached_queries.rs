@@ -13,14 +13,14 @@ pub(super) fn referential_constraint(
     conn: &mut PgConnection,
 ) -> Result<ReferentialConstraint, diesel::result::Error> {
     use crate::schema::information_schema::referential_constraints::referential_constraints;
-    Ok(referential_constraints::table
+    referential_constraints::table
         .filter(referential_constraints::constraint_name.eq(&key_column_usage.constraint_name))
         .filter(referential_constraints::constraint_schema.eq(&key_column_usage.constraint_schema))
         .filter(
             referential_constraints::constraint_catalog.eq(&key_column_usage.constraint_catalog),
         )
         .select(ReferentialConstraint::as_select())
-        .first::<ReferentialConstraint>(conn)?)
+        .first::<ReferentialConstraint>(conn)
 }
 
 pub(super) fn referenced_columns(
@@ -68,7 +68,7 @@ pub(crate) fn host_columns(
     conn: &mut PgConnection,
 ) -> Result<Vec<Column>, diesel::result::Error> {
     use crate::schema::information_schema::{columns::columns, key_column_usage::key_column_usage};
-    Ok(key_column_usage::table
+    key_column_usage::table
         .filter(key_column_usage::constraint_name.eq(&key_column_usage.constraint_name))
         .filter(key_column_usage::constraint_schema.eq(&key_column_usage.constraint_schema))
         .filter(key_column_usage::constraint_catalog.eq(&key_column_usage.constraint_catalog))
@@ -81,7 +81,7 @@ pub(crate) fn host_columns(
         )
         .order_by(key_column_usage::ordinal_position.asc())
         .select(Column::as_select())
-        .load::<Column>(conn)?)
+        .load::<Column>(conn)
 }
 
 /// Returns the referenced table associated with this key column usage
@@ -103,7 +103,7 @@ pub(super) fn referenced_table(
 
     let constraint = referential_constraint(key_column_usage, conn)?;
 
-    Ok(constraint_table_usage::table
+    constraint_table_usage::table
         .inner_join(
             tables::table.on(tables::table_name
                 .eq(constraint_table_usage::table_name)
@@ -114,5 +114,5 @@ pub(super) fn referenced_table(
         .filter(constraint_table_usage::constraint_schema.eq(&constraint.constraint_schema))
         .filter(constraint_table_usage::constraint_catalog.eq(&constraint.constraint_catalog))
         .select(Table::as_select())
-        .first::<Table>(conn)?)
+        .first::<Table>(conn)
 }

@@ -6,9 +6,9 @@ diesel::table! {
     pg_catalog.pg_publication_rel (oid) {
         /// OID of this mapping entry.
         oid -> Oid,
-        /// OID of the publication (references pg_publication).
+        /// OID of the publication (references `pg_publication`).
         prpubid -> Oid,
-        /// OID of the relation/table (references pg_class).
+        /// OID of the relation/table (references `pg_class`).
         prrelid -> Oid,
         /// Array of attribute numbers for column-level replication; `NULL` if all columns.
         prattrs -> Nullable<Array<SmallInt>>,

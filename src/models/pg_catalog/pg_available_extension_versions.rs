@@ -1,4 +1,4 @@
-//! PostgreSQL available extension versions view model.
+//! `PostgreSQL` available extension versions view model.
 //!
 //! This module provides the `PgAvailableExtensionVersions` struct for working
 //! with the `pg_catalog.pg_available_extension_versions` system view.
@@ -6,7 +6,7 @@
 /// Represents a row from the `pg_catalog.pg_available_extension_versions` view.
 ///
 /// Shows all extension versions that are available for installation.
-/// This view provides information about PostgreSQL extensions that can be
+/// This view provides information about `PostgreSQL` extensions that can be
 /// installed in the database, including their versions and properties.
 #[derive(diesel::Queryable, diesel::QueryableByName, diesel::Selectable)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]

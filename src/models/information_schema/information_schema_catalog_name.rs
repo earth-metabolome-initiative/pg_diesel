@@ -1,5 +1,5 @@
-//! InformationSchemaCatalogName model representing the
-//! information_schema.information_schema_catalog_name view.
+//! `InformationSchemaCatalogName` model representing the
+//! `information_schema.information_schema_catalog_name` view.
 
 use diesel::prelude::*;
 

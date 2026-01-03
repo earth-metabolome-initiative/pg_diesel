@@ -13,7 +13,7 @@ pub fn table_constraint(
 ) -> Result<TableConstraint, diesel::result::Error> {
     use crate::schema::information_schema::table_constraints::table_constraints;
 
-    Ok(table_constraints::table
+    table_constraints::table
         .filter(
             table_constraints::constraint_name
                 .eq(&check_constraint.constraint_name)
@@ -21,5 +21,5 @@ pub fn table_constraint(
                 .and(table_constraints::constraint_schema.eq(&check_constraint.constraint_schema)),
         )
         .select(TableConstraint::as_select())
-        .first(conn)?)
+        .first(conn)
 }

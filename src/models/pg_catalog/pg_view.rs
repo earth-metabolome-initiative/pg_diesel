@@ -1,4 +1,4 @@
-//! Model for pg_catalog.pg_views view.
+//! Model for `pg_catalog.pg_views` view.
 
 use diesel::prelude::*;
 

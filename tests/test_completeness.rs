@@ -109,7 +109,7 @@ async fn test_schema_completeness() {
     let crate_root_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
 
     for table in db.table_dag() {
-        if table.table_name().starts_with("_") {
+        if table.table_name().starts_with('_') {
             // Skip internal tables
             continue;
         }
@@ -120,12 +120,10 @@ async fn test_schema_completeness() {
             .join(table.table_schema().unwrap())
             .join(format!("{}.rs", table.table_name()));
 
-        if !expected_schema_path.exists() {
-            panic!(
-                "Table `{}` not found in src/schema/",
-                expected_schema_path.display(),
-            );
-        }
+        assert!(expected_schema_path.exists(), 
+            "Table `{}` not found in src/schema/",
+            expected_schema_path.display(),
+        );
 
         // We read the content of the expected schema file
         let expected_schema_content = std::fs::read_to_string(&expected_schema_path)

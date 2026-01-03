@@ -27,11 +27,13 @@ pub struct ReferentialConstraint {
 
 impl ReferentialConstraint {
     /// Returns true if the referential constraint has an ON DELETE CASCADE rule
+    #[must_use]
     pub fn on_delete_cascade(&self) -> bool {
         self.delete_rule.eq_ignore_ascii_case("CASCADE")
     }
 
     /// Returns the match kind of the referential constraint
+    #[must_use]
     pub fn match_kind(&self) -> sqlparser::ast::ConstraintReferenceMatchKind {
         match self.match_option.to_uppercase().as_str() {
             "FULL" => sqlparser::ast::ConstraintReferenceMatchKind::Full,
@@ -100,6 +102,6 @@ mod tests {
     fn test_match_kind_invalid() {
         let mut constraint = dummy_referential_constraint();
         constraint.match_option = "INVALID".to_string();
-        constraint.match_kind();
+        let _ = constraint.match_kind();
     }
 }

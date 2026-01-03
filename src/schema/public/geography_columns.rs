@@ -1,7 +1,7 @@
-//! Schema definition for the `geography_columns` view in PostGIS.
+//! Schema definition for the `geography_columns` view in `PostGIS`.
 
 diesel::table! {
-    /// `geography_columns` — a PostGIS metadata view that contains one row for each geography column
+    /// `geography_columns` — a `PostGIS` metadata view that contains one row for each geography column
     /// in the database. Provides information about the table, column name, coordinate dimension,
     /// spatial reference system (SRID), and geography type.
     public.geography_columns (f_table_catalog, f_table_schema, f_table_name, f_geography_column) {

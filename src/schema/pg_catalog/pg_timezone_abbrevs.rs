@@ -1,4 +1,4 @@
-//! Schema for pg_catalog.pg_timezone_abbrevs view.
+//! Schema for `pg_catalog.pg_timezone_abbrevs` view.
 
 diesel::table! {
     /// Timezone abbreviations

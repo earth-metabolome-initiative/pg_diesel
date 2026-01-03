@@ -1,7 +1,7 @@
-//! Schema for pg_catalog.pg_user_mappings view.
+//! Schema for `pg_catalog.pg_user_mappings` view.
 
 diesel::table! {
-    use diesel::sql_types::*;
+    use diesel::sql_types::{Nullable, Oid, Text, Array};
 
     /// User mappings view
     ///

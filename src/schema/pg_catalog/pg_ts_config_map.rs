@@ -1,7 +1,7 @@
-//! Schema for pg_catalog.pg_ts_config_map table.
+//! Schema for `pg_catalog.pg_ts_config_map` table.
 
 diesel::table! {
-    use diesel::sql_types::*;
+    use diesel::sql_types::{Oid, Integer};
 
     /// Text search configuration mappings
     ///

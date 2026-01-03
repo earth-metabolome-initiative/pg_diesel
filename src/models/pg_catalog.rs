@@ -1,7 +1,7 @@
-//! Model structs for PostgreSQL's `pg_catalog` system tables.
+//! Model structs for `PostgreSQL`'s `pg_catalog` system tables.
 //!
 //! This module contains Diesel-queryable structs representing rows from
-//! PostgreSQL's system catalog tables in the `pg_catalog` schema. These tables
+//! `PostgreSQL`'s system catalog tables in the `pg_catalog` schema. These tables
 //! store all metadata about database objects, configuration, and runtime
 //! statistics.
 //!

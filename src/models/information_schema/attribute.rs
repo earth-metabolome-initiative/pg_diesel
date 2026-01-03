@@ -19,7 +19,7 @@ use diesel::{Queryable, QueryableByName, Selectable};
 #[diesel(table_name = crate::schema::information_schema::attributes::attributes)]
 pub struct Attribute {
     /// Name of the database containing the user-defined type (always the
-    /// current database). For PostgreSQL, this is typically the name of the
+    /// current database). For `PostgreSQL`, this is typically the name of the
     /// current database.
     pub udt_catalog: Option<String>,
     /// Name of the schema containing the user-defined type.

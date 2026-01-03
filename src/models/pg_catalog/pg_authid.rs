@@ -1,4 +1,4 @@
-//! PostgreSQL authorization identifiers (roles) catalog model.
+//! `PostgreSQL` authorization identifiers (roles) catalog model.
 //!
 //! This module provides the `PgAuthid` struct for working with the
 //! `pg_catalog.pg_authid` system catalog table.
@@ -9,7 +9,7 @@ use std::time::SystemTime;
 ///
 /// Contains information about database roles including their privileges and
 /// properties. This table stores all authentication identifiers (roles) in the
-/// PostgreSQL cluster including users, groups, and other role types.
+/// `PostgreSQL` cluster including users, groups, and other role types.
 #[derive(diesel::Queryable, diesel::QueryableByName, diesel::Selectable)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]

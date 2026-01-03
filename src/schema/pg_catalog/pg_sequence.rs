@@ -4,7 +4,7 @@ diesel::table! {
     /// `pg_catalog.pg_sequence` — system catalog containing sequence parameters.
     /// Each row represents a sequence object with its configuration.
     pg_catalog.pg_sequence (seqrelid) {
-        /// OID of the sequence (references pg_class).
+        /// OID of the sequence (references `pg_class`).
         seqrelid -> Oid,
         /// OID of the data type of the sequence.
         seqtypid -> Oid,

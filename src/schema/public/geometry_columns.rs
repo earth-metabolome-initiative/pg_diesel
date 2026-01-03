@@ -1,8 +1,8 @@
-//! Schema definitions for the `public` schema in a PostgreSQL database with
-//! PostGIS extension.
+//! Schema definitions for the `public` schema in a `PostgreSQL` database with
+//! `PostGIS` extension.
 
 diesel::table! {
-    /// `geometry_columns` — a PostGIS metadata view that contains one row for each geometry column
+    /// `geometry_columns` — a `PostGIS` metadata view that contains one row for each geometry column
     /// in the database. Provides information about the table, column name, coordinate dimension,
     /// spatial reference system (SRID), and geometry type.
     geometry_columns (f_table_catalog, f_table_schema, f_table_name, f_geometry_column) {

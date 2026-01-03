@@ -2,7 +2,7 @@
 
 diesel::table! {
     /// `pg_catalog.pg_stats_ext` — view providing access to extended statistics.
-    /// This view presents the contents of pg_statistic_ext and pg_statistic_ext_data in a more readable format.
+    /// This view presents the contents of `pg_statistic_ext` and `pg_statistic_ext_data` in a more readable format.
     /// Uses `schemaname` as a nominal primary key for Diesel compatibility.
     pg_catalog.pg_stats_ext (schemaname) {
         /// Name of the schema containing the table.

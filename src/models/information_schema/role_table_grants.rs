@@ -1,4 +1,4 @@
-//! RoleTableGrants model representing the information_schema.role_table_grants
+//! `RoleTableGrants` model representing the `information_schema.role_table_grants`
 //! view.
 
 use diesel::prelude::*;

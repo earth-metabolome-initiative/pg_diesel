@@ -1,5 +1,5 @@
-//! RoleRoutineGrants model representing the
-//! information_schema.role_routine_grants view.
+//! `RoleRoutineGrants` model representing the
+//! `information_schema.role_routine_grants` view.
 
 use diesel::prelude::*;
 

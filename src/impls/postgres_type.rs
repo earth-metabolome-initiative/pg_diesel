@@ -1,7 +1,7 @@
 //! Implementations of [`PostgresType`] for database types and columns.
 //!
 //! This module implements the [`PostgresType`] trait for types that can resolve
-//! their PostgreSQL type information. This is used for type mapping and Diesel
+//! their `PostgreSQL` type information. This is used for type mapping and Diesel
 //! type generation.
 //!
 //! ## Implemented Types

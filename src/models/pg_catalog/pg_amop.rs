@@ -1,4 +1,4 @@
-//! PostgreSQL access method operators catalog model.
+//! `PostgreSQL` access method operators catalog model.
 //!
 //! This module provides the `PgAmop` struct for working with the
 //! `pg_catalog.pg_amop` system catalog table.

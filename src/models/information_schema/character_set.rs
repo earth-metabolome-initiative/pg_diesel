@@ -19,7 +19,7 @@ use diesel::{Queryable, QueryableByName, Selectable};
 #[diesel(table_name = crate::schema::information_schema::character_sets::character_sets)]
 pub struct CharacterSet {
     /// Name of the database containing the character set (always the current
-    /// database). For PostgreSQL, this is typically the name of the current
+    /// database). For `PostgreSQL`, this is typically the name of the current
     /// database.
     pub character_set_catalog: Option<String>,
     /// Name of the schema containing the character set.
@@ -27,7 +27,7 @@ pub struct CharacterSet {
     pub character_set_schema: Option<String>,
     /// Name of the character set.
     /// This is the identifier for the specific character encoding (e.g.,
-    /// "UTF8", "SQL_ASCII").
+    /// "UTF8", "`SQL_ASCII`").
     pub character_set_name: Option<String>,
     /// Identifies the character repertoire or the method used to define the
     /// character set. Typically describes the Unicode standard or character

@@ -9,21 +9,23 @@ use crate::models::{
     CheckConstraint, Column, KeyColumnUsage, PgDescription, PgIndex, PgTrigger, Table,
 };
 
+/// Loads all tables from the information schema for the given catalog and schema.
 pub(crate) fn load_all_tables(
     table_catalog: &str,
     table_schema: &str,
     conn: &mut PgConnection,
 ) -> Result<Vec<Table>, diesel::result::Error> {
     use crate::schema::information_schema::tables::tables;
-    Ok(tables::table
+    tables::table
         .filter(tables::table_catalog.eq(table_catalog))
         .filter(tables::table_schema.eq(table_schema))
         .filter(tables::table_name.ne("__diesel_schema_migrations"))
         .order_by(tables::table_name)
         .select(Table::as_select())
-        .load::<Table>(conn)?)
+        .load::<Table>(conn)
 }
 
+/// Loads a specific table by name, schema, and catalog.
 pub(crate) fn load_table(
     conn: &mut PgConnection,
     table_name: &str,
@@ -31,13 +33,14 @@ pub(crate) fn load_table(
     table_catalog: &str,
 ) -> Result<Table, diesel::result::Error> {
     use crate::schema::information_schema::tables::tables;
-    Ok(tables::table
+    tables::table
         .filter(tables::table_name.eq(table_name))
         .filter(tables::table_schema.eq(table_schema))
         .filter(tables::table_catalog.eq(table_catalog))
-        .first::<Table>(conn)?)
+        .first::<Table>(conn)
 }
 
+/// Returns the columns of the table.
 pub(crate) fn columns(
     table: &Table,
     conn: &mut PgConnection,
@@ -68,7 +71,7 @@ pub fn primary_key_columns(
     use crate::schema::information_schema::{
         columns::columns, key_column_usage::key_column_usage, table_constraints::table_constraints,
     };
-    Ok(key_column_usage::table
+    key_column_usage::table
         .inner_join(
             columns::table.on(key_column_usage::table_name
                 .nullable()
@@ -124,9 +127,10 @@ pub fn primary_key_columns(
         .filter(key_column_usage::table_catalog.eq(&table.table_catalog))
         .filter(table_constraints::constraint_type.eq("PRIMARY KEY"))
         .select(Column::as_select())
-        .load::<Column>(conn)?)
+        .load::<Column>(conn)
 }
 
+/// Returns the foreign keys of the table.
 pub(crate) fn foreign_keys(
     table: &Table,
     conn: &mut PgConnection,
@@ -134,7 +138,7 @@ pub(crate) fn foreign_keys(
     use crate::schema::information_schema::{
         key_column_usage::key_column_usage, referential_constraints::referential_constraints,
     };
-    Ok(key_column_usage::table
+    key_column_usage::table
         .inner_join(
             referential_constraints::table.on(key_column_usage::constraint_name
                 .eq(referential_constraints::constraint_name)
@@ -158,9 +162,10 @@ pub(crate) fn foreign_keys(
             key_column_usage::ordinal_position,
         ))
         .select(KeyColumnUsage::as_select())
-        .load::<KeyColumnUsage>(conn)?)
+        .load::<KeyColumnUsage>(conn)
 }
 
+/// Returns the unique indices of the table.
 pub(crate) fn unique_indices(
     table: &Table,
     conn: &mut PgConnection,
@@ -169,7 +174,7 @@ pub(crate) fn unique_indices(
 
     let (pg_class1, pg_class2) = diesel::alias!(pg_class as pg_class1, pg_class as pg_class2);
 
-    Ok(pg_index::table
+    pg_index::table
         .inner_join(pg_class1.on(pg_class1.field(pg_class::oid).eq(pg_index::indexrelid)))
         .inner_join(pg_class2.on(pg_class2.field(pg_class::oid).eq(pg_index::indrelid)))
         .filter(
@@ -184,9 +189,10 @@ pub(crate) fn unique_indices(
         )
         .filter(pg_index::indisunique.eq(true))
         .select(PgIndex::as_select())
-        .load::<PgIndex>(conn)?)
+        .load::<PgIndex>(conn)
 }
 
+/// Returns all indices of the table.
 pub(crate) fn indices(
     table: &Table,
     conn: &mut PgConnection,
@@ -195,7 +201,7 @@ pub(crate) fn indices(
 
     let (pg_class1, pg_class2) = diesel::alias!(pg_class as pg_class1, pg_class as pg_class2);
 
-    Ok(pg_index::table
+    pg_index::table
         .inner_join(pg_class1.on(pg_class1.field(pg_class::oid).eq(pg_index::indexrelid)))
         .inner_join(pg_class2.on(pg_class2.field(pg_class::oid).eq(pg_index::indrelid)))
         .filter(
@@ -209,9 +215,10 @@ pub(crate) fn indices(
                 ),
         )
         .select(PgIndex::as_select())
-        .load::<PgIndex>(conn)?)
+        .load::<PgIndex>(conn)
 }
 
+/// Returns the triggers of the table.
 pub(crate) fn triggers(
     table: &Table,
     conn: &mut PgConnection,
@@ -219,15 +226,16 @@ pub(crate) fn triggers(
     use crate::schema::pg_catalog::{
         pg_class::pg_class, pg_namespace::pg_namespace, pg_trigger::pg_trigger,
     };
-    Ok(pg_trigger::table
+    pg_trigger::table
         .inner_join(pg_class::table.on(pg_trigger::tgrelid.eq(pg_class::oid)))
         .inner_join(pg_namespace::table.on(pg_class::relnamespace.eq(pg_namespace::oid)))
         .filter(pg_class::relname.eq(&table.table_name))
         .filter(pg_namespace::nspname.eq(&table.table_schema))
         .select(PgTrigger::as_select())
-        .load::<PgTrigger>(conn)?)
+        .load::<PgTrigger>(conn)
 }
 
+/// Returns the check constraints of the table.
 pub(crate) fn check_constraints(
     table: &Table,
     conn: &mut PgConnection,
@@ -236,7 +244,7 @@ pub(crate) fn check_constraints(
         check_constraints::check_constraints, table_constraints::table_constraints,
     };
 
-    Ok(check_constraints::table
+    check_constraints::table
         .inner_join(
             table_constraints::table.on(check_constraints::constraint_name
                 .eq(table_constraints::constraint_name)
@@ -249,23 +257,25 @@ pub(crate) fn check_constraints(
         .filter(table_constraints::table_schema.eq(&table.table_schema))
         .filter(table_constraints::table_catalog.eq(&table.table_catalog))
         .select(CheckConstraint::as_select())
-        .load::<CheckConstraint>(conn)?)
+        .load::<CheckConstraint>(conn)
 }
 
+/// Returns the column with the given name from the table.
 pub(crate) fn column_by_name(
     table: &Table,
     column_name: &str,
     conn: &mut PgConnection,
 ) -> Result<Column, diesel::result::Error> {
     use crate::schema::information_schema::columns::columns;
-    Ok(columns::table
+    columns::table
         .filter(columns::table_name.eq(&table.table_name))
         .filter(columns::table_schema.eq(&table.table_schema))
         .filter(columns::table_catalog.eq(&table.table_catalog))
         .filter(columns::column_name.eq(column_name))
-        .first::<Column>(conn)?)
+        .first::<Column>(conn)
 }
 
+/// Returns the description of the table from `pg_description`.
 pub(super) fn pg_description(
     table: &Table,
     conn: &mut PgConnection,
@@ -275,7 +285,7 @@ pub(super) fn pg_description(
         pg_namespace::pg_namespace,
     };
 
-    Ok(pg_description::table
+    pg_description::table
         .inner_join(pg_attribute::table.on(pg_description::objoid.eq(pg_attribute::attrelid)))
         .inner_join(pg_class::table.on(pg_attribute::attrelid.eq(pg_class::oid)))
         .inner_join(pg_namespace::table.on(pg_class::relnamespace.eq(pg_namespace::oid)))
@@ -283,5 +293,5 @@ pub(super) fn pg_description(
         .filter(pg_namespace::nspname.eq(&table.table_schema))
         .filter(pg_attribute::attname.eq(&table.table_name))
         .select(PgDescription::as_select())
-        .first::<PgDescription>(conn)?)
+        .first::<PgDescription>(conn)
 }

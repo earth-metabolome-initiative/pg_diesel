@@ -62,39 +62,46 @@ impl KeyColumnUsageMetadata {
     }
 
     /// Returns a reference to the table that the foreign key references.
+    #[must_use]
     pub fn referenced_table(&self) -> &Table {
         &self.referenced_table
     }
 
     /// Returns a reference to the table that contains the foreign key.
+    #[must_use]
     pub fn host_table(&self) -> &Table {
         &self.host_table
     }
 
     /// Returns a reference to the columns in the referenced table that the
     /// foreign key points to.
+    #[must_use]
     pub fn referenced_columns(&self) -> &[Column] {
         &self.referenced_columns
     }
 
     /// Returns a reference to the columns in the host table that are part of
     /// the foreign key.
+    #[must_use]
     pub fn host_columns(&self) -> &[Column] {
         &self.host_columns
     }
 
     /// Returns a reference to the referential constraint associated with the
     /// foreign key.
+    #[must_use] 
     pub fn referential_constraint(&self) -> &ReferentialConstraint {
         &self.referential_constraint
     }
 
-    /// Returns whether the foreign key has an ON DELETE CASCADE rule.
+    /// Returns whether the foreign key has an `ON DELETE CASCADE` rule.
+    #[must_use] 
     pub fn on_delete_cascade(&self) -> bool {
         self.referential_constraint.on_delete_cascade()
     }
 
     /// Returns the match kind of the foreign key.
+    #[must_use] 
     pub fn match_kind(&self) -> sqlparser::ast::ConstraintReferenceMatchKind {
         self.referential_constraint.match_kind()
     }
@@ -142,11 +149,11 @@ mod tests {
         let referential_constraint = dummy_referential_constraint();
 
         let metadata = KeyColumnUsageMetadata::new(
-            referenced_table.clone(),
+            referenced_table,
             vec![],
-            host_table.clone(),
+            host_table,
             vec![],
-            referential_constraint.clone(),
+            referential_constraint,
         );
 
         assert_eq!(metadata.referenced_table().table_name, "table");

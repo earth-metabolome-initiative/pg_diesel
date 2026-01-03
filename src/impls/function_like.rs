@@ -3,7 +3,7 @@
 //! This module implements the
 //! [`FunctionLike`](sql_traits::prelude::FunctionLike) trait
 //! for the [`PgProc`](crate::models::PgProc) model from `pg_catalog.pg_proc`,
-//! enabling generic introspection of PostgreSQL functions and procedures.
+//! enabling generic introspection of `PostgreSQL` functions and procedures.
 //!
 //! The implementation provides access to:
 //! - Function name

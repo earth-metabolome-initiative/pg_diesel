@@ -1,7 +1,7 @@
 //! Submodule providing the `PgStatActivity` struct representing a row of the
 //! `pg_stat_activity` view in `PostgreSQL`.
 
-use std::{net::IpAddr, time::SystemTime};
+use std::time::SystemTime;
 
 use diesel::{Queryable, QueryableByName, Selectable};
 

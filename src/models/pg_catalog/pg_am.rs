@@ -1,4 +1,4 @@
-//! PostgreSQL access methods catalog model.
+//! `PostgreSQL` access methods catalog model.
 //!
 //! This module provides the `PgAm` struct for working with the
 //! `pg_catalog.pg_am` system catalog table.
@@ -6,7 +6,7 @@
 /// Represents a row from the `pg_catalog.pg_am` table.
 ///
 /// Contains information about available index access methods (btree, hash, gin,
-/// gist, etc.). Access methods define how PostgreSQL can access and organize
+/// gist, etc.). Access methods define how `PostgreSQL` can access and organize
 /// data in tables and indexes.
 #[derive(diesel::Queryable, diesel::QueryableByName, diesel::Selectable)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]

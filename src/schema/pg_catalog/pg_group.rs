@@ -2,8 +2,8 @@
 
 diesel::table! {
     /// `pg_catalog.pg_group` — view providing access to information about database roles
-    /// that are marked as groups (for backwards compatibility with PostgreSQL versions
-    /// before 8.1). This is a deprecated view; use pg_roles or pg_authid instead.
+    /// that are marked as groups (for backwards compatibility with `PostgreSQL` versions
+    /// before 8.1). This is a deprecated view; use `pg_roles` or `pg_authid` instead.
     pg_catalog.pg_group (groname) {
         /// Name of the group role.
         groname -> Nullable<Text>,

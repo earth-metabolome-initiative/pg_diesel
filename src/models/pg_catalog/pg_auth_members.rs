@@ -1,4 +1,4 @@
-//! PostgreSQL authorization identifier membership catalog model.
+//! `PostgreSQL` authorization identifier membership catalog model.
 //!
 //! This module provides the `PgAuthMembers` struct for working with the
 //! `pg_catalog.pg_auth_members` system catalog table.
@@ -6,7 +6,7 @@
 /// Represents a row from the `pg_catalog.pg_auth_members` table.
 ///
 /// Contains information about which roles are members of which other roles.
-/// This table tracks the membership relationships between PostgreSQL roles
+/// This table tracks the membership relationships between `PostgreSQL` roles
 /// and the privileges associated with those memberships.
 #[derive(diesel::Queryable, diesel::QueryableByName, diesel::Selectable)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]

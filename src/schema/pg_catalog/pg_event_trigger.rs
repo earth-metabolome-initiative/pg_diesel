@@ -8,7 +8,7 @@ diesel::table! {
         oid -> Oid,
         /// Name of the event trigger.
         evtname -> Text,
-        /// Event that this trigger fires on (e.g., 'ddl_command_start', 'ddl_command_end').
+        /// Event that this trigger fires on (e.g., `ddl_command_start`, `ddl_command_end`).
         evtevent -> Text,
         /// OID of the role that owns the event trigger.
         evtowner -> Oid,

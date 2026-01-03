@@ -21,7 +21,7 @@ diesel::table! {
         stxkeys -> Array<SmallInt>,
         /// Array showing which types of statistics this object collects.
         stxkind -> Array<Text>,
-        /// Expression tree (in nodeToString() representation) for statistics object expressions.
+        /// Expression tree (in `nodeToString()` representation) for statistics object expressions.
         stxexprs -> Nullable<Text>,
     }
 }

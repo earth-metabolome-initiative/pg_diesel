@@ -25,7 +25,7 @@ async fn reference_docker(
 }
 
 fn establish_connection(port: u16, name: &str) -> PgConnection {
-    let url = format!("postgres://user:password@localhost:{}/{name}", port);
+    let url = format!("postgres://user:password@localhost:{port}/{name}");
     let mut attempts = 0;
     loop {
         match PgConnection::establish(&url) {
@@ -40,6 +40,7 @@ fn establish_connection(port: u16, name: &str) -> PgConnection {
 }
 
 #[tokio::test]
+#[allow(clippy::too_many_lines)]
 async fn test_load_all_models() {
     let database_name = "test_load_all";
     let port = 35434;

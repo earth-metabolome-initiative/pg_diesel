@@ -4,7 +4,7 @@ diesel::table! {
     /// `pg_catalog.pg_partitioned_table` — system catalog containing partitioning information for partitioned tables.
     /// Each row represents a partitioned table and describes its partitioning strategy.
     pg_catalog.pg_partitioned_table (partrelid) {
-        /// OID of the partitioned table (references pg_class).
+        /// OID of the partitioned table (references `pg_class`).
         partrelid -> Oid,
         /// Partitioning strategy: 'l' (list), 'r' (range), 'h' (hash).
         partstrat -> Text,

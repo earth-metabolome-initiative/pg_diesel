@@ -11,7 +11,7 @@ diesel::table! {
         datname -> Text,
         /// OID of the role that owns the database.
         datdba -> Oid,
-        /// Character encoding for this database (encoding ID from pg_encoding).
+        /// Character encoding for this database (encoding ID from `pg_encoding`).
         encoding -> Integer,
         /// Locale provider: 'c' (libc), 'i' (icu), or 'd' (database default).
         datlocprovider -> Text,
@@ -29,9 +29,9 @@ diesel::table! {
         datminmxid -> Oid,
         /// Default tablespace for this database.
         dattablespace -> Oid,
-        /// LC_COLLATE setting for this database.
+        /// `LC_COLLATE` setting for this database.
         datcollate -> Text,
-        /// LC_CTYPE setting for this database.
+        /// `LC_CTYPE` setting for this database.
         datctype -> Text,
         /// Locale name if using ICU provider.
         datlocale -> Nullable<Text>,

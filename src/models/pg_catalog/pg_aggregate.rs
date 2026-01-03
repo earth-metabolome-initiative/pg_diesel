@@ -1,4 +1,4 @@
-//! PostgreSQL aggregate functions catalog model.
+//! `PostgreSQL` aggregate functions catalog model.
 //!
 //! This module provides the `PgAggregate` struct for working with the
 //! `pg_catalog.pg_aggregate` system catalog table.
@@ -9,7 +9,7 @@ use diesel::{Queryable, QueryableByName, Selectable};
 ///
 /// Contains information about aggregate functions including their transition
 /// functions, final functions, and other properties specific to aggregation.
-/// This table stores metadata about how PostgreSQL aggregate functions work
+/// This table stores metadata about how `PostgreSQL` aggregate functions work
 /// internally.
 #[derive(
     Queryable, QueryableByName, Selectable, Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord,

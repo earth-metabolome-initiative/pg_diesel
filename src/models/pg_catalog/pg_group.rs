@@ -7,7 +7,7 @@ use diesel::{Queryable, QueryableByName, Selectable};
 ///
 /// The `pg_group` view provides access to information about database role
 /// groups. This is a backwards compatibility view for pre-8.1 applications.
-/// Modern applications should use pg_roles instead.
+/// Modern applications should use `pg_roles` instead.
 ///
 /// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/view-pg-group.html).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]

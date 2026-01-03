@@ -1,7 +1,7 @@
 //! Submodule for the `pg_catalog.pg_settings` view schema.
 
 diesel::table! {
-    /// `pg_catalog.pg_settings` — view exposing PostgreSQL run-time configuration parameters (GUCs).
+    /// `pg_catalog.pg_settings` — view exposing `PostgreSQL` run-time configuration parameters (GUCs).
     /// Each row represents one server configuration parameter and metadata about it:
     /// name, current value, type, source, allowable range, descriptions, and file/location info.
     pg_catalog.pg_settings (name) {

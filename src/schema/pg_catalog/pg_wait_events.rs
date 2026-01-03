@@ -1,7 +1,7 @@
-//! Schema for pg_catalog.pg_wait_events view.
+//! Schema for `pg_catalog.pg_wait_events` view.
 
 diesel::table! {
-    use diesel::sql_types::*;
+    use diesel::sql_types::{Nullable, Text};
 
     /// Wait events
     ///

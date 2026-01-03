@@ -1,4 +1,4 @@
-//! Model for pg_catalog.pg_timezone_abbrevs view.
+//! Model for `pg_catalog.pg_timezone_abbrevs` view.
 use diesel::{pg::data_types::PgInterval, prelude::*};
 
 #[derive(Queryable, QueryableByName, Selectable, Identifiable, Debug, PartialEq, Eq, Clone)]

@@ -1,4 +1,4 @@
-//! PostgreSQL column default values catalog model.
+//! `PostgreSQL` column default values catalog model.
 //!
 //! This module provides the `PgAttrdef` struct for working with the
 //! `pg_catalog.pg_attrdef` system catalog table.

@@ -1,6 +1,6 @@
-//! Diesel schema definitions for PostgreSQL's `pg_catalog` system tables.
+//! Diesel schema definitions for `PostgreSQL`'s `pg_catalog` system tables.
 //!
-//! The `pg_catalog` schema contains PostgreSQL's system catalog tables and
+//! The `pg_catalog` schema contains `PostgreSQL`'s system catalog tables and
 //! views, which store all metadata about database objects, statistics, and
 //! configuration. This module provides Diesel `table!` definitions for these
 //! system tables.

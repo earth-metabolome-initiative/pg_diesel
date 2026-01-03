@@ -64,7 +64,7 @@ diesel::table! {
         typndims -> Integer,
         /// OID of the collation of the type, or 0 if none.
         typcollation -> Oid,
-        /// Expression tree for the default value, in nodeToString() representation; `NULL` if none.
+        /// Expression tree for the default value, in `nodeToString()` representation; `NULL` if none.
         typdefaultbin -> Nullable<Bytea>,
         /// Human-readable text form of the default value; `NULL` if none.
         typdefault -> Nullable<Text>,
@@ -139,7 +139,7 @@ diesel::table! {
         typndims -> Integer,
         /// OID of the collation of the type, or 0 if none.
         typcollation -> Oid,
-        /// Expression tree for the default value, in nodeToString() representation; `NULL` if none.
+        /// Expression tree for the default value, in `nodeToString()` representation; `NULL` if none.
         typdefaultbin -> Nullable<Bytea>,
         /// Human-readable text form of the default value; `NULL` if none.
         typdefault -> Nullable<Text>,

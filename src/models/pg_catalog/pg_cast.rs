@@ -1,4 +1,4 @@
-//! PostgreSQL data type casts catalog model.
+//! `PostgreSQL` data type casts catalog model.
 //!
 //! This module provides the `PgCast` struct for working with the
 //! `pg_catalog.pg_cast` system catalog table.
@@ -6,7 +6,7 @@
 /// Represents a row from the `pg_catalog.pg_cast` table.
 ///
 /// Contains information about data type conversion functions.
-/// This table defines how PostgreSQL can convert values from one data type
+/// This table defines how `PostgreSQL` can convert values from one data type
 /// to another, including the contexts where such conversions are allowed.
 #[derive(diesel::Queryable, diesel::QueryableByName, diesel::Selectable)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]

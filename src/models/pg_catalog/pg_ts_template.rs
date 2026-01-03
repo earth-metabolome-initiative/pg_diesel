@@ -1,4 +1,4 @@
-//! Model for pg_catalog.pg_ts_template table.
+//! Model for `pg_catalog.pg_ts_template` table.
 
 use diesel::prelude::*;
 

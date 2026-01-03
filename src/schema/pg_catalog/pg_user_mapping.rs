@@ -1,7 +1,7 @@
-//! Schema for pg_catalog.pg_user_mapping table.
+//! Schema for `pg_catalog.pg_user_mapping` table.
 
 diesel::table! {
-    use diesel::sql_types::*;
+    use diesel::sql_types::{Oid, Nullable, Array, Text};
 
     /// User mappings
     ///
