@@ -2,8 +2,8 @@
 //! `pg_catalog.pg_operator` system catalog table in `PostgreSQL`.
 //! It includes methods to access related information such as the
 //! associated function and operand/result types.
-use diesel::{PgConnection, RunQueryDsl, Queryable, QueryableByName, Selectable};
 use super::{PgExtension, PgProc, PgType};
+use diesel::{PgConnection, Queryable, QueryableByName, RunQueryDsl, Selectable};
 
 mod cached_queries;
 
