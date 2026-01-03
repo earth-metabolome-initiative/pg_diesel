@@ -114,8 +114,6 @@ async fn test_schema_completeness() {
             continue;
         }
 
-        println!("{}: {}", table.table_name(), table.number_of_columns(&db));
-
         let expected_schema_path = crate_root_path
             .join("src")
             .join("schema")
