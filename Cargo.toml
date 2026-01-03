@@ -16,7 +16,7 @@ sqlparser = { version = "0.60.0", features = ["serde"] }
 thiserror = "2.0.17"
 
 [dev-dependencies]
-tokio = { version = "1.43.0", features = ["full"] }
+tokio = { version = "1.49.0", features = ["full"] }
 testcontainers = { version = "0.26.3" }
 
 [lints.rust]

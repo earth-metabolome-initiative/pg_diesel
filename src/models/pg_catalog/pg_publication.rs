@@ -13,6 +13,7 @@ use diesel::{Queryable, QueryableByName, Selectable};
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_publication::pg_publication)]
+#[allow(clippy::struct_excessive_bools)]
 pub struct PgPublication {
     /// OID of the publication.
     pub oid: u32,

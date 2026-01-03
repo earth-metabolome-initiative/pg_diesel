@@ -8,6 +8,7 @@ use diesel::{
 
 use crate::models::{Column, KeyColumnUsage, ReferentialConstraint, Table};
 
+/// Returns the referential constraint associated with this key column usage.
 pub(super) fn referential_constraint(
     key_column_usage: &KeyColumnUsage,
     conn: &mut PgConnection,
@@ -23,6 +24,7 @@ pub(super) fn referential_constraint(
         .first::<ReferentialConstraint>(conn)
 }
 
+/// Returns the columns referenced by this foreign key.
 pub(super) fn referenced_columns(
     key_column_usage: &KeyColumnUsage,
     conn: &mut PgConnection,
@@ -63,6 +65,7 @@ pub(super) fn referenced_columns(
         .load::<Column>(conn)
 }
 
+/// Returns the host columns for this key column usage.
 pub(crate) fn host_columns(
     key_column_usage: &KeyColumnUsage,
     conn: &mut PgConnection,

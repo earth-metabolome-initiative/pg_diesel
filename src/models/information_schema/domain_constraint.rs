@@ -1,3 +1,5 @@
+//! Domain constraint model.
+
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a domain constraint in the database.

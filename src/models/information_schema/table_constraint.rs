@@ -1,3 +1,5 @@
+//! Table constraint model.
+
 use std::io::Write;
 
 use diesel::{

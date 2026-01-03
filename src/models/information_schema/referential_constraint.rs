@@ -1,3 +1,5 @@
+//! Referential constraint model.
+
 use diesel::{Queryable, QueryableByName, Selectable};
 
 #[derive(Queryable, QueryableByName, Selectable, PartialEq, Eq, Debug, Clone)]

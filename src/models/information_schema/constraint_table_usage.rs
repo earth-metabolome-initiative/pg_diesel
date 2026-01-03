@@ -1,3 +1,5 @@
+//! Constraint table usage model.
+
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row in the `constraint_table_usage` table in the `PostgreSQL`

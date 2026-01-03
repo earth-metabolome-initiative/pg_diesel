@@ -1,3 +1,5 @@
+//! Views model.
+
 /// Represents a row from the `information_schema.views` table.
 ///
 /// Contains metadata about database views including their definitions and

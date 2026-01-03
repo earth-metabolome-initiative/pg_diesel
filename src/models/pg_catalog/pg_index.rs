@@ -1,3 +1,5 @@
+//! `PostgreSQL` index catalog model.
+
 use std::rc::Rc;
 
 use diesel::{PgConnection, Queryable, QueryableByName, Selectable};
@@ -75,6 +77,7 @@ impl PgIndex {
     /// # Errors
     ///
     /// * If an error occurs while loading the metadata from the database
+    #[allow(clippy::missing_panics_doc)]
     pub fn metadata(
         &self,
         table: Rc<Table>,

@@ -120,7 +120,8 @@ async fn test_schema_completeness() {
             .join(table.table_schema().unwrap())
             .join(format!("{}.rs", table.table_name()));
 
-        assert!(expected_schema_path.exists(), 
+        assert!(
+            expected_schema_path.exists(),
             "Table `{}` not found in src/schema/",
             expected_schema_path.display(),
         );

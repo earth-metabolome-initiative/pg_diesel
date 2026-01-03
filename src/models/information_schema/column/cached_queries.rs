@@ -10,6 +10,7 @@ use crate::models::{
     PgType, Table,
 };
 
+/// Returns the foreign keys that reference this column.
 pub(super) fn foreign_keys(
     column: &Column,
     conn: &mut PgConnection,
@@ -61,6 +62,7 @@ pub(super) fn foreign_keys(
             .load::<KeyColumnUsage>(conn)
 }
 
+/// Returns the check constraints that apply to this column.
 pub(super) fn check_constraints(
     column: &Column,
     conn: &mut PgConnection,
@@ -98,6 +100,7 @@ pub(super) fn check_constraints(
         .load(conn)
 }
 
+/// Returns the table that contains this column.
 pub(super) fn table(
     column: &Column,
     conn: &mut PgConnection,
@@ -110,6 +113,7 @@ pub(super) fn table(
         .first::<Table>(conn)
 }
 
+/// Returns the geometry column metadata if this column is a geometry column.
 pub(super) fn geometry_column(
     column: &Column,
     conn: &mut PgConnection,
@@ -124,6 +128,7 @@ pub(super) fn geometry_column(
         .optional()
 }
 
+/// Returns the geography column metadata if this column is a geography column.
 pub(super) fn geography_column(
     column: &Column,
     conn: &mut PgConnection,
@@ -138,6 +143,7 @@ pub(super) fn geography_column(
         .optional()
 }
 
+/// Returns the `PostgreSQL` type of this column.
 pub(super) fn pg_type(
     column: &Column,
     conn: &mut PgConnection,
@@ -158,6 +164,7 @@ pub(super) fn pg_type(
         .first::<PgType>(conn)
 }
 
+/// Returns the description of this column from `pg_description`.
 pub(super) fn pg_description(
     column: &Column,
     conn: &mut PgConnection,

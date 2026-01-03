@@ -45,31 +45,35 @@ pub enum PgDatabaseBuildError {
 
 impl<'conn> PgDieselDatabaseBuilder<'conn> {
     /// Sets the `PostgreSQL` connection to use for building the `PgDatabase`.
+    #[must_use]
     pub fn connection(mut self, connection: &'conn mut PgConnection) -> Self {
         self.connection = Some(connection);
         self
     }
 
     /// Sets the catalog (database) name to filter by.
-    pub fn catalog<S: ToString>(mut self, catalog: S) -> Self {
-        self.catalog = Some(catalog.to_string());
+    #[must_use]
+    pub fn catalog<S: AsRef<str>>(mut self, catalog: S) -> Self {
+        self.catalog = Some(catalog.as_ref().to_string());
         self
     }
 
     /// Adds a schema name to include.
-    pub fn schema<S: ToString>(mut self, schema: S) -> Self {
-        self.schemas.push(schema.to_string());
+    #[must_use]
+    pub fn schema<S: AsRef<str>>(mut self, schema: S) -> Self {
+        self.schemas.push(schema.as_ref().to_string());
         self
     }
 
     /// Sets the schema names to include.
+    #[must_use]
     pub fn schemas<I, S>(mut self, schemas: I) -> Self
     where
         I: IntoIterator<Item = S>,
-        S: ToString,
+        S: ToString + AsRef<str>,
     {
         for schema in schemas {
-            if !self.schemas.contains(&schema.to_string()) {
+            if !self.schemas.contains(&schema.as_ref().to_string()) {
                 self = self.schema(schema);
             }
         }
@@ -77,8 +81,12 @@ impl<'conn> PgDieselDatabaseBuilder<'conn> {
     }
 
     /// Adds a type to the denylist.
-    pub fn denylist_type<S: ToString>(mut self, ty: S) -> Result<Self, PgDatabaseBuildError> {
-        let ty_str = ty.to_string();
+    ///
+    /// # Errors
+    ///
+    /// Returns [`PgDatabaseBuildError::DuplicateDenylistedType`] if the type is already in the denylist.
+    pub fn denylist_type<S: AsRef<str>>(mut self, ty: S) -> Result<Self, PgDatabaseBuildError> {
+        let ty_str = ty.as_ref().to_string();
         if self.denylist_types.contains(&ty_str) {
             return Err(PgDatabaseBuildError::DuplicateDenylistedType(ty_str));
         }
@@ -87,10 +95,14 @@ impl<'conn> PgDieselDatabaseBuilder<'conn> {
     }
 
     /// Adds multiple types to the denylist.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`PgDatabaseBuildError::DuplicateDenylistedType`] if any type is already in the denylist.
     pub fn denylist_types<I, S>(mut self, types: I) -> Result<Self, PgDatabaseBuildError>
     where
         I: IntoIterator<Item = S>,
-        S: ToString,
+        S: ToString + AsRef<str>,
     {
         for ty in types {
             self = self.denylist_type(ty)?;
@@ -102,6 +114,7 @@ impl<'conn> PgDieselDatabaseBuilder<'conn> {
 impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
     type Error = PgDatabaseBuildError;
 
+    #[allow(clippy::needless_borrow)]
     fn try_from(value: PgDieselDatabaseBuilder<'a>) -> Result<Self, Self::Error> {
         let connection = value
             .connection
@@ -149,29 +162,33 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
             let table_metadata = table.metadata(connection, &value.denylist_types)?;
 
             for column in table_metadata.column_rcs() {
-                generic_builder = generic_builder
-                    .add_column(column.clone(), column.metadata(table.clone(), connection)?);
+                generic_builder = generic_builder.add_column(
+                    Rc::clone(&column),
+                    column.metadata(Rc::clone(&table), connection)?,
+                );
             }
 
             for check_constraint in table_metadata.check_constraint_rcs() {
                 let metadata = check_constraint.metadata(
-                    table.clone(),
+                    Rc::clone(&table),
                     &table_metadata,
                     generic_builder.function_rc_vec().as_slice(),
                     connection,
                 )?;
                 generic_builder =
-                    generic_builder.add_check_constraint(check_constraint.clone(), metadata);
+                    generic_builder.add_check_constraint(Rc::clone(&check_constraint), metadata);
             }
 
             for fk in table_metadata.foreign_key_rcs() {
                 generic_builder = generic_builder
-                    .add_foreign_key(fk.clone(), fk.metadata(table.clone(), connection)?);
+                    .add_foreign_key(Rc::clone(&fk), fk.metadata(Rc::clone(&table), connection)?);
             }
 
             for index in table_metadata.unique_index_rcs() {
-                generic_builder = generic_builder
-                    .add_unique_index(index.clone(), index.metadata(table.clone(), connection)?);
+                generic_builder = generic_builder.add_unique_index(
+                    Rc::clone(&index),
+                    index.metadata(Rc::clone(&table), connection)?,
+                );
             }
 
             generic_builder = generic_builder.add_table(table, table_metadata);

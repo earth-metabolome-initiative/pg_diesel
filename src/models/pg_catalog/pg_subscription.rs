@@ -14,6 +14,7 @@ use diesel::{Identifiable, Queryable, QueryableByName, Selectable, data_types::P
 )]
 #[diesel(table_name = crate::schema::pg_catalog::pg_subscription::pg_subscription)]
 #[diesel(primary_key(oid))]
+#[allow(clippy::struct_excessive_bools)]
 pub struct PgSubscription {
     /// Object identifier.
     pub oid: u32,

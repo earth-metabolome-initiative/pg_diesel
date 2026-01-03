@@ -14,6 +14,7 @@ use std::time::SystemTime;
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 #[diesel(table_name = crate::schema::pg_catalog::pg_authid::pg_authid)]
+#[allow(clippy::struct_excessive_bools)]
 pub struct PgAuthid {
     /// OID of the role (primary key).
     pub oid: u32,

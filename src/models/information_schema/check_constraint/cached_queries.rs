@@ -7,6 +7,7 @@ use diesel::{
 
 use crate::models::{CheckConstraint, TableConstraint};
 
+/// Returns the table constraint associated with the check constraint.
 pub fn table_constraint(
     check_constraint: &CheckConstraint,
     conn: &mut PgConnection,

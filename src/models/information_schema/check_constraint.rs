@@ -1,3 +1,5 @@
+//! Check constraint model.
+
 use std::{
     fmt::{Debug, Display},
     rc::Rc,
@@ -47,6 +49,7 @@ impl Display for CheckConstraint {
     }
 }
 
+/// List of PostGIS-related constraint names to skip.
 const POSTGIS_CONSTRAINTS: [&str; 1] = ["spatial_ref_sys_srid_check"];
 
 impl CheckConstraint {
@@ -115,7 +118,8 @@ impl CheckConstraint {
             )
             .filter(pg_namespace::nspname.eq(&self.constraint_schema))
             .select(PgConstraint::as_select())
-            .first(conn)}
+            .first(conn)
+    }
 
     /// Returns the table constraint associated with this check constraint
     ///
@@ -161,7 +165,7 @@ impl CheckConstraint {
     /// # Panics
     ///
     /// * If the check clause cannot be parsed into an expression, which should
-    ///  not happen if the database is consistent.
+    ///   not happen if the database is consistent.
     pub fn metadata(
         &self,
         table: Rc<Table>,

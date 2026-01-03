@@ -1,3 +1,5 @@
+//! Column model.
+
 use std::{fmt::Display, rc::Rc};
 
 use diesel::{OptionalExtension, PgConnection, Queryable, QueryableByName, Selectable};
@@ -30,6 +32,7 @@ pub struct Column {
     /// Default expression of the column
     pub column_default: Option<String>,
     /// Indicates if the column is nullable ("YES" or "NO")
+    #[allow(clippy::pub_underscore_fields)]
     pub __is_nullable: String,
     /// Data type of the column
     data_type: String,
@@ -242,6 +245,7 @@ impl Column {
     }
 
     /// Returns the data type associated with the column as a string.
+    #[allow(clippy::unimplemented)]
     #[must_use]
     pub fn data_type_str(&self) -> &str {
         if self.has_custom_type() {

@@ -7,6 +7,8 @@
 [![Crates.io](https://img.shields.io/crates/v/pg_diesel.svg)](https://crates.io/crates/pg_diesel)
 [![Docs.rs](https://docs.rs/pg_diesel/badge.svg)](https://docs.rs/pg_diesel)
 
+This library provides an easy way to analyze and work with `PostgreSQL` metadata, making it useful for metaprogramming tasks such as code generation based on database schemas.
+
 Diesel models and schemas for `PostgreSQL` system catalogs (`pg_catalog`, `information_schema`) and `PostGIS` (`public`).
 
 ## What it does

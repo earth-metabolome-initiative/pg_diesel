@@ -40,6 +40,7 @@ pub struct Attribute {
     pub attribute_default: Option<String>,
     /// "YES" if the attribute allows NULL values, "NO" otherwise.
     /// This indicates whether the attribute can contain NULL values.
+    #[allow(clippy::pub_underscore_fields)]
     pub __is_nullable: Option<String>,
     /// Data type of the attribute (e.g., "integer", "text", "timestamp").
     /// This is the SQL data type name for the attribute.

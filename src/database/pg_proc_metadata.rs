@@ -51,13 +51,13 @@ impl PgProcMetadata {
     }
 
     /// Returns the argument types.
-    #[must_use] 
+    #[must_use]
     pub fn argument_types(&self) -> &[PgType] {
         &self.argument_types
     }
 
     /// Returns the return type.
-    #[must_use] 
+    #[must_use]
     pub fn return_type(&self) -> Option<&PgType> {
         self.return_type.as_ref()
     }

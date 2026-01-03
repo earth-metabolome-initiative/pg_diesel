@@ -1,3 +1,5 @@
+//! Table model and related cached queries.
+
 use std::fmt::Display;
 
 use diesel::{OptionalExtension, PgConnection, Queryable, QueryableByName, Selectable};

@@ -89,19 +89,19 @@ impl KeyColumnUsageMetadata {
 
     /// Returns a reference to the referential constraint associated with the
     /// foreign key.
-    #[must_use] 
+    #[must_use]
     pub fn referential_constraint(&self) -> &ReferentialConstraint {
         &self.referential_constraint
     }
 
     /// Returns whether the foreign key has an `ON DELETE CASCADE` rule.
-    #[must_use] 
+    #[must_use]
     pub fn on_delete_cascade(&self) -> bool {
         self.referential_constraint.on_delete_cascade()
     }
 
     /// Returns the match kind of the foreign key.
-    #[must_use] 
+    #[must_use]
     pub fn match_kind(&self) -> sqlparser::ast::ConstraintReferenceMatchKind {
         self.referential_constraint.match_kind()
     }
