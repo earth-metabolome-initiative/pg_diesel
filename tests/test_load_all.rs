@@ -337,6 +337,7 @@ async fn test_load_all_models() {
             .select(RoutineTableUsage::as_select())
             .load::<RoutineTableUsage>(&mut conn);
     }
+    #[cfg(feature = "routines")]
     {
         use pg_diesel::models::Routines;
         use pg_diesel::schema::information_schema::routines::routines::dsl::*;

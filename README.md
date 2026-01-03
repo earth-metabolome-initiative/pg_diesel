@@ -33,3 +33,11 @@ Some `PostgreSQL` types are excluded because Diesel can't map them:
 - `pg_ndistinct`, `pg_dependencies`, `pg_mcv_list`, `_pg_statistic` - internal statistics types
 
 Columns with these types are omitted from generated schemas.
+
+Additionally, Diesel requires tables that need to appear in the same query to be marked with the `allow_tables_to_appear_in_same_query!` macro. While we have added this macro for a selection of the most commonly queried tables, not all combinations are covered as we do not know all possible use cases. Feel free to send a pull request if you need additional combinations.
+
+The differences between `PostgreSQL` versions are not fully covered yet. We currently support some differences between `PostgreSQL` versions 14, 15, and 17 via Cargo features. More work is needed to cover all differences.
+
+The [`routines`](https://www.postgresql.org/docs/current/infoschema-routines.html) table is currently excluded by default because it has 88 columns, which would require enabling Diesel's `128-column-tables` feature, which in turn increases compile times significantly. You can enable it via the `routines` Cargo feature. Excluding `routines`, there are still several important tables such as [`columns`](https://www.postgresql.org/docs/current/infoschema-columns.html) which more than 32 columns and thus require Diesel's `64-column-tables` feature, which is enabled by default.
+
+With the default features, and most notably without `routines`, the crate compiles in about 60 seconds. Enabling the `routines` feature increases compile times to about 170 seconds on a typical development machine.

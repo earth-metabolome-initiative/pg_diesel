@@ -126,6 +126,7 @@ pub use routine_privileges::RoutinePrivileges;
 pub use routine_routine_usage::RoutineRoutineUsage;
 pub use routine_sequence_usage::RoutineSequenceUsage;
 pub use routine_table_usage::RoutineTableUsage;
+#[cfg(feature = "routines")]
 pub use routines::Routines;
 pub use schemata::Schemata;
 pub use sequences::Sequences;

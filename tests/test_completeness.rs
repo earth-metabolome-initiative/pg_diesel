@@ -114,6 +114,8 @@ async fn test_schema_completeness() {
             continue;
         }
 
+        println!("{}: {}", table.table_name(), table.number_of_columns(&db));
+
         let expected_schema_path = crate_root_path
             .join("src")
             .join("schema")
@@ -141,9 +143,6 @@ async fn test_schema_completeness() {
         }
     }
 
-    // Extended coverage tests
-
-    // Test PgProc
     let procs = PgProc::load_all(&mut conn).expect("Failed to load procs");
     for proc in procs.iter().take(10) {
         // Limit to 10 to avoid slow tests
@@ -152,19 +151,16 @@ async fn test_schema_completeness() {
         let _ = proc.extension(&mut conn);
     }
 
-    // Test PgExtension
     let extensions = PgExtension::load_all(&mut conn).expect("Failed to load extensions");
     for ext in extensions {
         let _ = ext.functions(&mut conn);
         let _ = ext.types(&mut conn);
         let _ = ext.enums(&mut conn);
 
-        // Test loading specific extension
         let _ = PgExtension::load(&ext.extname, &mut conn);
     }
 
-    // Test Column methods requiring DB
-    for table in db.table_dag().into_iter().take(5) {
+    for table in db.tables() {
         for column in table.columns(&db) {
             // column is &Column. We need to call methods on it.
             // The methods take &self.
@@ -174,7 +170,6 @@ async fn test_schema_completeness() {
             let _ = column.geography(&mut conn);
             let _ = column.has_foreign_keys(&mut conn);
 
-            // Test PgType via column
             if let Ok(pg_type) = column.pg_type(&mut conn) {
                 let _ = pg_type.extension(&mut conn);
                 let _ = pg_type.internal_user_defined_types(&mut conn);
@@ -187,19 +182,16 @@ async fn test_schema_completeness() {
                 }
                 let _ = pg_type.variants(&mut conn);
 
-                // Test PostgresType trait
                 let _ = pg_type.postgres_type(&mut conn);
             }
         }
 
-        // Test CheckConstraintLike
         for check in <Table as TableLike>::check_constraints(table, &db) {
             let _ = CheckConstraintLike::expression(check, &db);
             let _ = CheckConstraintLike::table(check, &db);
             let _ = CheckConstraintLike::columns(check, &db);
         }
 
-        // Test ForeignKeyLike
         for fk in <Table as TableLike>::foreign_keys(table, &db) {
             let _ = ForeignKeyLike::foreign_key_name(fk);
             let _ = ForeignKeyLike::referenced_table(fk, &db);
@@ -210,7 +202,6 @@ async fn test_schema_completeness() {
             let _ = ForeignKeyLike::match_kind(fk, &db);
         }
 
-        // Test UniqueIndexLike
         for idx in <Table as TableLike>::unique_indices(table, &db) {
             let _ = UniqueIndexLike::table(idx, &db);
             let _ = UniqueIndexLike::expression(idx, &db);

@@ -7,7 +7,7 @@ edition = "2024"
 diesel = { git = "https://github.com/LucaCappelletti94/diesel", branch = "future3", features = [
   "postgres",
   "extras",
-  "128-column-tables",
+  "64-column-tables",
 ] }
 ipnetwork = {version = "0.21.1", features = ["serde"]}
 serde = { version = "1.0", features = ["derive"], optional = true }
@@ -66,3 +66,6 @@ serde = ["dep:serde"]
 postgres-14 = []
 postgres-15 = []
 postgres-17 = []
+# Whether to include routines metadata, which is a rather large
+# table with 88 columns.
+routines = ["diesel/128-column-tables"]

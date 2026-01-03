@@ -1,3 +1,4 @@
+#![cfg(feature = "routines")]
 //! Model struct for the `information_schema.routines` view.
 //!
 //! This view contains one row for each function and procedure in the current

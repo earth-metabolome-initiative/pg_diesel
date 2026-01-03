@@ -1,3 +1,4 @@
+#![cfg(feature = "routines")]
 //! Submodule for the `information_schema.routines` view schema.
 
 diesel::table! {
