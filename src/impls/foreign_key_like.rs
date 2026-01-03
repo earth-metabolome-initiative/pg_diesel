@@ -1,7 +1,7 @@
 //! Implementation of [`ForeignKeyLike`] for [`KeyColumnUsage`].
 //!
 //! This module implements the
-//! [`ForeignKeyLike`](sql_traits::prelude::ForeignKeyLike) trait
+//! [`ForeignKeyLike`] trait
 //! for the [`KeyColumnUsage`] model from `information_schema.key_column_usage`,
 //! enabling generic introspection of foreign key relationships.
 //!

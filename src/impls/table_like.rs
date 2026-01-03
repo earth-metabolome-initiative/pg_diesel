@@ -1,7 +1,7 @@
-//! Implementation of [`TableLike`] for [`Table`].
+//! Implementation of [`TableLike`] for [`Table`](crate::models::Table).
 //!
-//! This module implements the [`TableLike`](sql_traits::prelude::TableLike)
-//! trait for the [`Table`] model from `information_schema.tables`, enabling
+//! This module implements the [`TableLike`]
+//! trait for the [`Table`](crate::models::Table) model from `information_schema.tables`, enabling
 //! generic introspection of database tables.
 //!
 //! The implementation provides access to:

@@ -1,4 +1,4 @@
-//! Submodule providing the `TableMetadata` struct for a [`Table`] model.
+//! Submodule providing the `TableMetadata` struct for a [`Table`](crate::models::Table) model.
 
 use std::rc::Rc;
 

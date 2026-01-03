@@ -5,7 +5,7 @@
 //! - Argument types (from `pg_proc.proargtypes`)
 //! - Return type (from `pg_proc.prorettype`)
 //!
-//! This metadata is used by the [`PgDatabase`](crate::database::PgDatabase) to
+//! This metadata is used by the [`PgDieselDatabase`](crate::database::PgDieselDatabase) to
 //! provide function introspection through the `sql_traits` trait system.
 
 use diesel::PgConnection;
@@ -14,7 +14,7 @@ use crate::models::{PgProc, PgType};
 
 #[derive(Debug, Clone)]
 /// Struct collecting metadata about a `PostgreSQL` function represented by a
-/// [`PgProc`](crate::models::PgProc) entry.
+/// [`PgProc`] entry.
 pub struct PgProcMetadata {
     /// The argument types.
     argument_types: Vec<PgType>,

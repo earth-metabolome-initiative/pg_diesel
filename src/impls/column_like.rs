@@ -1,7 +1,7 @@
-//! Implementation of [`ColumnLike`] for [`Column`].
+//! Implementation of [`ColumnLike`] for [`Column`](crate::models::Column).
 //!
-//! This module implements the [`ColumnLike`](sql_traits::prelude::ColumnLike)
-//! trait for the [`Column`] model from `information_schema.columns`, enabling
+//! This module implements the [`ColumnLike`]
+//! trait for the [`Column`](crate::models::Column) model from `information_schema.columns`, enabling
 //! generic introspection of table columns.
 //!
 //! The implementation provides access to:

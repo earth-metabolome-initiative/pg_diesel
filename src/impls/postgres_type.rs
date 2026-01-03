@@ -6,8 +6,8 @@
 //!
 //! ## Implemented Types
 //!
-//! - [`PgType`](crate::models::PgType): Returns itself (already a type)
-//! - [`Column`](crate::models::Column): Queries `pg_type` to resolve the
+//! - [`PgType`]: Returns itself (already a type)
+//! - [`Column`]: Queries `pg_type` to resolve the
 //!   column's type
 //!
 //! The trait provides a unified interface for obtaining [`PgType`] information

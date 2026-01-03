@@ -6,7 +6,7 @@
 //! - The referenced (target) table and columns
 //! - The referential constraint rules (ON DELETE, ON UPDATE, MATCH)
 //!
-//! This metadata is used by the [`PgDatabase`](crate::database::PgDatabase) to
+//! This metadata is used by the [`PgDieselDatabase`](crate::database::PgDieselDatabase) to
 //! provide rich foreign key introspection through the `sql_traits` trait
 //! system.
 

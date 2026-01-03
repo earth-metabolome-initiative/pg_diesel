@@ -1,7 +1,7 @@
 //! Implementation of [`CheckConstraintLike`] for [`CheckConstraint`].
 //!
 //! This module implements the
-//! [`CheckConstraintLike`](sql_traits::prelude::CheckConstraintLike)
+//! [`CheckConstraintLike`]
 //! trait for the [`CheckConstraint`] model, enabling generic introspection of
 //! check constraints.
 //!

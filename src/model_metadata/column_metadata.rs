@@ -1,4 +1,4 @@
-//! Submodule providing the `ColumnMetadata` struct for a [`Column`] model.
+//! Submodule providing the `ColumnMetadata` struct for a [`Column`](crate::models::Column) model.
 
 use std::rc::Rc;
 

@@ -112,7 +112,7 @@ impl PgProc {
     /// # Arguments
     ///
     /// * `conn` - A mutable reference to a
-    ///   [`PgConnection`](diesel::PgConnection).
+    ///   [`PgConnection`].
     ///
     /// # Errors
     ///

@@ -41,7 +41,7 @@ pub struct KeyColumnUsage {
 
 impl KeyColumnUsage {
     /// Creates a new `KeyColumnUsageMetadata` instance from the given
-    /// [`KeyColumnUsage`](crate::models::KeyColumnUsage), and connection to the
+    /// [`KeyColumnUsage`], and connection to the
     /// database.
     ///
     /// # Arguments

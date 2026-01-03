@@ -1,7 +1,7 @@
 //! Implementation of [`UniqueIndexLike`] for [`PgIndex`].
 //!
 //! This module implements the
-//! [`UniqueIndexLike`](sql_traits::prelude::UniqueIndexLike) trait for the
+//! [`UniqueIndexLike`] trait for the
 //! [`PgIndex`] model from `pg_catalog.pg_index`, enabling generic introspection
 //! of unique indexes and primary keys.
 //!
