@@ -3,10 +3,10 @@
 //! This module provides Diesel-queryable structs for all major `PostgreSQL`
 //! metadata tables and views across three schemas:
 //!
-//! - [`information_schema`]: SQL-standard metadata views (portable across
+//! - `information_schema`: SQL-standard metadata views (portable across
 //!   databases)
-//! - [`pg_catalog`]: `PostgreSQL`-specific system catalog tables
-//! - [`public`]: `PostGIS` extension tables (geography and geometry columns)
+//! - `pg_catalog`: `PostgreSQL`-specific system catalog tables
+//! - `public`: `PostGIS` extension tables (geography and geometry columns)
 //!
 //! Each struct corresponds to a table or view in `PostgreSQL` and can be queried
 //! using Diesel. The structs implement `Queryable`, `QueryableByName`, and

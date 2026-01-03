@@ -16,8 +16,8 @@ use crate::models::{CheckConstraint, Column, KeyColumnUsage, PgDescription, PgIn
 /// - Table description from `pg_catalog.pg_description`
 ///
 /// This metadata is constructed during
-/// [`PgDatabase`](crate::database::PgDatabase) building and cached for
-/// efficient access via the [`TableLike`](sql_traits::traits::TableLike) trait.
+/// [`PgDieselDatabase`](crate::database::PgDieselDatabase) building and cached for
+/// efficient access via the `TableLike` trait.
 pub struct TableMetadata {
     /// The underlying table metadata.
     metadata: sql_traits::structs::TableMetadata<crate::models::Table>,

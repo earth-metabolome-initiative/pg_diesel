@@ -1,4 +1,4 @@
-//! Builder pattern for constructing a [`PgDatabase`] instance.
+//! Builder pattern for constructing a [`PgDieselDatabase`] instance.
 
 use std::rc::Rc;
 
@@ -11,7 +11,7 @@ use crate::{
 };
 
 #[derive(Default)]
-/// Builder for constructing a [`PgDatabase`] instance from `PostgreSQL` metadata.
+/// Builder for constructing a [`PgDieselDatabase`] instance from `PostgreSQL` metadata.
 pub struct PgDieselDatabaseBuilder<'conn> {
     /// Connection to the `PostgreSQL` database.
     connection: Option<&'conn mut PgConnection>,
@@ -24,7 +24,7 @@ pub struct PgDieselDatabaseBuilder<'conn> {
 }
 
 #[derive(Debug, thiserror::Error)]
-/// Errors that can occur when building a [`PgDatabase`] instance.
+/// Errors that can occur when building a [`PgDieselDatabase`] instance.
 ///
 /// This error type encompasses all failure modes during database metadata
 /// loading:
@@ -44,7 +44,7 @@ pub enum PgDatabaseBuildError {
 }
 
 impl<'conn> PgDieselDatabaseBuilder<'conn> {
-    /// Sets the `PostgreSQL` connection to use for building the `PgDatabase`.
+    /// Sets the `PostgreSQL` connection to use for building the `PgDieselDatabase`.
     #[must_use]
     pub fn connection(mut self, connection: &'conn mut PgConnection) -> Self {
         self.connection = Some(connection);

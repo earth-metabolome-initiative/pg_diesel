@@ -1,6 +1,6 @@
-//! Submodule providing the `PgDatabase` struct which holds data queried from
+//! Submodule providing the `PgDieselDatabase` struct which holds data queried from
 //! the `PostgreSQL` information schema and implements the
-//! [`DatabaseLike`](sql_traits::prelude::DatabaseLike) trait.
+//! `DatabaseLike` trait.
 
 use sql_traits::structs::GenericDB;
 
@@ -11,26 +11,26 @@ mod pg_proc_metadata;
 pub use pg_proc_metadata::PgProcMetadata;
 
 mod builder;
-pub use builder::PgDieselDatabaseBuilder;
+pub use builder::{PgDatabaseBuildError, PgDieselDatabaseBuilder};
 
 /// Type alias representing a `PostgreSQL` database with loaded metadata.
 ///
 /// This is a specialization of [`GenericDB`] configured for `PostgreSQL`, using:
-/// - [`Table`](crate::models::Table) from `information_schema.tables` as the
+/// - [`Table`] from `information_schema.tables` as the
 ///   table type
-/// - [`Column`](crate::models::Column) from `information_schema.columns` as the
+/// - [`Column`] from `information_schema.columns` as the
 ///   column type
-/// - [`PgIndex`](crate::models::PgIndex) from `pg_catalog.pg_index` as the
+/// - [`PgIndex`] from `pg_catalog.pg_index` as the
 ///   unique index type
-/// - [`KeyColumnUsage`](crate::models::KeyColumnUsage) from
+/// - [`KeyColumnUsage`] from
 ///   `information_schema.key_column_usage` as the foreign key type
-/// - [`PgProc`](crate::models::PgProc) from `pg_catalog.pg_proc` as the
+/// - [`PgProc`] from `pg_catalog.pg_proc` as the
 ///   function type
-/// - [`CheckConstraint`](crate::models::CheckConstraint) from
+/// - [`CheckConstraint`] from
 ///   `information_schema.check_constraints` as the check constraint type
 ///
-/// The `PgDatabase` implements
-/// [`DatabaseLike`](sql_traits::prelude::DatabaseLike), providing methods to
+/// The `PgDieselDatabase` implements
+/// `DatabaseLike`, providing methods to
 /// iterate over tables, columns, foreign keys, and other database objects.
 pub type PgDieselDatabase =
     GenericDB<Table, Column, PgIndex, KeyColumnUsage, PgProc, CheckConstraint>;

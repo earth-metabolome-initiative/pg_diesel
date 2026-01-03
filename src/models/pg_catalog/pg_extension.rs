@@ -89,7 +89,7 @@ impl PgExtension {
         cached_queries::functions(self, conn)
     }
 
-    /// Returns all [`PgType`](crate::PgType) types associated with this
+    /// Returns all [`PgType`] types associated with this
     /// extension.
     ///
     /// # Arguments
@@ -103,7 +103,7 @@ impl PgExtension {
         cached_queries::types(self, conn)
     }
 
-    /// Returns all [`PgEnum`](crate::PgEnum) enums associated with this
+    /// Returns all [`PgEnum`] enums associated with this
     /// extension.
     ///
     /// # Arguments

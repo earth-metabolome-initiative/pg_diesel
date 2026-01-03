@@ -81,6 +81,7 @@ fn establish_connection_to_postgres<C: Connection>(
 }
 
 #[tokio::test]
+#[allow(clippy::too_many_lines)]
 /// Test retrieval of extensions from a column
 async fn test_schema_completeness() {
     let database_name = "test_schema_completeness";

@@ -6,16 +6,16 @@
 //!
 //! ## Implemented Traits
 //!
-//! - [`TableLike`](sql_traits::traits::TableLike): Implemented for
+//! - `TableLike`: Implemented for
 //!   [`Table`](crate::models::Table)
-//! - [`ColumnLike`](sql_traits::traits::ColumnLike): Implemented for
+//! - `ColumnLike`: Implemented for
 //!   [`Column`](crate::models::Column)
-//! - [`CheckConstraintLike`]: Implemented for
+//! - `CheckConstraintLike`: Implemented for
 //!   [`CheckConstraint`](crate::models::CheckConstraint)
-//! - [`ForeignKeyLike`]: Implemented for
+//! - `ForeignKeyLike`: Implemented for
 //!   [`KeyColumnUsage`](crate::models::KeyColumnUsage)
-//! - [`FunctionLike`]: Implemented for [`PgProc`](crate::models::PgProc)
-//! - [`UniqueIndexLike`]: Implemented for [`PgIndex`](crate::models::PgIndex)
+//! - `FunctionLike`: Implemented for [`PgProc`](crate::models::PgProc)
+//! - `UniqueIndexLike`: Implemented for [`PgIndex`](crate::models::PgIndex)
 //! - [`HasOid`](crate::traits::HasOid): Implemented for various catalog types
 //! - [`PostgresType`](crate::traits::PostgresType): Implemented for types that
 //!   resolve their Postgres type

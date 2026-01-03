@@ -14,8 +14,8 @@ use crate::models::{PgDescription, PgType, Table};
 /// - Column description from `pg_catalog.pg_description`
 ///
 /// This metadata is constructed during
-/// [`PgDatabase`](crate::database::PgDatabase) building and cached for
-/// efficient access via the [`ColumnLike`](sql_traits::traits::ColumnLike)
+/// [`PgDieselDatabase`](crate::database::PgDieselDatabase) building and cached for
+/// efficient access via the `ColumnLike`
 /// trait.
 ///
 /// ## Type Resolution

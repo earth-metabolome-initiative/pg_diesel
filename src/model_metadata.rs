@@ -9,7 +9,7 @@
 //!   description
 //!
 //! These metadata types are used by the
-//! [`PgDatabase`](crate::database::PgDatabase) to provide rich introspection
+//! [`PgDieselDatabase`](crate::database::PgDieselDatabase) to provide rich introspection
 //! capabilities through the `sql_traits` trait system.
 
 mod table_metadata;
