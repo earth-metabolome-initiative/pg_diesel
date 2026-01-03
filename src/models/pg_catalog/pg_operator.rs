@@ -2,8 +2,7 @@
 //! `pg_catalog.pg_operator` system catalog table in `PostgreSQL`.
 //! It includes methods to access related information such as the
 //! associated function and operand/result types.
-use diesel::{PgConnection, Queryable, QueryableByName, Selectable};
-
+use diesel::{PgConnection, RunQueryDsl, Queryable, QueryableByName, Selectable};
 use super::{PgExtension, PgProc, PgType};
 
 mod cached_queries;
@@ -48,6 +47,20 @@ pub struct PgOperator {
 }
 
 impl PgOperator {
+    /// Loads all of the [`PgExtension`]s from the database.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::pg_catalog::pg_operator::pg_operator;
+        pg_operator::table.load(conn)
+    }
+
     /// Returns the symbol of the operator.
     #[must_use]
     pub fn symbol(&self) -> &str {

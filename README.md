@@ -13,9 +13,9 @@ Diesel models and schemas for `PostgreSQL` system catalogs (`pg_catalog`, `infor
 
 ## What it does
 
-- Provides Diesel schemas for **192** `PostgreSQL` metadata tables and views across:
-  - `information_schema`: Standard SQL metadata
-  - `pg_catalog`: `PostgreSQL` system catalogs
+- Provides Diesel schemas for **209** `PostgreSQL` metadata tables and views across:
+  - `information_schema`: Standard SQL metadata, including 64 tables and views
+  - `pg_catalog`: `PostgreSQL` system catalogs, including 143 tables and views
   - `public`: `PostGIS` geometry/geography columns
 - Includes models for querying system catalogs type-safely
 - Offers `PgDieselDatabaseBuilder` for runtime database introspection

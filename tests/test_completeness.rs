@@ -5,7 +5,7 @@ use std::rc::Rc;
 
 use diesel::{Connection, PgConnection};
 use pg_diesel::database::{PgDieselDatabase, PgDieselDatabaseBuilder};
-use pg_diesel::models::{PgExtension, PgProc, Table};
+use pg_diesel::models::{PgExtension, PgOperator, PgProc, Table};
 use pg_diesel::traits::PostgresType;
 use sql_traits::traits::{
     CheckConstraintLike, ColumnLike, ForeignKeyLike, TableLike, UniqueIndexLike,
@@ -157,6 +157,16 @@ async fn test_schema_completeness() {
         let _ = ext.enums(&mut conn);
 
         let _ = PgExtension::load(&ext.extname, &mut conn);
+    }
+
+    let operators = PgOperator::load_all(&mut conn).expect("Failed to load operators");
+    for operator in operators {
+        let _ = operator.function(&mut conn);
+        let _ = operator.extension(&mut conn);
+        let _ = operator.left_operand_type(&mut conn);
+        let _ = operator.right_operand_type(&mut conn);
+        let _ = operator.result_type(&mut conn);
+        let _ = operator.symbol();
     }
 
     for table in db.tables() {
