@@ -12,21 +12,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "algebra"
-version = "0.1.0"
-source = "git+https://github.com/earth-metabolome-initiative/emi-monorepo?branch=postgres-crate#7fc3057a92c35022a618985032a577701d083b34"
-dependencies = [
- "arbitrary",
- "common_traits",
- "iter_utils",
- "lender",
- "multi_ranged",
- "num-traits",
- "numeric_common_traits",
- "serde",
-]
-
-[[package]]
 name = "android_system_properties"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -48,15 +33,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f0c269894b6fe5e9d7ada0cf69b5bf847ff35bc25fc271f08e1d080fce80339a"
 dependencies = [
  "object",
-]
-
-[[package]]
-name = "arbitrary"
-version = "1.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c3d036a3c4ab069c7b410a2ce876bd74808d2d0888a82667669f8e783a898bf1"
-dependencies = [
- "derive_arbitrary",
 ]
 
 [[package]]
@@ -296,6 +272,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7a0aeaff4ff1a90589618835a598e545176939b97874f7abc7851caa0618f203"
 dependencies = [
  "find-msvc-tools",
+ "jobserver",
+ "libc",
  "shlex",
 ]
 
@@ -315,14 +293,6 @@ dependencies = [
  "num-traits",
  "serde",
  "windows-link",
-]
-
-[[package]]
-name = "common_traits"
-version = "0.1.0"
-source = "git+https://github.com/earth-metabolome-initiative/emi-monorepo?branch=postgres-crate#7fc3057a92c35022a618985032a577701d083b34"
-dependencies = [
- "serde",
 ]
 
 [[package]]
@@ -384,17 +354,6 @@ checksum = "ececcb659e7ba858fb4f10388c250a7252eb0a27373f1a72b8748afdd248e587"
 dependencies = [
  "powerfmt",
  "serde_core",
-]
-
-[[package]]
-name = "derive_arbitrary"
-version = "1.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e567bd82dcff979e4b03460c307b3cdc9e96fde3d73bed1496d2bc75d9dd62a"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]
@@ -519,6 +478,18 @@ dependencies = [
  "cfg-if",
  "windows-sys 0.61.2",
 ]
+
+[[package]]
+name = "fallible-iterator"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2acce4a10f12dc2fb14a218589d4f1f62ef011b2d0cc4b3cb1bba8e94da14649"
+
+[[package]]
+name = "fastrand"
+version = "2.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "37909eebbb50d72f9059c3b6d82c0463f2ff062c9e95845c43a6c9c0355411be"
 
 [[package]]
 name = "ferroid"
@@ -654,6 +625,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "geometric-traits"
+version = "0.1.0"
+source = "git+https://github.com/earth-metabolome-initiative/geometric-traits?branch=main#b4b55cb80b20cedc1f977f7abe9f45b6852ee502"
+dependencies = [
+ "lender",
+ "multi_ranged",
+ "num-traits",
+ "thiserror",
+]
+
+[[package]]
 name = "getrandom"
 version = "0.2.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -677,16 +659,18 @@ dependencies = [
 ]
 
 [[package]]
-name = "graph"
-version = "0.1.0"
-source = "git+https://github.com/earth-metabolome-initiative/emi-monorepo?branch=postgres-crate#7fc3057a92c35022a618985032a577701d083b34"
+name = "git2"
+version = "0.20.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3e2b37e2f62729cdada11f0e6b3b6fe383c69c29fc619e391223e12856af308c"
 dependencies = [
- "algebra",
- "multi_ranged",
- "num-traits",
- "numeric_common_traits",
- "sorted_vec",
- "thiserror",
+ "bitflags",
+ "libc",
+ "libgit2-sys",
+ "log",
+ "openssl-probe 0.1.6",
+ "openssl-sys",
+ "url",
 ]
 
 [[package]]
@@ -1054,11 +1038,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "iter_utils"
-version = "0.1.0"
-source = "git+https://github.com/earth-metabolome-initiative/emi-monorepo?branch=postgres-crate#7fc3057a92c35022a618985032a577701d083b34"
-
-[[package]]
 name = "itertools"
 version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1074,6 +1053,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "92ecc6618181def0457392ccd0ee51198e065e016d1d527a7ac1b6dc7c1f09d2"
 
 [[package]]
+name = "jobserver"
+version = "0.1.34"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9afb3de4395d6b3e67a780b6de64b51c978ecf11cb9a462c66be7d4ca9039d33"
+dependencies = [
+ "getrandom 0.3.4",
+ "libc",
+]
+
+[[package]]
 name = "js-sys"
 version = "0.3.83"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1085,10 +1074,11 @@ dependencies = [
 
 [[package]]
 name = "lender"
-version = "0.3.2"
+version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3d82d5a5c23e4d70f79c4cdfaa1d0beb6b3c660080c05dafd236f0514ce51ba6"
+checksum = "c150e24afda8f769930a339cb5ad6e182101fdf1165c30c157b33ce5050fd7ad"
 dependencies = [
+ "fallible-iterator",
  "lender-derive",
  "stable_try_trait_v2",
 ]
@@ -1111,6 +1101,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "37c93d8daa9d8a012fd8ab92f088405fb202ea0b6ab73ee2482ae66af4f42091"
 
 [[package]]
+name = "libgit2-sys"
+version = "0.18.3+1.9.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c9b3acc4b91781bb0b3386669d325163746af5f6e4f73e6d2d630e09a35f3487"
+dependencies = [
+ "cc",
+ "libc",
+ "libssh2-sys",
+ "libz-sys",
+ "openssl-sys",
+ "pkg-config",
+]
+
+[[package]]
 name = "libm"
 version = "0.2.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1125,6 +1129,32 @@ dependencies = [
  "bitflags",
  "libc",
  "redox_syscall 0.7.0",
+]
+
+[[package]]
+name = "libssh2-sys"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "220e4f05ad4a218192533b300327f5150e809b54c4ec83b5a1d91833601811b9"
+dependencies = [
+ "cc",
+ "libc",
+ "libz-sys",
+ "openssl-sys",
+ "pkg-config",
+ "vcpkg",
+]
+
+[[package]]
+name = "libz-sys"
+version = "1.1.23"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "15d118bbf3771060e7311cc7bb0545b01d08a8b4a7de949198dec1fa0ca1c0f7"
+dependencies = [
+ "cc",
+ "libc",
+ "pkg-config",
+ "vcpkg",
 ]
 
 [[package]]
@@ -1185,10 +1215,13 @@ dependencies = [
 
 [[package]]
 name = "multi_ranged"
-version = "0.1.0"
-source = "git+https://github.com/earth-metabolome-initiative/emi-monorepo?branch=postgres-crate#7fc3057a92c35022a618985032a577701d083b34"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9809fbd1a12e6b2303cedb9bff55196574b4d0c9b40209ba0d39aa1bb780cc69"
 dependencies = [
  "num-traits",
+ "serde",
+ "thiserror",
 ]
 
 [[package]]
@@ -1271,15 +1304,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "numeric_common_traits"
-version = "0.1.0"
-source = "git+https://github.com/earth-metabolome-initiative/emi-monorepo?branch=postgres-crate#7fc3057a92c35022a618985032a577701d083b34"
-dependencies = [
- "common_traits",
- "num-traits",
-]
-
-[[package]]
 name = "object"
 version = "0.32.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1296,9 +1320,27 @@ checksum = "42f5e15c9953c5e4ccceeb2e7382a716482c34515315f7b03532b8b4e8393d2d"
 
 [[package]]
 name = "openssl-probe"
+version = "0.1.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d05e27ee213611ffe7d6348b942e8f942b37114c00cc03cec254295a4a17852e"
+
+[[package]]
+name = "openssl-probe"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9f50d9b3dabb09ecd771ad0aa242ca6894994c130308ca3d7684634df8037391"
+
+[[package]]
+name = "openssl-sys"
+version = "0.9.111"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "82cab2d520aa75e3c58898289429321eb788c3106963d0dc886ec7a5f4adc321"
+dependencies = [
+ "cc",
+ "libc",
+ "pkg-config",
+ "vcpkg",
+]
 
 [[package]]
 name = "parking_lot"
@@ -1361,7 +1403,7 @@ dependencies = [
  "diesel",
  "ipnetwork",
  "serde",
- "sql_traits",
+ "sql-traits",
  "sqlparser",
  "testcontainers",
  "thiserror",
@@ -1694,7 +1736,7 @@ version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "612460d5f7bea540c490b2b6395d8e34a953e52b491accd6c86c8164c5932a63"
 dependencies = [
- "openssl-probe",
+ "openssl-probe 0.2.0",
  "rustls-pki-types",
  "schannel",
  "security-framework",
@@ -1948,21 +1990,14 @@ dependencies = [
 ]
 
 [[package]]
-name = "sorted_vec"
+name = "sql-traits"
 version = "0.1.0"
-source = "git+https://github.com/earth-metabolome-initiative/emi-monorepo?branch=postgres-crate#7fc3057a92c35022a618985032a577701d083b34"
+source = "git+https://github.com/earth-metabolome-initiative/sql-traits?branch=main#f952dfe5ea80e721db050b226c1adb142c21a008"
 dependencies = [
- "common_traits",
-]
-
-[[package]]
-name = "sql_traits"
-version = "0.1.0"
-source = "git+https://github.com/earth-metabolome-initiative/emi-monorepo?branch=postgres-crate#7fc3057a92c35022a618985032a577701d083b34"
-dependencies = [
- "algebra",
- "graph",
+ "geometric-traits",
+ "git2",
  "sqlparser",
+ "tempfile",
  "thiserror",
 ]
 
@@ -2063,6 +2098,19 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "tempfile"
+version = "3.24.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "655da9c7eb6305c55742045d5a8d2037996d61d8de95806335c7c86ce0f82e9c"
+dependencies = [
+ "fastrand",
+ "getrandom 0.3.4",
+ "once_cell",
+ "rustix",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]

@@ -11,7 +11,7 @@ diesel = { git = "https://github.com/LucaCappelletti94/diesel", branch = "future
 ] }
 ipnetwork = {version = "0.21.1", features = ["serde"]}
 serde = { version = "1.0", features = ["derive"], optional = true }
-sql_traits = { git = "https://github.com/earth-metabolome-initiative/emi-monorepo", branch = "postgres-crate" }
+sql-traits = { git = "https://github.com/earth-metabolome-initiative/sql-traits", branch = "main" }
 sqlparser = { version = "0.60.0", features = ["serde"] }
 thiserror = "2.0.17"
 
