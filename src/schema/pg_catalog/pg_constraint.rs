@@ -1,6 +1,10 @@
 //! Submodule for the `pg_constraint` table schema.
 
-#[cfg(not(any(feature = "postgres-14", feature = "postgres-15", feature = "postgres-17")))]
+#[cfg(not(any(
+    feature = "postgres-14",
+    feature = "postgres-15",
+    feature = "postgres-17"
+)))]
 diesel::table! {
     /// `pg_constraint` — system catalog containing one row for each table, domain, or index constraint.
     /// Stores metadata about primary keys, foreign keys, unique constraints, check constraints,
@@ -68,7 +72,11 @@ diesel::table! {
     }
 }
 
-#[cfg(all(feature = "postgres-14", not(feature = "postgres-15"), not(feature = "postgres-17")))]
+#[cfg(all(
+    feature = "postgres-14",
+    not(feature = "postgres-15"),
+    not(feature = "postgres-17")
+))]
 diesel::table! {
     /// `pg_constraint` — system catalog containing one row for each table, domain, or index constraint.
     /// Stores metadata about primary keys, foreign keys, unique constraints, check constraints,
@@ -136,8 +144,11 @@ diesel::table! {
     }
 }
 
-
-#[cfg(all(feature = "postgres-15", not(feature = "postgres-14"), not(feature = "postgres-17")))]
+#[cfg(all(
+    feature = "postgres-15",
+    not(feature = "postgres-14"),
+    not(feature = "postgres-17")
+))]
 diesel::table! {
     /// `pg_constraint` — system catalog containing one row for each table, domain, or index constraint.
     /// Stores metadata about primary keys, foreign keys, unique constraints, check constraints,
@@ -207,8 +218,11 @@ diesel::table! {
     }
 }
 
-
-#[cfg(all(feature = "postgres-17", not(feature = "postgres-15"), not(feature = "postgres-14")))]
+#[cfg(all(
+    feature = "postgres-17",
+    not(feature = "postgres-15"),
+    not(feature = "postgres-14")
+))]
 diesel::table! {
     /// `pg_constraint` — system catalog containing one row for each table, domain, or index constraint.
     /// Stores metadata about primary keys, foreign keys, unique constraints, check constraints,
@@ -277,7 +291,6 @@ diesel::table! {
         conbin -> Nullable<Text>,
     }
 }
-
 
 use super::pg_depend::pg_depend;
 diesel::allow_tables_to_appear_in_same_query!(pg_constraint, pg_depend);
