@@ -29,7 +29,12 @@ jobs:
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
-        sudo apt-get install -y libfontconfig1-dev
+        sudo apt-get install -y libfontconfig1-dev libpq-dev
+    - name: Install dependencies (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        brew install libpq
+        brew link --force libpq
     - name: Build and Test
       run: cargo test --release
     - name: Test with no default features
@@ -62,7 +67,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libfontconfig1-dev
+        sudo apt-get install -y libfontconfig1-dev libpq-dev
     - name: Run clippy
       run: cargo clippy --all-targets -- -D warnings
 
@@ -78,7 +83,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libfontconfig1-dev
+        sudo apt-get install -y libfontconfig1-dev libpq-dev
     - name: Check documentation
       run: cargo doc --no-deps --document-private-items
       env:
