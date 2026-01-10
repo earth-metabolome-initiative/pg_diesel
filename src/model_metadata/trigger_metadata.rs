@@ -1,4 +1,4 @@
-//! Submodule providing the `TriggerMetadata` struct for a [`Triggers`](crate::models::Triggers) model.
+//! Submodule providing the `TriggerMetadata` struct for a [`Triggers`] model.
 
 use std::rc::Rc;
 
@@ -15,7 +15,6 @@ pub struct TriggerMetadata {
     pub table: Rc<Table>,
     /// The events that fire the trigger.
     pub events: Vec<TriggerEvent>,
-
     /// The timing of the trigger.
     pub timing: Option<TriggerPeriod>,
     /// The orientation of the trigger.
