@@ -7,6 +7,7 @@ use sql_traits::{structs::generic_db::GenericDBBuilder, traits::TableLike};
 
 use crate::{
     PgDieselDatabase,
+    model_metadata::TriggerMetadata,
     models::{PgProc, Table},
 };
 
@@ -189,6 +190,15 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
                     Rc::clone(&index),
                     index.metadata(Rc::clone(&table), connection)?,
                 );
+            }
+
+            for (trigger, function_oid) in table_metadata.triggers() {
+                let metadata = TriggerMetadata::new(
+                    trigger.as_ref().clone(),
+                    Rc::clone(&table),
+                    *function_oid,
+                );
+                generic_builder = generic_builder.add_trigger(Rc::new(metadata), ());
             }
 
             generic_builder = generic_builder.add_table(table, table_metadata);

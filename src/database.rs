@@ -4,6 +4,7 @@
 
 use sql_traits::structs::GenericDB;
 
+use crate::model_metadata::TriggerMetadata;
 use crate::models::{CheckConstraint, Column, KeyColumnUsage, PgIndex, PgProc, Table};
 mod key_column_usage_metadata;
 pub use key_column_usage_metadata::KeyColumnUsageMetadata;
@@ -28,9 +29,10 @@ pub use builder::{PgDatabaseBuildError, PgDieselDatabaseBuilder};
 ///   function type
 /// - [`CheckConstraint`] from
 ///   `information_schema.check_constraints` as the check constraint type
+/// - [`TriggerMetadata`] from `information_schema.triggers` as the trigger type
 ///
 /// The `PgDieselDatabase` implements
 /// `DatabaseLike`, providing methods to
 /// iterate over tables, columns, foreign keys, and other database objects.
 pub type PgDieselDatabase =
-    GenericDB<Table, Column, PgIndex, KeyColumnUsage, PgProc, CheckConstraint>;
+    GenericDB<Table, Column, PgIndex, KeyColumnUsage, PgProc, CheckConstraint, TriggerMetadata>;

@@ -27,4 +27,5 @@ mod function_like;
 mod oid;
 mod postgres_type;
 mod table_like;
+mod trigger_like;
 mod unique_index_like;

@@ -6,7 +6,7 @@ use diesel::{OptionalExtension, PgConnection, Queryable, QueryableByName, Select
 
 use crate::{
     model_metadata::TableMetadata,
-    models::{CheckConstraint, Column, PgIndex, PgTrigger},
+    models::{CheckConstraint, Column, PgIndex, Triggers},
 };
 
 mod cached_queries;
@@ -95,9 +95,15 @@ impl Table {
         }
         sql_metadata.set_primary_key(primary_key_columns);
 
+        let triggers = cached_queries::triggers(self, conn)?
+            .into_iter()
+            .map(|(t, oid)| (std::rc::Rc::new(t), oid))
+            .collect();
+
         let metadata = TableMetadata::new(
             sql_metadata,
             cached_queries::pg_description(self, conn).optional()?,
+            triggers,
         );
 
         Ok(metadata)
@@ -268,7 +274,7 @@ impl Table {
     pub fn triggers(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<PgTrigger>, diesel::result::Error> {
+    ) -> Result<Vec<(Triggers, Option<u32>)>, diesel::result::Error> {
         triggers(self, conn)
     }
 }

@@ -16,3 +16,5 @@ mod table_metadata;
 pub use table_metadata::TableMetadata;
 mod column_metadata;
 pub use column_metadata::ColumnMetadata;
+mod trigger_metadata;
+pub use trigger_metadata::TriggerMetadata;

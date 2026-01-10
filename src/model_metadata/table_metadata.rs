@@ -2,7 +2,7 @@
 
 use std::rc::Rc;
 
-use crate::models::{CheckConstraint, Column, KeyColumnUsage, PgDescription, PgIndex};
+use crate::models::{CheckConstraint, Column, KeyColumnUsage, PgDescription, PgIndex, Triggers};
 
 #[derive(Clone, Debug)]
 /// Rich metadata about a `PostgreSQL` table.
@@ -23,6 +23,8 @@ pub struct TableMetadata {
     metadata: sql_traits::structs::TableMetadata<crate::models::Table>,
     /// The description of the table, if any.
     description: Option<PgDescription>,
+    /// The triggers defined on the table, along with the OID of the function they call.
+    triggers: Vec<(Rc<Triggers>, Option<u32>)>,
 }
 
 impl TableMetadata {
@@ -31,10 +33,12 @@ impl TableMetadata {
     pub fn new(
         metadata: sql_traits::structs::TableMetadata<crate::models::Table>,
         description: Option<PgDescription>,
+        triggers: Vec<(Rc<Triggers>, Option<u32>)>,
     ) -> Self {
         Self {
             metadata,
             description,
+            triggers,
         }
     }
 
@@ -94,5 +98,10 @@ impl TableMetadata {
     #[must_use]
     pub fn description(&self) -> Option<&PgDescription> {
         self.description.as_ref()
+    }
+
+    /// Returns an iterator over the triggers of the table.
+    pub fn triggers(&self) -> impl Iterator<Item = &(Rc<Triggers>, Option<u32>)> {
+        self.triggers.iter()
     }
 }

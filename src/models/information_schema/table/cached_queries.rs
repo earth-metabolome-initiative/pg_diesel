@@ -6,7 +6,7 @@ use diesel::{
 };
 
 use crate::models::{
-    CheckConstraint, Column, KeyColumnUsage, PgDescription, PgIndex, PgTrigger, Table,
+    CheckConstraint, Column, KeyColumnUsage, PgDescription, PgIndex, PgTrigger, Table, Triggers,
 };
 
 /// Loads all tables from the information schema for the given catalog and schema.
@@ -218,23 +218,6 @@ pub(crate) fn indices(
         .load::<PgIndex>(conn)
 }
 
-/// Returns the triggers of the table.
-pub(crate) fn triggers(
-    table: &Table,
-    conn: &mut PgConnection,
-) -> Result<Vec<PgTrigger>, diesel::result::Error> {
-    use crate::schema::pg_catalog::{
-        pg_class::pg_class, pg_namespace::pg_namespace, pg_trigger::pg_trigger,
-    };
-    pg_trigger::table
-        .inner_join(pg_class::table.on(pg_trigger::tgrelid.eq(pg_class::oid)))
-        .inner_join(pg_namespace::table.on(pg_class::relnamespace.eq(pg_namespace::oid)))
-        .filter(pg_class::relname.eq(&table.table_name))
-        .filter(pg_namespace::nspname.eq(&table.table_schema))
-        .select(PgTrigger::as_select())
-        .load::<PgTrigger>(conn)
-}
-
 /// Returns the check constraints of the table.
 pub(crate) fn check_constraints(
     table: &Table,
@@ -294,4 +277,41 @@ pub(super) fn pg_description(
         .filter(pg_attribute::attname.eq(&table.table_name))
         .select(PgDescription::as_select())
         .first::<PgDescription>(conn)
+}
+
+/// Returns the triggers of the table, along with the OID of the function they call.
+pub(crate) fn triggers(
+    table: &Table,
+    conn: &mut PgConnection,
+) -> Result<Vec<(Triggers, Option<u32>)>, diesel::result::Error> {
+    use crate::schema::information_schema::triggers::triggers;
+    use crate::schema::pg_catalog::{
+        pg_class::pg_class, pg_namespace::pg_namespace, pg_trigger::pg_trigger,
+    };
+
+    let is_triggers = triggers::table
+        .filter(triggers::event_object_catalog.eq(&table.table_catalog))
+        .filter(triggers::event_object_schema.eq(&table.table_schema))
+        .filter(triggers::event_object_table.eq(&table.table_name))
+        .select(Triggers::as_select())
+        .load::<Triggers>(conn)?;
+
+    let pg_triggers = pg_trigger::table
+        .inner_join(pg_class::table.on(pg_trigger::tgrelid.eq(pg_class::oid)))
+        .inner_join(pg_namespace::table.on(pg_class::relnamespace.eq(pg_namespace::oid)))
+        .filter(pg_class::relname.eq(&table.table_name))
+        .filter(pg_namespace::nspname.eq(&table.table_schema))
+        .select(PgTrigger::as_select())
+        .load::<PgTrigger>(conn)?;
+
+    let mut result = Vec::new();
+    for trig in is_triggers {
+        let name = trig.trigger_name.as_deref().unwrap_or("");
+        let oid = pg_triggers
+            .iter()
+            .find(|t| t.tgname == name)
+            .map(|t| t.tgfoid);
+        result.push((trig, oid));
+    }
+    Ok(result)
 }
