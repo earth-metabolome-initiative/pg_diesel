@@ -28,6 +28,10 @@ impl FunctionLike for PgProc {
         &self.proname
     }
 
+    fn body(&self) -> Option<&str> {
+        Some(&self.prosrc)
+    }
+
     fn argument_type_names<'db>(
         &'db self,
         database: &'db Self::DB,
