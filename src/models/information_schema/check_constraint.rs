@@ -10,9 +10,7 @@ use diesel::{
     Queryable, QueryableByName, Selectable, SelectableHelper,
 };
 use sql_traits::{
-    structs::metadata::CheckMetadata,
-    traits::{CheckConstraintLike, FunctionLike},
-    utils::columns_in_expression,
+    structs::metadata::CheckMetadata, traits::FunctionLike, utils::columns_in_expression,
 };
 
 use crate::{
@@ -180,7 +178,7 @@ impl CheckConstraint {
             .parse_expr()
             .expect("No expression found in parsed unique constraint");
 
-        let columns = columns_in_expression::<<Self as CheckConstraintLike>::DB>(
+        let columns = columns_in_expression(
             &expression,
             &table.table_name,
             table_metadata.column_rc_slice(),

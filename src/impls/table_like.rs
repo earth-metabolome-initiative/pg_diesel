@@ -13,12 +13,16 @@
 //! All metadata is loaded from [`TableMetadata`] which is constructed during
 //! database building.
 
-use sql_traits::traits::{Metadata, TableLike};
+use sql_traits::traits::{DocumentationMetadata, Metadata, TableLike};
 
 use crate::{PgDieselDatabase, model_metadata::TableMetadata};
 
 impl Metadata for crate::models::Table {
     type Meta = TableMetadata;
+}
+
+impl DocumentationMetadata for crate::models::Table {
+    type Documentation = ();
 }
 
 impl TableLike for crate::models::Table {
