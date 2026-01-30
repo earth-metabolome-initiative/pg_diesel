@@ -1,6 +1,9 @@
 //! Implementation of [`IndexLike`] for [`PgIndex`].
 
-use sql_traits::traits::IndexLike;
+use sql_traits::{
+    structs::metadata::UniqueIndexMetadata,
+    traits::{IndexLike, Metadata},
+};
 use sqlparser::ast::Expr;
 
 use crate::{PgDieselDatabase, models::PgIndex};
@@ -30,4 +33,8 @@ impl IndexLike for PgIndex {
             .expect("Index must exist in database")
             .expression()
     }
+}
+
+impl Metadata for PgIndex {
+    type Meta = UniqueIndexMetadata<Self>;
 }
