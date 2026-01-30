@@ -68,6 +68,16 @@ impl TableMetadata {
         self.metadata.check_constraint_rcs()
     }
 
+    /// Returns an iterator over the indices of the table.
+    pub fn indices(&self) -> impl Iterator<Item = &PgIndex> {
+        self.metadata.indices()
+    }
+
+    /// Returns an iterator over the Rc of indices of the table.
+    pub fn index_rcs(&self) -> impl Iterator<Item = &Rc<PgIndex>> {
+        self.metadata.index_rcs()
+    }
+
     /// Returns an iterator over the unique indices of the table.
     pub fn unique_indices(&self) -> impl Iterator<Item = &PgIndex> {
         self.metadata.unique_indices()

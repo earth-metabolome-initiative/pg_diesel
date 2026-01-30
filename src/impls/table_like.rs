@@ -60,6 +60,19 @@ impl TableLike for crate::models::Table {
             .columns()
     }
 
+    fn indices<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as sql_traits::traits::DatabaseLike>::Index>
+    where
+        Self: 'db,
+    {
+        database
+            .table_metadata(self)
+            .expect("Table must exist in database")
+            .indices()
+    }
+
     fn primary_key_columns<'db>(
         &'db self,
         database: &'db Self::DB,

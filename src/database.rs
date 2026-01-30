@@ -34,5 +34,13 @@ pub use builder::{PgDatabaseBuildError, PgDieselDatabaseBuilder};
 /// The `PgDieselDatabase` implements
 /// `DatabaseLike`, providing methods to
 /// iterate over tables, columns, foreign keys, and other database objects.
-pub type PgDieselDatabase =
-    GenericDB<Table, Column, PgIndex, KeyColumnUsage, PgProc, CheckConstraint, TriggerMetadata>;
+pub type PgDieselDatabase = GenericDB<
+    Table,
+    Column,
+    PgIndex,
+    PgIndex,
+    KeyColumnUsage,
+    PgProc,
+    CheckConstraint,
+    TriggerMetadata,
+>;

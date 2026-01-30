@@ -7,9 +7,9 @@ use diesel::{Connection, PgConnection};
 use pg_diesel::database::{PgDieselDatabase, PgDieselDatabaseBuilder};
 use pg_diesel::models::{PgExtension, PgOperator, PgProc, Table};
 use pg_diesel::traits::PostgresType;
+use sql_traits::traits::IndexLike;
 use sql_traits::traits::{
-    CheckConstraintLike, ColumnLike, ForeignKeyLike, TableLike, UniqueIndexLike,
-    database::DatabaseLike,
+    CheckConstraintLike, ColumnLike, ForeignKeyLike, TableLike, database::DatabaseLike,
 };
 use testcontainers::ImageExt;
 use testcontainers::core::IntoContainerPort;
@@ -211,10 +211,12 @@ async fn test_schema_completeness() {
             let _ = ForeignKeyLike::match_kind(fk, &db);
         }
 
-        for idx in <Table as TableLike>::unique_indices(table, &db) {
-            let _ = UniqueIndexLike::table(idx, &db);
-            let _ = UniqueIndexLike::expression(idx, &db);
+        for idx in <Table as TableLike>::indices(table, &db) {
+            let _ = IndexLike::table(idx, &db);
+            let _ = IndexLike::expression(idx, &db);
         }
+
+        for _idx in <Table as TableLike>::unique_indices(table, &db) {}
     }
 
     docker.stop().await.unwrap();
