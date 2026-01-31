@@ -9,7 +9,7 @@ use pg_diesel::models::{PgExtension, PgOperator, PgProc, Table};
 use pg_diesel::traits::PostgresType;
 use sql_traits::traits::IndexLike;
 use sql_traits::traits::{
-    CheckConstraintLike, ColumnLike, ForeignKeyLike, TableLike, database::DatabaseLike,
+    CheckConstraintLike, ColumnLike, ForeignKeyLike, PolicyLike, TableLike, database::DatabaseLike,
 };
 use testcontainers::ImageExt;
 use testcontainers::core::IntoContainerPort;
@@ -217,6 +217,17 @@ async fn test_schema_completeness() {
         }
 
         for _idx in <Table as TableLike>::unique_indices(table, &db) {}
+
+        for policy in <Table as TableLike>::policies(table, &db) {
+            let _ = PolicyLike::table(policy, &db);
+            let _ = PolicyLike::roles(policy, &db);
+            let _ = PolicyLike::using_expression(policy, &db);
+            let _ = PolicyLike::check_expression(policy, &db);
+            let _ = PolicyLike::command(policy);
+            let _ = PolicyLike::name(policy);
+            let _ = PolicyLike::using_functions(policy, &db);
+            let _ = PolicyLike::check_functions(policy, &db);
+        }
     }
 
     docker.stop().await.unwrap();

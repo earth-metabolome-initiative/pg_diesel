@@ -4,6 +4,7 @@ use std::rc::Rc;
 
 use diesel::PgConnection;
 use sql_traits::{structs::generic_db::GenericDBBuilder, traits::TableLike};
+use sqlparser::{ast::Ident, ast::Owner, dialect::PostgreSqlDialect, parser::Parser};
 
 use crate::{
     PgDieselDatabase,
@@ -199,6 +200,39 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
                     *function_oid,
                 );
                 generic_builder = generic_builder.add_trigger(Rc::new(metadata), ());
+            }
+
+            for policy in table_metadata.policies() {
+                let parse_expr = |sql: &Option<String>| -> Option<sqlparser::ast::Expr> {
+                    sql.as_ref().and_then(|s| {
+                        Parser::new(&PostgreSqlDialect {})
+                            .try_with_sql(s)
+                            .ok()?
+                            .parse_expr()
+                            .ok()
+                    })
+                };
+
+                let using_expression = parse_expr(&policy.polqual);
+                let check_expression = parse_expr(&policy.polwithcheck);
+
+                let roles: Vec<Owner> =
+                    crate::models::pg_policy_table::cached_queries::roles(policy, connection)?
+                        .into_iter()
+                        .map(|r| Owner::Ident(Ident::new(r.rolname)))
+                        .collect();
+
+                // Initialize Metadata with empty dependencies and table (functions will be filled later if we had logic for it)
+                let metadata = crate::model_metadata::PolicyMetadata::new(
+                    Rc::clone(&table),
+                    Vec::new(), // using_functions
+                    Vec::new(), // check_functions
+                    using_expression,
+                    check_expression,
+                    roles,
+                );
+
+                generic_builder = generic_builder.add_policy(Rc::clone(policy), metadata);
             }
 
             generic_builder = generic_builder.add_table(table, table_metadata);

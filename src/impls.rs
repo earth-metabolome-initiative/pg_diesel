@@ -26,6 +26,7 @@ mod foreign_key_like;
 mod function_like;
 mod index_like;
 mod oid;
+mod policy_like;
 mod postgres_type;
 mod table_like;
 mod trigger_like;

@@ -3,6 +3,8 @@
 
 use diesel::{Queryable, QueryableByName, Selectable};
 
+pub mod cached_queries;
+
 /// Represents a row from the `pg_policy` table.
 ///
 /// The `pg_policy` catalog stores row-level security policies. Note that this
@@ -10,7 +12,9 @@ use diesel::{Queryable, QueryableByName, Selectable};
 /// a more user-friendly representation.
 ///
 /// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/catalog-pg-policy.html).
-#[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
+#[derive(
+    Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash, PartialOrd, Ord,
+)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_policy::pg_policy)]
 pub struct PgPolicyTable {

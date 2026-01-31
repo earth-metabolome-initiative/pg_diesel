@@ -2,7 +2,9 @@
 
 use std::rc::Rc;
 
-use crate::models::{CheckConstraint, Column, KeyColumnUsage, PgDescription, PgIndex, Triggers};
+use crate::models::{
+    CheckConstraint, Column, KeyColumnUsage, PgDescription, PgIndex, PgPolicyTable, Triggers,
+};
 
 #[derive(Clone, Debug)]
 /// Rich metadata about a `PostgreSQL` table.
@@ -14,6 +16,7 @@ use crate::models::{CheckConstraint, Column, KeyColumnUsage, PgDescription, PgIn
 /// - Unique indexes (including primary key)
 /// - Foreign keys referencing other tables
 /// - Table description from `pg_catalog.pg_description`
+/// - Row Security Policies
 ///
 /// This metadata is constructed during
 /// [`PgDieselDatabase`](crate::database::PgDieselDatabase) building and cached for
@@ -25,6 +28,8 @@ pub struct TableMetadata {
     description: Option<PgDescription>,
     /// The triggers defined on the table, along with the OID of the function they call.
     triggers: Vec<(Rc<Triggers>, Option<u32>)>,
+    /// The policies defined on the table.
+    policies: Vec<Rc<PgPolicyTable>>,
 }
 
 impl TableMetadata {
@@ -34,11 +39,13 @@ impl TableMetadata {
         metadata: sql_traits::structs::TableMetadata<crate::models::Table>,
         description: Option<PgDescription>,
         triggers: Vec<(Rc<Triggers>, Option<u32>)>,
+        policies: Vec<Rc<PgPolicyTable>>,
     ) -> Self {
         Self {
             metadata,
             description,
             triggers,
+            policies,
         }
     }
 
@@ -113,5 +120,10 @@ impl TableMetadata {
     /// Returns an iterator over the triggers of the table.
     pub fn triggers(&self) -> impl Iterator<Item = &(Rc<Triggers>, Option<u32>)> {
         self.triggers.iter()
+    }
+
+    /// Returns an iterator over the policies of the table.
+    pub fn policies(&self) -> impl Iterator<Item = &Rc<PgPolicyTable>> {
+        self.policies.iter()
     }
 }

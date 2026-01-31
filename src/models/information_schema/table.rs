@@ -100,10 +100,16 @@ impl Table {
             .map(|(t, oid)| (std::rc::Rc::new(t), oid))
             .collect();
 
+        let policies = cached_queries::policies(self, conn)?
+            .into_iter()
+            .map(std::rc::Rc::new)
+            .collect();
+
         let metadata = TableMetadata::new(
             sql_metadata,
             cached_queries::pg_description(self, conn).optional()?,
             triggers,
+            policies,
         );
 
         Ok(metadata)

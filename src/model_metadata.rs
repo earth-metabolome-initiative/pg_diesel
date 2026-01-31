@@ -18,3 +18,5 @@ mod column_metadata;
 pub use column_metadata::ColumnMetadata;
 mod trigger_metadata;
 pub use trigger_metadata::TriggerMetadata;
+mod policy_metadata;
+pub use policy_metadata::PolicyMetadata;

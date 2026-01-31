@@ -315,3 +315,26 @@ pub(crate) fn triggers(
     }
     Ok(result)
 }
+
+/// Returns the policies associated with the table.
+pub(crate) fn policies(
+    table: &Table,
+    conn: &mut PgConnection,
+) -> Result<Vec<crate::models::PgPolicyTable>, diesel::result::Error> {
+    use crate::schema::pg_catalog::{
+        pg_class::pg_class, pg_namespace::pg_namespace, pg_policy::pg_policy,
+    };
+
+    // First find Table OID reliably
+    let table_oid: u32 = pg_class::table
+        .inner_join(pg_namespace::table.on(pg_class::relnamespace.eq(pg_namespace::oid)))
+        .filter(pg_class::relname.eq(&table.table_name))
+        .filter(pg_namespace::nspname.eq(&table.table_schema))
+        .select(pg_class::oid)
+        .first(conn)?;
+
+    pg_policy::table
+        .filter(pg_policy::polrelid.eq(table_oid))
+        .select(crate::models::PgPolicyTable::as_select())
+        .load(conn)
+}

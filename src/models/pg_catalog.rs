@@ -76,7 +76,7 @@ mod pg_opfamily;
 mod pg_parameter_acl;
 mod pg_partitioned_table;
 mod pg_policy;
-mod pg_policy_table;
+pub mod pg_policy_table;
 mod pg_prepared_statement;
 mod pg_prepared_xact;
 mod pg_proc;

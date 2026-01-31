@@ -5,7 +5,9 @@
 use sql_traits::structs::GenericDB;
 
 use crate::model_metadata::TriggerMetadata;
-use crate::models::{CheckConstraint, Column, KeyColumnUsage, PgIndex, PgProc, Table};
+use crate::models::{
+    CheckConstraint, Column, KeyColumnUsage, PgIndex, PgPolicyTable, PgProc, Table,
+};
 mod key_column_usage_metadata;
 pub use key_column_usage_metadata::KeyColumnUsageMetadata;
 mod pg_proc_metadata;
@@ -43,4 +45,5 @@ pub type PgDieselDatabase = GenericDB<
     PgProc,
     CheckConstraint,
     TriggerMetadata,
+    PgPolicyTable,
 >;

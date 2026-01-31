@@ -1403,7 +1403,7 @@ dependencies = [
  "ipnetwork",
  "serde",
  "sql-traits",
- "sqlparser",
+ "sqlparser 0.60.0 (git+https://github.com/LucaCappelletti94/sqlparser-rs?branch=externalize-statements)",
  "testcontainers",
  "thiserror",
  "tokio",
@@ -1991,12 +1991,12 @@ dependencies = [
 [[package]]
 name = "sql-traits"
 version = "0.1.0"
-source = "git+https://github.com/earth-metabolome-initiative/sql-traits?branch=main#45f10c2443f4c021921c0bf4f4ee43e4c5a05e4a"
+source = "git+https://github.com/earth-metabolome-initiative/sql-traits?branch=main#827efde35fd1e0d765a1963d713bc995a37c93ad"
 dependencies = [
  "geometric-traits",
  "git2",
  "sql_docs",
- "sqlparser",
+ "sqlparser 0.60.0 (git+https://github.com/LucaCappelletti94/sqlparser-rs?branch=externalize-statements)",
  "tempfile",
  "thiserror",
 ]
@@ -2004,21 +2004,28 @@ dependencies = [
 [[package]]
 name = "sql_docs"
 version = "1.0.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f3c0c4ee7f4455ee1bf7043e39222c163178df311baca7bd6fc5dd9b3daf822c"
+source = "git+https://github.com/LucaCappelletti94/sql-docs?branch=main#db34474b99836bb9291a4bebc5d0633cb1af64c7"
 dependencies = [
- "sqlparser",
+ "sqlparser 0.60.0 (git+https://github.com/apache/datafusion-sqlparser-rs?branch=main)",
 ]
 
 [[package]]
 name = "sqlparser"
 version = "0.60.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "505aa16b045c4c1375bf5f125cce3813d0176325bfe9ffc4a903f423de7774ff"
+source = "git+https://github.com/LucaCappelletti94/sqlparser-rs?branch=externalize-statements#cd2d7f035703cb81af1d7864c2f6f82f105f31d9"
 dependencies = [
  "log",
  "recursive",
  "serde",
+]
+
+[[package]]
+name = "sqlparser"
+version = "0.60.0"
+source = "git+https://github.com/apache/datafusion-sqlparser-rs?branch=main#c8b7f7cf4281cdfff3e08e9827928662b8be8095"
+dependencies = [
+ "log",
+ "recursive",
 ]
 
 [[package]]
@@ -2845,18 +2852,18 @@ dependencies = [
 
 [[package]]
 name = "zerocopy"
-version = "0.8.36"
+version = "0.8.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dafd85c832c1b68bbb4ec0c72c7f6f4fc5179627d2bc7c26b30e4c0cc11e76cc"
+checksum = "7456cf00f0685ad319c5b1693f291a650eaf345e941d082fc4e03df8a03996ac"
 dependencies = [
  "zerocopy-derive",
 ]
 
 [[package]]
 name = "zerocopy-derive"
-version = "0.8.36"
+version = "0.8.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7cb7e4e8436d9db52fbd6625dbf2f45243ab84994a72882ec8227b99e72b439a"
+checksum = "1328722bbf2115db7e19d69ebcc15e795719e2d66b60827c6a69a117365e37a0"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2925,6 +2932,6 @@ dependencies = [
 
 [[package]]
 name = "zmij"
-version = "1.0.17"
+version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "02aae0f83f69aafc94776e879363e9771d7ecbffe2c7fbb6c14c5e00dfe88439"
+checksum = "1966f8ac2c1f76987d69a74d0e0f929241c10e78136434e3be70ff7f58f64214"

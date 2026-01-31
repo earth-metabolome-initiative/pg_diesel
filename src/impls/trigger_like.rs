@@ -32,7 +32,7 @@ impl TriggerLike for TriggerMetadata {
     }
 
     fn orientation(&self) -> Option<TriggerObjectKind> {
-        self.orientation.clone()
+        self.orientation
     }
 
     fn function<'db>(
