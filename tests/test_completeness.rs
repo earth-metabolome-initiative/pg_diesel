@@ -5,9 +5,10 @@ use std::rc::Rc;
 
 use diesel::{Connection, PgConnection};
 use pg_diesel::database::{PgDieselDatabase, PgDieselDatabaseBuilder};
-use pg_diesel::models::{PgExtension, PgOperator, PgProc, Table};
+use pg_diesel::models::{PgExtension, PgOperator, PgProc, PgRole, Table};
 use pg_diesel::traits::PostgresType;
 use sql_traits::traits::IndexLike;
+use sql_traits::traits::RoleLike;
 use sql_traits::traits::{
     CheckConstraintLike, ColumnLike, ForeignKeyLike, PolicyLike, TableLike, database::DatabaseLike,
 };
@@ -167,6 +168,11 @@ async fn test_schema_completeness() {
         let _ = operator.right_operand_type(&mut conn);
         let _ = operator.result_type(&mut conn);
         let _ = operator.symbol();
+    }
+
+    for role in PgRole::load_all(&mut conn).expect("Failed to load roles") {
+        let _ = role.member_of(&db).collect::<Vec<_>>();
+        let _ = role.policies(&db).collect::<Vec<_>>();
     }
 
     for table in db.tables() {

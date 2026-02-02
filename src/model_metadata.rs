@@ -20,3 +20,5 @@ mod trigger_metadata;
 pub use trigger_metadata::TriggerMetadata;
 mod policy_metadata;
 pub use policy_metadata::PolicyMetadata;
+mod role_metadata;
+pub use role_metadata::RoleMetadata;

@@ -9,7 +9,7 @@ use sqlparser::{ast::Ident, ast::Owner, dialect::PostgreSqlDialect, parser::Pars
 use crate::{
     PgDieselDatabase,
     model_metadata::TriggerMetadata,
-    models::{PgProc, Table},
+    models::{PgProc, PgRole, Table},
 };
 
 #[derive(Default)]
@@ -117,6 +117,7 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
     type Error = PgDatabaseBuildError;
 
     #[allow(clippy::needless_borrow)]
+    #[allow(clippy::too_many_lines)]
     fn try_from(value: PgDieselDatabaseBuilder<'a>) -> Result<Self, Self::Error> {
         let connection = value
             .connection
@@ -135,10 +136,17 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
 
         let mut generic_builder = GenericDBBuilder::new(table_catalog.clone());
 
+        // Load all functions first as they may be referenced by other objects
         for function in PgProc::load_all(connection)? {
             let metadata = crate::database::PgProcMetadata::new(&function, connection)?;
             generic_builder = generic_builder.add_function(std::rc::Rc::new(function), metadata);
         }
+
+        // Load all roles
+        let roles: Vec<Rc<PgRole>> = PgRole::load_all(connection)?
+            .into_iter()
+            .map(Rc::new)
+            .collect();
 
         let mut tables = Vec::new();
         for table_schema in &table_schemas {
@@ -236,6 +244,49 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
             }
 
             generic_builder = generic_builder.add_table(table, table_metadata);
+        }
+
+        // Collect all roles' membership data and prepare role Rcs
+        let mut role_memberships: std::collections::HashMap<u32, Vec<u32>> =
+            std::collections::HashMap::new();
+        let mut roles_map: std::collections::HashMap<u32, Rc<PgRole>> =
+            std::collections::HashMap::new();
+
+        // First, create Rc for all roles and query their memberships
+        for role in roles {
+            let role_rc = Rc::clone(&role);
+
+            if let Some(role_oid) = role.oid {
+                roles_map.insert(role_oid, Rc::clone(&role_rc));
+
+                // Query pg_auth_members for this role's memberships
+                let member_of_oids =
+                    crate::models::pg_role::cached_queries::member_of(&role, connection)
+                        .unwrap_or_default();
+
+                role_memberships.insert(role_oid, member_of_oids);
+            }
+        }
+
+        // Now add roles with their metadata
+        // Note: We cannot populate policies here because policies reference roles by name,
+        // and we'd need to query the already-built database. For now, we leave policies empty.
+        for (role_oid, role_rc) in &roles_map {
+            let Some(member_of_oids) = role_memberships.get(role_oid) else {
+                continue;
+            };
+
+            // Find the actual role Rcs from our map
+            let member_of: Vec<Rc<PgRole>> = member_of_oids
+                .iter()
+                .filter_map(|oid| roles_map.get(oid).cloned())
+                .collect();
+
+            // For now, we don't populate policies (would require post-build processing)
+            let policies = Vec::new();
+
+            let metadata = crate::model_metadata::RoleMetadata::new(member_of, policies);
+            generic_builder = generic_builder.add_role(Rc::clone(role_rc), metadata);
         }
 
         Ok(generic_builder.into())

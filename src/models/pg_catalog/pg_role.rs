@@ -3,13 +3,17 @@
 
 use diesel::{Queryable, QueryableByName, Selectable};
 
+pub mod cached_queries;
+
 /// Represents a row from the `pg_roles` view.
 ///
 /// The `pg_roles` view provides information about database roles. It is a
 /// publicly readable view of `pg_authid` that blanks out the password field.
 ///
 /// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/view-pg-roles.html).
-#[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
+#[derive(
+    Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Hash,
+)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_roles::pg_roles)]
 pub struct PgRole {
@@ -39,4 +43,25 @@ pub struct PgRole {
     pub rolconfig: Option<Vec<String>>,
     /// OID of the role.
     pub oid: Option<u32>,
+}
+
+impl PgRole {
+    /// Loads all roles from the `pg_roles` view.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`.
+    ///
+    /// # Errors
+    ///
+    /// * If the database query fails.
+    pub fn load_all(conn: &mut diesel::PgConnection) -> Result<Vec<Self>, diesel::result::Error> {
+        cached_queries::load_all(conn)
+    }
+
+    /// Returns the name of the role.
+    #[must_use]
+    pub fn name(&self) -> &str {
+        self.rolname.as_deref().unwrap_or("<unknown>")
+    }
 }

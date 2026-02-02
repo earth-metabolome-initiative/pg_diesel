@@ -89,7 +89,7 @@ mod pg_replication_origin;
 mod pg_replication_origin_status;
 mod pg_replication_slot;
 mod pg_rewrite;
-mod pg_role;
+pub mod pg_role;
 mod pg_rule;
 mod pg_seclabel;
 mod pg_seclabel_view;
