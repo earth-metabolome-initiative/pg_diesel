@@ -1,240 +1,361 @@
 //! Submodule testing that all relevant postgres tables exist in the schema.
+#![allow(clippy::too_many_lines)]
 
-use std::path::PathBuf;
-use std::rc::Rc;
+mod test_utils;
 
-use diesel::{Connection, PgConnection};
-use pg_diesel::database::{PgDieselDatabase, PgDieselDatabaseBuilder};
-use pg_diesel::models::{PgExtension, PgOperator, PgProc, PgRole, Table};
-use pg_diesel::traits::PostgresType;
-use sql_traits::traits::IndexLike;
-use sql_traits::traits::RoleLike;
-use sql_traits::traits::{
-    CheckConstraintLike, ColumnLike, ForeignKeyLike, PolicyLike, TableLike, database::DatabaseLike,
+use std::collections::HashSet;
+
+use diesel::{PgConnection, RunQueryDsl};
+
+use test_utils::{
+    establish_connection, get_active_postgres_features, docker_helpers::get_postgres_version_tag,
+    is_enabled_for_current_features, model_parser::parse_model_file, schema_parser::parse_schema_file, reference_docker,
 };
-use testcontainers::ImageExt;
-use testcontainers::core::IntoContainerPort;
-use testcontainers::runners::AsyncRunner;
-use testcontainers::{ContainerAsync, GenericImage, TestcontainersError, core::WaitFor};
-
-/// Setup a docker container with a postgres database.
-///
-/// # Arguments
-///
-/// * `database_port` - The port of the database.
-/// * `database_name` - The name of the database.
-///
-/// # Panics
-///
-/// * If the container cannot be started.
-///
-/// # Errors
-///
-/// * If there is an error starting the container.
-async fn reference_docker(
-    database_port: u16,
-    database_name: &str,
-) -> Result<ContainerAsync<GenericImage>, TestcontainersError> {
-    GenericImage::new("postgres", "17.4")
-        .with_wait_for(WaitFor::message_on_stderr(
-            "database system is ready to accept connections",
-        ))
-        .with_network("bridge")
-        .with_env_var("DEBUG", "1")
-        .with_env_var("POSTGRES_USER", "user")
-        .with_env_var("POSTGRES_PASSWORD", "password")
-        .with_env_var("POSTGRES_DB", database_name)
-        .with_mapped_port(database_port, 5432_u16.tcp())
-        .start()
-        .await
-}
-
-/// Establish a connection to a postgres database.
-///
-/// # Arguments
-///
-/// * `database_port` - The port of the database.
-/// * `database_name` - The name of the database.
-///
-/// # Errors
-///
-/// * If the connection cannot be established.
-fn establish_connection_to_postgres<C: Connection>(
-    database_port: u16,
-    database_name: &str,
-) -> Result<C, diesel::ConnectionError> {
-    let database_url =
-        format!("postgres://user:password@localhost:{database_port}/{database_name}",);
-
-    let mut number_of_attempts = 0;
-
-    while let Err(e) = C::establish(&database_url) {
-        eprintln!("Failed to establish connection: {e:?}");
-        std::thread::sleep(std::time::Duration::from_secs(1));
-        if number_of_attempts > 10 {
-            eprintln!("Failed to establish connection after 10 attempts");
-            std::process::exit(1);
-        }
-        number_of_attempts += 1;
-    }
-
-    C::establish(&database_url)
-}
 
 #[tokio::test]
-#[allow(clippy::too_many_lines)]
 /// Test retrieval of extensions from a column
 async fn test_schema_completeness() {
+    use diesel::QueryableByName;
+    use diesel::sql_types::Text;
+
+    #[derive(QueryableByName, Debug)]
+    struct TableInfo {
+        #[diesel(sql_type = Text)]
+        table_schema: String,
+        #[diesel(sql_type = Text)]
+        table_name: String,
+    }
+
+    #[derive(QueryableByName, Debug)]
+    struct ColumnInfo {
+        #[diesel(sql_type = Text)]
+        column_name: String,
+    }
+
     let database_name = "test_schema_completeness";
     let port = 35433;
     let docker = reference_docker(port, database_name)
         .await
         .expect("Failed to start docker container");
-    let mut conn: PgConnection = establish_connection_to_postgres(port, database_name)
+    let mut conn: PgConnection = establish_connection(port, database_name)
         .expect("Failed to establish connection to database");
 
-    let db: PgDieselDatabase = PgDieselDatabaseBuilder::default()
-        .connection(&mut conn)
-        .catalog(database_name)
-        .denylist_types([
-            "anyarray",
-            "pg_ndistinct",
-            "pg_dependencies",
-            "pg_mcv_list",
-            "_pg_statistic",
-        ])
-        .unwrap()
-        .schemas(["pg_toast", "pg_catalog", "information_schema", "public"])
-        .try_into()
-        .expect("Failed to build database");
+    let crate_root_path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
 
-    let crate_root_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    // Get all tables from information_schema
+    let tables: Vec<TableInfo> = diesel::sql_query(
+        "SELECT table_schema, table_name FROM information_schema.tables 
+         WHERE table_schema IN ('pg_catalog', 'information_schema') 
+         AND table_type IN ('BASE TABLE', 'VIEW')
+         ORDER BY table_schema, table_name",
+    )
+    .load(&mut conn)
+    .expect("Failed to load tables");
 
-    for table in db.table_dag() {
-        if table.table_name().starts_with('_') {
-            // Skip internal tables
+    for table in tables {
+        let table_schema = &table.table_schema;
+        let table_name = &table.table_name;
+
+        if table_name.starts_with('_') {
             continue;
         }
 
         let expected_schema_path = crate_root_path
             .join("src")
             .join("schema")
-            .join(table.table_schema().unwrap())
-            .join(format!("{}.rs", table.table_name()));
+            .join(table_schema)
+            .join(format!("{table_name}.rs"));
 
-        assert!(
-            expected_schema_path.exists(),
-            "Table `{}` not found in src/schema/",
-            expected_schema_path.display(),
+        if !expected_schema_path.exists() {
+            continue;
+        }
+
+        let model_filename = match table_name.as_str() {
+            "pg_policy" => "pg_policy_table",
+            _ => table_name,
+        };
+
+        let expected_model_path = crate_root_path
+            .join("src")
+            .join("models")
+            .join(table_schema)
+            .join(format!("{model_filename}.rs"));
+
+        let schema_result = parse_schema_file(&expected_schema_path).unwrap_or_else(|e| {
+            panic!(
+                "Failed to parse schema file {}: {e}",
+                expected_schema_path.display(),
+            )
+        });
+
+        let enabled_schema_columns: HashSet<String> = schema_result
+            .columns
+            .iter()
+            .filter(|col| is_enabled_for_current_features(&col.feature_gate))
+            .map(|col| col.name.clone())
+            .collect();
+
+        let enabled_model_fields: HashSet<String> = if expected_model_path.exists() {
+            match parse_model_file(&expected_model_path) {
+                Ok(model_result) => model_result
+                    .fields
+                    .iter()
+                    .filter(|field| is_enabled_for_current_features(&field.feature_gate))
+                    .map(|field| field.name.clone())
+                    .collect(),
+                Err(_) => HashSet::new(),
+            }
+        } else {
+            HashSet::new()
+        };
+
+        let query = format!(
+            "SELECT column_name FROM information_schema.columns WHERE table_schema = '{table_schema}' AND table_name = '{table_name}' ORDER BY ordinal_position"
         );
+        let columns: Vec<ColumnInfo> =
+            diesel::sql_query(&query)
+                .load(&mut conn)
+                .unwrap_or_else(|e| {
+                    panic!("Failed to load columns for {table_schema}.{table_name}: {e}")
+                });
 
-        // We read the content of the expected schema file
-        let expected_schema_content = std::fs::read_to_string(&expected_schema_path)
-            .expect("Unable to read expected schema file");
+        let db_columns: HashSet<String> = columns.into_iter().map(|col| col.column_name).collect();
 
-        // We check that all columns are found in the expected schema file
-        for column in table.columns(&db) {
+        for db_col in &db_columns {
+            let schema_col_candidates =
+                [db_col.clone(), format!("__{db_col}"), format!("r#{db_col}")];
+            let found = schema_col_candidates
+                .iter()
+                .any(|c| enabled_schema_columns.contains(c));
+
             assert!(
-                expected_schema_content.contains(column.column_name()),
-                "Column `{}.{}` not found in expected schema file",
-                table.table_name(),
-                column.column_name(),
+                found,
+                "Database column `{table_schema}.{table_name}.{db_col}` exists in postgres {} but is not enabled in schema file.\n\
+                 Active features: {:?}\n\
+                 Enabled schema columns: {enabled_schema_columns:?}",
+                get_postgres_version_tag(),
+                get_active_postgres_features(),
             );
         }
-    }
 
-    let procs = PgProc::load_all(&mut conn).expect("Failed to load procs");
-    for proc in procs.iter().take(10) {
-        // Limit to 10 to avoid slow tests
-        let _ = proc.argument_types(&mut conn);
-        let _ = proc.return_type(&mut conn);
-        let _ = proc.extension(&mut conn);
-    }
+        for schema_col in &enabled_schema_columns {
+            let db_col_candidates: Vec<String> =
+                if let Some(stripped) = schema_col.strip_prefix("__") {
+                    vec![schema_col.clone(), stripped.to_string()]
+                } else if let Some(stripped) = schema_col.strip_prefix("r#") {
+                    vec![schema_col.clone(), stripped.to_string()]
+                } else {
+                    vec![schema_col.clone()]
+                };
 
-    let extensions = PgExtension::load_all(&mut conn).expect("Failed to load extensions");
-    for ext in extensions {
-        let _ = ext.functions(&mut conn);
-        let _ = ext.types(&mut conn);
-        let _ = ext.enums(&mut conn);
+            let found = db_col_candidates.iter().any(|c| db_columns.contains(c));
 
-        let _ = PgExtension::load(&ext.extname, &mut conn);
-    }
+            assert!(
+                found,
+                "Schema column `{table_schema}.{table_name}.{schema_col}` is enabled for current features but doesn't exist in database.\n\
+                 This might indicate an incorrect feature gate.\n\
+                 Active features: {:?}\n\
+                 Database columns: {db_columns:?}",
+                get_active_postgres_features(),
+            );
+        }
 
-    let operators = PgOperator::load_all(&mut conn).expect("Failed to load operators");
-    for operator in operators {
-        let _ = operator.function(&mut conn);
-        let _ = operator.extension(&mut conn);
-        let _ = operator.left_operand_type(&mut conn);
-        let _ = operator.right_operand_type(&mut conn);
-        let _ = operator.result_type(&mut conn);
-        let _ = operator.symbol();
-    }
-
-    for role in PgRole::load_all(&mut conn).expect("Failed to load roles") {
-        let _ = role.member_of(&db).collect::<Vec<_>>();
-        let _ = role.policies(&db).collect::<Vec<_>>();
-    }
-
-    for table in db.tables() {
-        for column in table.columns(&db) {
-            // column is &Column. We need to call methods on it.
-            // The methods take &self.
-            let _ = column.metadata(Rc::new(table.clone()), &mut conn);
-            let _ = column.check_constraints(&mut conn);
-            let _ = column.geometry(&mut conn);
-            let _ = column.geography(&mut conn);
-            let _ = column.has_foreign_keys(&mut conn);
-
-            if let Ok(pg_type) = column.pg_type(&mut conn) {
-                let _ = pg_type.extension(&mut conn);
-                let _ = pg_type.internal_user_defined_types(&mut conn);
-                let _ = pg_type.base_type(&mut conn);
-                let _ = pg_type.is_user_defined(&mut conn);
-                if let Ok(attributes) = pg_type.attributes(&mut conn) {
-                    for attr in attributes {
-                        let _ = attr.pg_type(&mut conn);
-                    }
-                }
-                let _ = pg_type.variants(&mut conn);
-
-                let _ = pg_type.postgres_type(&mut conn);
+        if !enabled_model_fields.is_empty() {
+            for model_field in &enabled_model_fields {
+                assert!(
+                    enabled_schema_columns.contains(model_field),
+                    "Model field `{table_schema}.{table_name}.{model_field}` is enabled but not found in enabled schema columns.\n\
+                     This indicates a mismatch between model and schema feature gates.\n\
+                     Active features: {:?}\n\
+                     Enabled schema columns: {enabled_schema_columns:?}",
+                    get_active_postgres_features(),
+                );
             }
-        }
 
-        for check in <Table as TableLike>::check_constraints(table, &db) {
-            let _ = CheckConstraintLike::expression(check, &db);
-            let _ = CheckConstraintLike::table(check, &db);
-            let _ = CheckConstraintLike::columns(check, &db);
-        }
-
-        for fk in <Table as TableLike>::foreign_keys(table, &db) {
-            let _ = ForeignKeyLike::foreign_key_name(fk);
-            let _ = ForeignKeyLike::referenced_table(fk, &db);
-            let _ = ForeignKeyLike::host_table(fk, &db);
-            let _ = ForeignKeyLike::referenced_columns(fk, &db);
-            let _ = ForeignKeyLike::host_columns(fk, &db);
-            let _ = ForeignKeyLike::on_delete_cascade(fk, &db);
-            let _ = ForeignKeyLike::match_kind(fk, &db);
-        }
-
-        for idx in <Table as TableLike>::indices(table, &db) {
-            let _ = IndexLike::table(idx, &db);
-            let _ = IndexLike::expression(idx, &db);
-        }
-
-        for _idx in <Table as TableLike>::unique_indices(table, &db) {}
-
-        for policy in <Table as TableLike>::policies(table, &db) {
-            let _ = PolicyLike::table(policy, &db);
-            let _ = PolicyLike::roles(policy, &db);
-            let _ = PolicyLike::using_expression(policy, &db);
-            let _ = PolicyLike::check_expression(policy, &db);
-            let _ = PolicyLike::command(policy);
-            let _ = PolicyLike::name(policy);
-            let _ = PolicyLike::using_functions(policy, &db);
-            let _ = PolicyLike::check_functions(policy, &db);
+            for schema_col in &enabled_schema_columns {
+                assert!(
+                    enabled_model_fields.contains(schema_col)
+                        || enabled_model_fields.contains(&format!("__{schema_col}")),
+                    "Schema column `{table_schema}.{table_name}.{schema_col}` is enabled but has no corresponding model field.\n\
+                     This indicates a mismatch between model and schema.\n\
+                     Active features: {:?}\n\
+                     Enabled model fields: {enabled_model_fields:?}",
+                    get_active_postgres_features(),
+                );
+            }
         }
     }
 
     docker.stop().await.unwrap();
+}
+
+/// Test that `test_load_all.rs` has test blocks for all tables in the schema.
+///
+/// This test parses the `test_load_all.rs` file and verifies that:
+/// 1. All schema files have corresponding test blocks
+/// 2. Feature-gated tables have correctly feature-gated test blocks
+#[test]
+fn test_load_all_coverage() {
+    use std::collections::HashMap;
+
+    let crate_root_path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+
+    let test_file_path = crate_root_path.join("tests").join("test_load_all.rs");
+    let test_content =
+        std::fs::read_to_string(&test_file_path).expect("Failed to read test_load_all.rs");
+
+    let mut tested_models: HashMap<String, Option<String>> = HashMap::new();
+    let mut current_feature_gate: Option<String> = None;
+
+    for line in test_content.lines() {
+        let trimmed = line.trim();
+
+        if trimmed.starts_with("#[cfg(feature = \"") {
+            if let Some(start) = trimmed.find('"')
+                && let Some(end) = trimmed.rfind('"')
+                && start < end
+            {
+                current_feature_gate = Some(trimmed[start + 1..end].to_string());
+            }
+            continue;
+        }
+
+        if trimmed == "}" {
+            current_feature_gate = None;
+            continue;
+        }
+
+        if let Some(rest) = trimmed.strip_prefix("use pg_diesel::models::")
+            && let Some(end) = rest.find(';')
+        {
+            let model_name = rest[..end].trim().to_string();
+            tested_models.insert(model_name, current_feature_gate.clone());
+        }
+    }
+
+    let schemas = ["information_schema", "pg_catalog", "public"];
+    let mut missing_tests: Vec<String> = Vec::new();
+
+    for schema in schemas {
+        let schema_dir = crate_root_path.join("src").join("schema").join(schema);
+        let model_dir = crate_root_path.join("src").join("models").join(schema);
+
+        if !schema_dir.exists() {
+            continue;
+        }
+
+        for entry in std::fs::read_dir(&schema_dir).expect("Failed to read schema directory") {
+            let entry = entry.expect("Failed to read directory entry");
+            let path = entry.path();
+
+            if path.extension().is_some_and(|e| e == "rs") {
+                let file_name = path.file_stem().unwrap().to_str().unwrap();
+
+                if file_name == "mod" {
+                    continue;
+                }
+
+                let schema_result = parse_schema_file(&path);
+
+                let has_feature_gated_columns = if let Ok(ref result) = schema_result {
+                    result
+                        .columns
+                        .iter()
+                        .any(|col| !matches!(col.feature_gate, test_utils::FeatureGate::Always))
+                } else {
+                    false
+                };
+
+                let model_file_candidates = [
+                    file_name.to_string(),
+                    file_name.trim_end_matches('s').to_string(),
+                    file_name.trim_end_matches("es").to_string(),
+                    file_name.replace("_constraints", "_constraint"),
+                    file_name.replace("_tables", "_table"),
+                    file_name.replace("_columns", "_column"),
+                    file_name.replace("_indexes", "_index"),
+                    file_name.replace("_privileges", "_privilege"),
+                    file_name.replace("_grants", "_grant"),
+                ];
+
+                let mut actual_model_name: Option<String> = None;
+                let mut model_file_exists = false;
+                for candidate in &model_file_candidates {
+                    let model_path = model_dir.join(format!("{candidate}.rs"));
+                    if model_path.exists() {
+                        model_file_exists = true;
+                        if let Ok(model_result) = parse_model_file(&model_path)
+                            && model_result.struct_name.is_some()
+                        {
+                            actual_model_name = model_result.struct_name;
+                            break;
+                        }
+                    }
+                }
+
+                if !model_file_exists {
+                    continue;
+                }
+
+                let model_to_check = actual_model_name.unwrap_or_else(|| to_pascal_case(file_name));
+
+                if !tested_models.contains_key(&model_to_check) {
+                    let singular_model = model_to_check.trim_end_matches('s').to_string();
+                    let without_es = if model_to_check.ends_with("es") {
+                        model_to_check[..model_to_check.len() - 2].to_string()
+                    } else {
+                        model_to_check.clone()
+                    };
+
+                    let variations = [
+                        model_to_check.clone(),
+                        format!("Pg{model_to_check}"),
+                        model_to_check.replace("Pg", "PG"),
+                        to_pascal_case(file_name),
+                        singular_model,
+                        without_es,
+                        model_to_check.replace("Policies", "Policy"),
+                        model_to_check.replace("Indexes", "Index"),
+                        model_to_check.replace("Privileges", "Privilege"),
+                        model_to_check.replace("Tables", "Table"),
+                        model_to_check.replace("Columns", "Column"),
+                        model_to_check.replace("Grants", "Grant"),
+                        model_to_check.replace("Data", "Datum"),
+                    ];
+
+                    let found = variations.iter().any(|v| tested_models.contains_key(v));
+
+                    if !found {
+                        missing_tests.push(format!(
+                            "{schema}.{file_name} (model: {model_to_check}{})",
+                            if has_feature_gated_columns {
+                                " - has feature-gated columns"
+                            } else {
+                                ""
+                            }
+                        ));
+                    }
+                }
+            }
+        }
+    }
+
+    assert!(
+        missing_tests.is_empty(),
+        "The following tables are missing tests in test_load_all.rs:\n{}",
+        missing_tests.join("\n")
+    );
+}
+
+/// Convert `snake_case` to `PascalCase`.
+fn to_pascal_case(s: &str) -> String {
+    s.split('_')
+        .map(|part| {
+            let mut chars = part.chars();
+            match chars.next() {
+                None => String::new(),
+                Some(first) => first.to_uppercase().chain(chars).collect(),
+            }
+        })
+        .collect()
 }

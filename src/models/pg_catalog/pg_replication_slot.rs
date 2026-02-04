@@ -44,13 +44,26 @@ pub struct PgReplicationSlot {
     /// Whether two-phase commit enabled.
     pub two_phase: Option<bool>,
     /// Time since inactive.
+    /// Added in `PostgreSQL` 17.
+    #[cfg(any(feature = "postgres-17", feature = "postgres-18"))]
     pub inactive_since: Option<std::time::SystemTime>,
     /// Whether conflicting.
+    #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
     pub conflicting: Option<bool>,
     /// Invalidation reason.
+    /// Added in `PostgreSQL` 17.
+    #[cfg(any(feature = "postgres-17", feature = "postgres-18"))]
     pub invalidation_reason: Option<String>,
     /// Whether failover enabled.
+    /// Added in `PostgreSQL` 17.
+    #[cfg(any(feature = "postgres-17", feature = "postgres-18"))]
     pub failover: Option<bool>,
     /// Whether synced from primary.
+    /// Added in `PostgreSQL` 17.
+    #[cfg(any(feature = "postgres-17", feature = "postgres-18"))]
     pub synced: Option<bool>,
+    /// LSN at which two-phase commit decoding is enabled.
+    /// Added in `PostgreSQL` 18.
+    #[cfg(feature = "postgres-18")]
+    pub two_phase_at: Option<PgLsn>,
 }

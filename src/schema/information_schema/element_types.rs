@@ -44,6 +44,10 @@ diesel::table! {
         interval_type -> Nullable<Text>,
         /// Precision of interval elements.
         interval_precision -> Nullable<Integer>,
+        /// Domain default value (not yet implemented).
+        /// This column was removed in `PostgreSQL` 17.
+        #[cfg(not(any(feature = "postgres-17", feature = "postgres-18")))]
+        domain_default -> Nullable<Text>,
         /// Catalog of the underlying user-defined type.
         udt_catalog -> Nullable<Text>,
         /// Schema of the underlying user-defined type.

@@ -77,7 +77,12 @@ mod tests {
             indnatts: 0,
             indnkeyatts: 0,
             indisunique: false,
-            #[cfg(feature = "postgres-15")]
+            #[cfg(any(
+                feature = "postgres-15",
+                feature = "postgres-16",
+                feature = "postgres-17",
+                feature = "postgres-18"
+            ))]
             indnullsnotdistinct: false,
             indisprimary: false,
             indisexclusion: false,
@@ -106,6 +111,8 @@ mod tests {
             condeferrable: false,
             condeferred: false,
             convalidated: false,
+            #[cfg(feature = "postgres-18")]
+            conenforced: false,
             conrelid: 0,
             contypid: 0,
             conindid: 0,
@@ -118,13 +125,21 @@ mod tests {
             coninhcount: 0,
             connoinherit: false,
             conkey: None,
+            #[cfg(feature = "postgres-18")]
+            conperiod: false,
             confkey: None,
             conpfeqop: None,
             conppeqop: None,
             conffeqop: None,
             conexclop: None,
-            #[cfg(feature = "postgres-15")]
+            #[cfg(any(
+                feature = "postgres-15",
+                feature = "postgres-16",
+                feature = "postgres-17",
+                feature = "postgres-18"
+            ))]
             confdelsetcols: None,
+            conbin: None,
         }
     }
 
@@ -171,7 +186,13 @@ mod tests {
             typmodin: 0,
             typmodout: 0,
             typanalyze: 0,
-            #[cfg(feature = "postgres-14")]
+            #[cfg(any(
+                feature = "postgres-14",
+                feature = "postgres-15",
+                feature = "postgres-16",
+                feature = "postgres-17",
+                feature = "postgres-18"
+            ))]
             typsubscript: 0,
             typalign: String::new(),
             typstorage: String::new(),
@@ -211,11 +232,20 @@ mod tests {
             proallargtypes: None,
             proargmodes: None,
             proargnames: None,
+            proargdefaults: None,
+            protrftypes: None,
             prosrc: String::new(),
             probin: None,
-            #[cfg(feature = "postgres-14")]
+            #[cfg(any(
+                feature = "postgres-14",
+                feature = "postgres-15",
+                feature = "postgres-16",
+                feature = "postgres-17",
+                feature = "postgres-18"
+            ))]
             prosqlbody: None,
             proconfig: None,
+            proacl: None,
         }
     }
 

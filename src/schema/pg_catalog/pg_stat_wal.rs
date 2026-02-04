@@ -13,12 +13,16 @@ diesel::table! {
         wal_bytes -> Nullable<Double>,
         /// Number of times WAL data was written to disk because WAL buffers became full.
         wal_buffers_full -> Nullable<BigInt>,
+        #[cfg(not(feature = "postgres-18"))]
         /// Number of times WAL buffers were written out to disk.
         wal_write -> Nullable<BigInt>,
+        #[cfg(not(feature = "postgres-18"))]
         /// Number of times WAL files were synced to disk.
         wal_sync -> Nullable<BigInt>,
+        #[cfg(not(feature = "postgres-18"))]
         /// Total time spent writing WAL buffers to disk, in milliseconds.
         wal_write_time -> Nullable<Double>,
+        #[cfg(not(feature = "postgres-18"))]
         /// Total time spent syncing WAL files to disk, in milliseconds.
         wal_sync_time -> Nullable<Double>,
         /// Time at which these statistics were last reset.

@@ -34,5 +34,7 @@ pub struct PgStatProgressCopy {
     /// Tuples excluded.
     pub tuples_excluded: Option<i64>,
     /// Tuples skipped.
+    /// Only available in `PostgreSQL` 17+.
+    #[cfg(any(feature = "postgres-17", feature = "postgres-18"))]
     pub tuples_skipped: Option<i64>,
 }

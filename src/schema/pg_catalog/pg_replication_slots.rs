@@ -36,14 +36,27 @@ diesel::table! {
         /// `true` if the slot is enabled for two-phase commit decoding.
         two_phase -> Nullable<Bool>,
         /// Time since the slot became inactive (null if active).
+        /// Added in `PostgreSQL` 17.
+        #[cfg(any(feature = "postgres-17", feature = "postgres-18"))]
         inactive_since -> Nullable<Timestamp>,
         /// `true` if the slot has been invalidated due to conflicts.
+        #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
         conflicting -> Nullable<Bool>,
         /// Reason for invalidation (null if not invalidated).
+        /// Added in `PostgreSQL` 17.
+        #[cfg(any(feature = "postgres-17", feature = "postgres-18"))]
         invalidation_reason -> Nullable<Text>,
         /// `true` if the slot is enabled for failover.
+        /// Added in `PostgreSQL` 17.
+        #[cfg(any(feature = "postgres-17", feature = "postgres-18"))]
         failover -> Nullable<Bool>,
         /// `true` if the slot is synchronized from a primary server.
+        /// Added in `PostgreSQL` 17.
+        #[cfg(any(feature = "postgres-17", feature = "postgres-18"))]
         synced -> Nullable<Bool>,
+        /// LSN at which two-phase commit decoding is enabled.
+        /// Added in `PostgreSQL` 18.
+        #[cfg(feature = "postgres-18")]
+        two_phase_at -> Nullable<PgLsn>,
     }
 }

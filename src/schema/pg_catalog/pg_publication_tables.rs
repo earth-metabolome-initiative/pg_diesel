@@ -12,9 +12,11 @@ diesel::table! {
         schemaname -> Nullable<Text>,
         /// Name of the table.
         tablename -> Nullable<Text>,
-        /// Names of columns included in the publication (null means all columns).
+        /// Names of columns included in the publication (null means all columns) (`PostgreSQL` 15+).
+        #[cfg(not(feature = "postgres-14"))]
         attnames -> Nullable<Array<Text>>,
-        /// Row filter expression (null if no filter).
+        /// Row filter expression (null if no filter) (`PostgreSQL` 15+).
+        #[cfg(not(feature = "postgres-14"))]
         rowfilter -> Nullable<Text>,
     }
 }

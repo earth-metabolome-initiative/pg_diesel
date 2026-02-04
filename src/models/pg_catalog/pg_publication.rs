@@ -33,4 +33,8 @@ pub struct PgPublication {
     pub pubtruncate: bool,
     /// Whether publishing via root table.
     pub pubviaroot: bool,
+    /// Whether generated columns are published.
+    /// Added in `PostgreSQL` 18.
+    #[cfg(feature = "postgres-18")]
+    pub pubgencols: bool,
 }

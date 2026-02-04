@@ -59,6 +59,14 @@ diesel::table! {
         sessions_fatal -> Nullable<BigInt>,
         /// Number of database sessions that were terminated by operator intervention.
         sessions_killed -> Nullable<BigInt>,
+        /// Number of parallel workers planned to be launched.
+        /// Added in `PostgreSQL` 18.
+        #[cfg(feature = "postgres-18")]
+        parallel_workers_to_launch -> Nullable<BigInt>,
+        /// Number of parallel workers actually launched.
+        /// Added in `PostgreSQL` 18.
+        #[cfg(feature = "postgres-18")]
+        parallel_workers_launched -> Nullable<BigInt>,
         /// Time at which these statistics were last reset.
         stats_reset -> Nullable<Timestamp>,
     }

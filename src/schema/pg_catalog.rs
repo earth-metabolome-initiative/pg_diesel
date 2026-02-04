@@ -21,6 +21,8 @@
 //! documentation.
 
 pub mod pg_aggregate;
+#[cfg(feature = "postgres-18")]
+pub mod pg_aios;
 pub mod pg_am;
 pub mod pg_amop;
 pub mod pg_amproc;
@@ -93,6 +95,7 @@ pub mod pg_shadow;
 pub mod pg_shdepend;
 pub mod pg_shdescription;
 pub mod pg_shmem_allocations;
+pub mod pg_shmem_allocations_numa;
 pub mod pg_shseclabel;
 pub mod pg_stat_activity;
 pub mod pg_stat_all_indexes;

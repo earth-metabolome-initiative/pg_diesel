@@ -14,12 +14,14 @@ diesel::table! {
         /// Number of sequential scans initiated on this table.
         seq_scan -> Nullable<BigInt>,
         /// Time of the last sequential scan on this table.
+        #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
         last_seq_scan -> Nullable<Timestamp>,
         /// Number of live rows fetched by sequential scans.
         seq_tup_read -> Nullable<BigInt>,
         /// Number of index scans initiated on this table.
         idx_scan -> Nullable<BigInt>,
         /// Time of the last index scan on this table.
+        #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
         last_idx_scan -> Nullable<Timestamp>,
         /// Number of live rows fetched by index scans.
         idx_tup_fetch -> Nullable<BigInt>,
@@ -32,6 +34,7 @@ diesel::table! {
         /// Number of rows HOT (Heap-Only Tuple) updated.
         n_tup_hot_upd -> Nullable<BigInt>,
         /// Number of rows updated to a new page.
+        #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
         n_tup_newpage_upd -> Nullable<BigInt>,
         /// Estimated number of live rows.
         n_live_tup -> Nullable<BigInt>,
@@ -57,5 +60,22 @@ diesel::table! {
         analyze_count -> Nullable<BigInt>,
         /// Number of times this table has been autoanalyzed.
         autoanalyze_count -> Nullable<BigInt>,
+
+        /// Total time this table has been manually vacuumed, in milliseconds.
+        /// Added in `PostgreSQL` 18.
+        #[cfg(feature = "postgres-18")]
+        total_vacuum_time -> Nullable<Double>,
+        /// Total time this table has been vacuumed by the autovacuum daemon, in milliseconds.
+        /// Added in `PostgreSQL` 18.
+        #[cfg(feature = "postgres-18")]
+        total_autovacuum_time -> Nullable<Double>,
+        /// Total time this table has been manually analyzed, in milliseconds.
+        /// Added in `PostgreSQL` 18.
+        #[cfg(feature = "postgres-18")]
+        total_analyze_time -> Nullable<Double>,
+        /// Total time this table has been analyzed by the autovacuum daemon, in milliseconds.
+        /// Added in `PostgreSQL` 18.
+        #[cfg(feature = "postgres-18")]
+        total_autoanalyze_time -> Nullable<Double>,
     }
 }

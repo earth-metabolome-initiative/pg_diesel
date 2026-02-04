@@ -24,12 +24,14 @@ pub struct PgStatUserTable {
     /// Sequential scans count.
     pub seq_scan: Option<i64>,
     /// Last sequential scan time.
+    #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
     pub last_seq_scan: Option<SystemTime>,
     /// Sequential tuples read.
     pub seq_tup_read: Option<i64>,
     /// Index scans count.
     pub idx_scan: Option<i64>,
     /// Last index scan time.
+    #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
     pub last_idx_scan: Option<SystemTime>,
     /// Index tuples fetched.
     pub idx_tup_fetch: Option<i64>,
@@ -42,6 +44,7 @@ pub struct PgStatUserTable {
     /// HOT updates.
     pub n_tup_hot_upd: Option<i64>,
     /// New page updates.
+    #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
     pub n_tup_newpage_upd: Option<i64>,
     /// Live tuples estimate.
     pub n_live_tup: Option<i64>,

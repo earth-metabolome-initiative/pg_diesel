@@ -18,10 +18,13 @@ pub struct PgStatSubscription {
     /// Subscription name.
     pub subname: Option<String>,
     /// Worker type.
+    /// Added in `PostgreSQL` 17.
+    #[cfg(any(feature = "postgres-17", feature = "postgres-18"))]
     pub worker_type: Option<String>,
     /// Process ID.
     pub pid: Option<i32>,
     /// Leader process ID.
+    #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
     pub leader_pid: Option<i32>,
     /// Relation OID.
     pub relid: Option<u32>,

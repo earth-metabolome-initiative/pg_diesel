@@ -29,5 +29,9 @@ diesel::table! {
         child_tables_done -> Nullable<BigInt>,
         /// OID of the child table currently being analyzed.
         current_child_table_relid -> Nullable<Oid>,
+        /// Total time spent sleeping due to cost-based delay, in milliseconds.
+        /// Added in `PostgreSQL` 18.
+        #[cfg(feature = "postgres-18")]
+        delay_time -> Nullable<Double>,
     }
 }

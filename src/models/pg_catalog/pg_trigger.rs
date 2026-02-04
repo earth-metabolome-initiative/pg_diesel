@@ -60,4 +60,6 @@ pub struct PgTrigger {
     pub tgoldtable: Option<String>,
     /// The name of the NEW transition table, if applicable; otherwise, `None`.
     pub tgnewtable: Option<String>,
+    /// Predicate expression (WHEN clause) for the trigger, or `NULL` if none.
+    pub tgqual: Option<String>,
 }

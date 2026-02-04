@@ -32,8 +32,13 @@ pub struct PgStatsExt {
     pub exprs: Option<Vec<String>>,
     /// Statistics kinds.
     pub kinds: Option<Vec<String>>,
-    /// Inherited stats flag.
+    /// Inherited stats flag (`PostgreSQL` 15+).
+    #[cfg(not(feature = "postgres-14"))]
     pub inherited: Option<bool>,
+    /// N-distinct counts (`pg_ndistinct` type).
+    pub n_distinct: Option<Vec<u8>>,
+    /// Functional dependencies (`pg_dependencies` type).
+    pub dependencies: Option<Vec<u8>>,
     /// Most common values.
     pub most_common_vals: Option<Vec<String>>,
     /// Most common value nulls flags.

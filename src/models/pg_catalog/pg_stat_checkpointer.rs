@@ -19,6 +19,10 @@ pub struct PgStatCheckpointer {
     pub num_timed: Option<i64>,
     /// Requested checkpoints.
     pub num_requested: Option<i64>,
+    /// Number of checkpoints done.
+    /// Added in `PostgreSQL` 18.
+    #[cfg(feature = "postgres-18")]
+    pub num_done: Option<i64>,
     /// Timed restartpoints.
     pub restartpoints_timed: Option<i64>,
     /// Requested restartpoints.
@@ -31,6 +35,10 @@ pub struct PgStatCheckpointer {
     pub sync_time: Option<f64>,
     /// Buffers written.
     pub buffers_written: Option<i64>,
+    /// SLRU buffers written.
+    /// Added in `PostgreSQL` 18.
+    #[cfg(feature = "postgres-18")]
+    pub slru_written: Option<i64>,
     /// Statistics reset time.
     pub stats_reset: Option<SystemTime>,
 }

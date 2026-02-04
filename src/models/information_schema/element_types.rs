@@ -55,6 +55,10 @@ pub struct ElementTypes {
     pub interval_type: Option<String>,
     /// Precision of interval elements.
     pub interval_precision: Option<i32>,
+    /// Domain default value (not yet implemented).
+    /// This column was removed in `PostgreSQL` 17.
+    #[cfg(not(any(feature = "postgres-17", feature = "postgres-18")))]
+    pub domain_default: Option<String>,
     /// Catalog of the underlying user-defined type.
     pub udt_catalog: Option<String>,
     /// Schema of the underlying user-defined type.

@@ -63,7 +63,13 @@ mod tests {
             typmodin: 0,
             typmodout: 0,
             typanalyze: 0,
-            #[cfg(feature = "postgres-14")]
+            #[cfg(any(
+                feature = "postgres-14",
+                feature = "postgres-15",
+                feature = "postgres-16",
+                feature = "postgres-17",
+                feature = "postgres-18"
+            ))]
             typsubscript: 0,
             typalign: "i".to_string(),
             typstorage: "p".to_string(),

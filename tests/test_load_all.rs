@@ -1,43 +1,9 @@
 //! Test loading all supported tables
 
-use diesel::{Connection, PgConnection, QueryDsl, RunQueryDsl, SelectableHelper};
-use testcontainers::runners::AsyncRunner;
-use testcontainers::{
-    ContainerAsync, GenericImage, ImageExt, TestcontainersError, core::IntoContainerPort,
-    core::WaitFor,
-};
+mod test_utils;
 
-async fn reference_docker(
-    database_port: u16,
-    database_name: &str,
-) -> Result<ContainerAsync<GenericImage>, TestcontainersError> {
-    GenericImage::new("postgres", "17.4")
-        .with_wait_for(WaitFor::message_on_stderr(
-            "database system is ready to accept connections",
-        ))
-        .with_network("bridge")
-        .with_env_var("POSTGRES_USER", "user")
-        .with_env_var("POSTGRES_PASSWORD", "password")
-        .with_env_var("POSTGRES_DB", database_name)
-        .with_mapped_port(database_port, 5432_u16.tcp())
-        .start()
-        .await
-}
-
-fn establish_connection(port: u16, name: &str) -> PgConnection {
-    let url = format!("postgres://user:password@localhost:{port}/{name}");
-    let mut attempts = 0;
-    loop {
-        match PgConnection::establish(&url) {
-            Ok(conn) => return conn,
-            Err(_) if attempts < 10 => {
-                std::thread::sleep(std::time::Duration::from_secs(1));
-                attempts += 1;
-            }
-            Err(e) => panic!("Failed to connect: {e:?}"),
-        }
-    }
-}
+use diesel::{PgConnection, QueryDsl, RunQueryDsl, SelectableHelper};
+use test_utils::{establish_connection, reference_docker};
 
 #[tokio::test]
 #[allow(clippy::too_many_lines)]
@@ -47,7 +13,8 @@ async fn test_load_all_models() {
     let _docker = reference_docker(port, database_name)
         .await
         .expect("Failed to start docker");
-    let mut conn = establish_connection(port, database_name);
+    let mut conn: PgConnection = establish_connection(port, database_name)
+        .expect("Failed to establish connection to database");
 
     // information_schema
     {
@@ -303,6 +270,13 @@ async fn test_load_all_models() {
             .load::<RoleUdtGrants>(&mut conn);
     }
     {
+        use pg_diesel::models::RoleUsageGrants;
+        use pg_diesel::schema::information_schema::role_usage_grants::role_usage_grants::dsl::*;
+        let _ = role_usage_grants
+            .select(RoleUsageGrants::as_select())
+            .load::<RoleUsageGrants>(&mut conn);
+    }
+    {
         use pg_diesel::schema::information_schema::routine_column_usage::routine_column_usage::dsl::*;
         use pg_diesel::models::RoutineColumnUsage;
         let _ = routine_column_usage
@@ -495,6 +469,14 @@ async fn test_load_all_models() {
         let _ = pg_aggregate
             .select(PgAggregate::as_select())
             .load::<PgAggregate>(&mut conn);
+    }
+    #[cfg(feature = "postgres-18")]
+    {
+        use pg_diesel::models::PgAios;
+        use pg_diesel::schema::pg_catalog::pg_aios::pg_aios::dsl::*;
+        let _ = pg_aios
+            .select(PgAios::as_select())
+            .load::<PgAios>(&mut conn);
     }
     {
         use pg_diesel::models::PgAm;

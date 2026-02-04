@@ -28,6 +28,7 @@ diesel::table! {
         /// Number of rows HOT (Heap-Only Tuple) updated within the current transaction.
         n_tup_hot_upd -> Nullable<BigInt>,
         /// Number of rows updated to a new page within the current transaction.
+        #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
         n_tup_newpage_upd -> Nullable<BigInt>,
     }
 }

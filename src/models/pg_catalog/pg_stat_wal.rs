@@ -26,12 +26,16 @@ pub struct PgStatWal {
     pub wal_bytes: Option<f64>,
     /// Times WAL buffers were full.
     pub wal_buffers_full: Option<i64>,
+    #[cfg(not(feature = "postgres-18"))]
     /// Number of WAL writes.
     pub wal_write: Option<i64>,
+    #[cfg(not(feature = "postgres-18"))]
     /// Number of WAL syncs.
     pub wal_sync: Option<i64>,
+    #[cfg(not(feature = "postgres-18"))]
     /// WAL write time (milliseconds).
     pub wal_write_time: Option<f64>,
+    #[cfg(not(feature = "postgres-18"))]
     /// WAL sync time (milliseconds).
     pub wal_sync_time: Option<f64>,
     /// Statistics reset time.

@@ -9,7 +9,7 @@ use diesel::{Queryable, QueryableByName, Selectable};
 /// backend currently running ANALYZE.
 ///
 /// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/progress-reporting.html#ANALYZE-PROGRESS-REPORTING).
-#[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
+#[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_stat_progress_analyze::pg_stat_progress_analyze)]
 pub struct PgStatProgressAnalyze {
@@ -37,4 +37,8 @@ pub struct PgStatProgressAnalyze {
     pub child_tables_done: Option<i64>,
     /// Current child table OID.
     pub current_child_table_relid: Option<u32>,
+    /// Delay time (milliseconds).
+    /// Added in `PostgreSQL` 18.
+    #[cfg(feature = "postgres-18")]
+    pub delay_time: Option<f64>,
 }

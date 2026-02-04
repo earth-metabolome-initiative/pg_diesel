@@ -19,6 +19,8 @@ pub struct PgBackendMemoryContexts {
     /// key).
     pub ident: Option<String>,
     /// Name of the parent memory context.
+    /// Removed in `PostgreSQL` 18 in favor of `path`.
+    #[cfg(not(feature = "postgres-18"))]
     pub parent: Option<String>,
     /// Nesting level of the memory context.
     pub level: Option<i32>,
@@ -32,4 +34,11 @@ pub struct PgBackendMemoryContexts {
     pub free_chunks: Option<i64>,
     /// Number of used bytes in this context.
     pub used_bytes: Option<i64>,
+    /// Path of the memory context (replaces `parent` in `PostgreSQL` 18+).
+    #[cfg(feature = "postgres-18")]
+    pub path: Option<String>,
+    /// Type of the memory context.
+    /// Added in `PostgreSQL` 18.
+    #[cfg(feature = "postgres-18")]
+    pub r#type: Option<String>,
 }

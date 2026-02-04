@@ -30,6 +30,10 @@ pub struct TableMetadata {
     triggers: Vec<(Rc<Triggers>, Option<u32>)>,
     /// The policies defined on the table.
     policies: Vec<Rc<PgPolicyTable>>,
+    /// Whether the table has row-level security enabled.
+    row_security: bool,
+    /// Whether the table has row-level security forced.
+    forced_row_security: bool,
 }
 
 impl TableMetadata {
@@ -40,12 +44,16 @@ impl TableMetadata {
         description: Option<PgDescription>,
         triggers: Vec<(Rc<Triggers>, Option<u32>)>,
         policies: Vec<Rc<PgPolicyTable>>,
+        row_security: bool,
+        forced_row_security: bool,
     ) -> Self {
         Self {
             metadata,
             description,
             triggers,
             policies,
+            row_security,
+            forced_row_security,
         }
     }
 
@@ -125,5 +133,17 @@ impl TableMetadata {
     /// Returns an iterator over the policies of the table.
     pub fn policies(&self) -> impl Iterator<Item = &Rc<PgPolicyTable>> {
         self.policies.iter()
+    }
+
+    /// Returns whether the table has row-level security enabled.
+    #[must_use]
+    pub fn row_security(&self) -> bool {
+        self.row_security
+    }
+
+    /// Returns whether the table has row-level security forced.
+    #[must_use]
+    pub fn forced_row_security(&self) -> bool {
+        self.forced_row_security
     }
 }

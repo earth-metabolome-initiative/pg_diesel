@@ -9,6 +9,8 @@ diesel::table! {
         /// Identification string of the memory context (part of composite primary key).
         ident -> Nullable<Text>,
         /// Name of the parent memory context.
+        /// Removed in `PostgreSQL` 18 in favor of `path`.
+        #[cfg(not(feature = "postgres-18"))]
         parent -> Nullable<Text>,
         /// Nesting level of the memory context.
         level -> Nullable<Integer>,
@@ -22,5 +24,12 @@ diesel::table! {
         free_chunks -> Nullable<BigInt>,
         /// Number of used bytes in this context.
         used_bytes -> Nullable<BigInt>,
+        /// Path of the memory context (replaces `parent` in `PostgreSQL` 18+).
+        #[cfg(feature = "postgres-18")]
+        path -> Nullable<Text>,
+        /// Type of the memory context.
+        /// Added in `PostgreSQL` 18.
+        #[cfg(feature = "postgres-18")]
+        r#type -> Nullable<Text>,
     }
 }

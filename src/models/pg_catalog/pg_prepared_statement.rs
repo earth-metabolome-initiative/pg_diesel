@@ -23,6 +23,7 @@ pub struct PgPreparedStatement {
     /// Parameter type OIDs.
     pub parameter_types: Option<Vec<u32>>,
     /// Result column type OIDs.
+    #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
     pub result_types: Option<Vec<u32>>,
     /// Whether created via SQL PREPARE.
     pub from_sql: Option<bool>,

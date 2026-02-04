@@ -77,6 +77,10 @@ diesel::table! {
         relreplident -> Char,
         /// `true` if this relation is a partition of another table.
         relispartition -> Bool,
+        /// Number of all-frozen pages in the table.
+        /// Added in `PostgreSQL` 18.
+        #[cfg(feature = "postgres-18")]
+        relallfrozen -> Integer,
         /// OID of the relation this one is being rewritten into (during operations like `ALTER TABLE`), or 0.
         relrewrite -> Oid,
         /// Minimum frozen transaction ID for the relation (used by VACUUM).

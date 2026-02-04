@@ -21,6 +21,8 @@ diesel::table! {
         attnum -> SmallInt,
         /// Column offset in the tuple (for internal use by the executor).
         /// -1 if not cached.
+        /// Removed in `PostgreSQL` 18.
+        #[cfg(not(feature = "postgres-18"))]
         attcacheoff -> Integer,
         /// Type-specific modifier (atttypmod), often indicating precision/scale for numeric types.
         /// -1 if not applicable.
@@ -72,6 +74,8 @@ diesel::table! {
         attfdwoptions -> Nullable<Array<Text>>,
         /// Compression method for the column: 'p' = pglz, 'l' = lz4, or '' if no compression.
         attcompression -> Text,
+        /// Missing value for added columns.
+        attmissingval -> Nullable<Array<Text>>,
     }
 }
 

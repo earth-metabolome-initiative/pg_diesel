@@ -62,15 +62,28 @@ pub struct PgProc {
     pub proargmodes: Option<Vec<String>>,
     /// An array of names of the arguments.
     pub proargnames: Option<Vec<String>>,
+    /// Default values for arguments (as a node tree representation).
+    pub proargdefaults: Option<String>,
+    /// Array of type OIDs for output of polymorphic functions.
+    pub protrftypes: Option<Vec<u32>>,
     /// The source code of the function.
     pub prosrc: String,
     /// The binary representation of the function.
     pub probin: Option<Vec<u8>>,
-    #[cfg(feature = "postgres-14")]
     /// The SQL body of the function, if any.
+    /// Added in `PostgreSQL` 14.
+    #[cfg(any(
+        feature = "postgres-14",
+        feature = "postgres-15",
+        feature = "postgres-16",
+        feature = "postgres-17",
+        feature = "postgres-18"
+    ))]
     pub prosqlbody: Option<String>,
     /// The configuration settings for the function.
     pub proconfig: Option<Vec<String>>,
+    /// Access privileges for the function.
+    pub proacl: Option<Vec<String>>,
 }
 
 impl PgProc {
@@ -191,11 +204,20 @@ mod tests {
             proallargtypes: None,
             proargmodes: None,
             proargnames: None,
+            proargdefaults: None,
+            protrftypes: None,
             prosrc: "src".to_string(),
             probin: None,
-            #[cfg(feature = "postgres-14")]
+            #[cfg(any(
+                feature = "postgres-14",
+                feature = "postgres-15",
+                feature = "postgres-16",
+                feature = "postgres-17",
+                feature = "postgres-18"
+            ))]
             prosqlbody: None,
             proconfig: None,
+            proacl: None,
         }
     }
 

@@ -14,6 +14,7 @@ diesel::table! {
         /// Whether GSSAPI encryption is in use for this connection.
         encrypted -> Nullable<Bool>,
         /// Whether GSSAPI credentials were delegated for this connection.
+        #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
         credentials_delegated -> Nullable<Bool>,
     }
 }

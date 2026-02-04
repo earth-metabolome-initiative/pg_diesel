@@ -105,11 +105,15 @@ impl Table {
             .map(std::rc::Rc::new)
             .collect();
 
+        let (row_security, forced_row_security) = cached_queries::pg_class(self, conn)?;
+
         let metadata = TableMetadata::new(
             sql_metadata,
             cached_queries::pg_description(self, conn).optional()?,
             triggers,
             policies,
+            row_security,
+            forced_row_security,
         );
 
         Ok(metadata)

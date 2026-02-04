@@ -70,6 +70,10 @@ pub struct PGClass {
     pub relreplident: String,
     /// Whether the object is a partition.
     pub relispartition: bool,
+    /// Number of all-frozen pages in the table.
+    /// Added in `PostgreSQL` 18.
+    #[cfg(feature = "postgres-18")]
+    pub relallfrozen: i32,
     /// The OID of the rewrite rule associated with this object, if any.
     pub relrewrite: u32,
     /// Minimum frozen transaction ID for the relation

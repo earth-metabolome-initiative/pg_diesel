@@ -10,9 +10,11 @@ diesel::table! {
         prpubid -> Oid,
         /// OID of the relation/table (references `pg_class`).
         prrelid -> Oid,
-        /// Array of attribute numbers for column-level replication; `NULL` if all columns.
+        /// Array of attribute numbers for column-level replication; `NULL` if all columns (`PostgreSQL` 15+).
+        #[cfg(not(feature = "postgres-14"))]
         prattrs -> Nullable<Array<SmallInt>>,
-        /// Optional WHERE clause expression tree for row filtering.
+        /// Optional WHERE clause expression tree for row filtering (`PostgreSQL` 15+).
+        #[cfg(not(feature = "postgres-14"))]
         prqual -> Nullable<Text>,
     }
 }

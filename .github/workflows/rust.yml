@@ -11,11 +11,13 @@ env:
 
 jobs:
   test:
-    name: Build
+    name: Test (${{ matrix.rust }}, postgres-${{ matrix.postgres }})
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        rust: [stable, beta, nightly]
+        rust: [stable, nightly]
+        postgres: [14, 15, 16, 17, 18]
     steps:
     - uses: actions/checkout@v4
     - name: Install Rust
@@ -26,11 +28,24 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y libfontconfig1-dev libpq-dev
-    - name: Build and Test
-      run: cargo test --release
+    - name: Build and Test (postgres-${{ matrix.postgres }})
+      run: cargo test --release --no-default-features --features postgres-${{ matrix.postgres }}
+    - name: Build and Test with serde (postgres-${{ matrix.postgres }})
+      run: cargo test --release --no-default-features --features "postgres-${{ matrix.postgres }},serde"
+
+  test-no-features:
+    name: Test (no default features)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libfontconfig1-dev libpq-dev
     - name: Test with no default features
       run: cargo test --release --no-default-features
-
 
   fmt:
     name: Rustfmt
@@ -45,8 +60,12 @@ jobs:
       run: cargo fmt --all -- --check
 
   clippy:
-    name: Clippy
+    name: Clippy (postgres-${{ matrix.postgres }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        postgres: [14, 15, 16, 17, 18]
     steps:
     - uses: actions/checkout@v4
     - name: Install Rust
@@ -57,8 +76,8 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y libfontconfig1-dev libpq-dev
-    - name: Run clippy
-      run: cargo clippy --all-targets -- -D warnings
+    - name: Run clippy (postgres-${{ matrix.postgres }})
+      run: cargo clippy --all-targets --no-default-features --features postgres-${{ matrix.postgres }} -- -D warnings
 
   doc:
     name: Documentation
@@ -85,10 +104,19 @@ jobs:
       uses: dtolnay/rust-toolchain@stable
     - name: Install tarpaulin
       uses: taiki-e/install-action@cargo-tarpaulin
-    - name: Generate coverage
-      run: cargo tarpaulin --engine=llvm --out xml --workspace --run-types AllTargets --run-types Doctests
+    - name: Generate coverage for postgres-14
+      run: cargo tarpaulin --engine=llvm --out xml --output-dir ./coverage --workspace --run-types AllTargets --no-default-features --features postgres-14
+    - name: Generate coverage for postgres-15
+      run: cargo tarpaulin --engine=llvm --out xml --output-dir ./coverage --workspace --run-types AllTargets --no-default-features --features postgres-15
+    - name: Generate coverage for postgres-16
+      run: cargo tarpaulin --engine=llvm --out xml --output-dir ./coverage --workspace --run-types AllTargets --no-default-features --features postgres-16
+    - name: Generate coverage for postgres-17
+      run: cargo tarpaulin --engine=llvm --out xml --output-dir ./coverage --workspace --run-types AllTargets --no-default-features --features postgres-17
+    - name: Generate coverage for postgres-18
+      run: cargo tarpaulin --engine=llvm --out xml --output-dir ./coverage --workspace --run-types AllTargets --no-default-features --features postgres-18
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
+        directory: ./coverage
         fail_ci_if_error: false

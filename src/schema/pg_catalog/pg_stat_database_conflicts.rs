@@ -20,6 +20,7 @@ diesel::table! {
         /// Number of queries canceled due to deadlocks.
         confl_deadlock -> Nullable<BigInt>,
         /// Number of queries canceled due to active logical replication slots.
+        #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
         confl_active_logicalslot -> Nullable<BigInt>,
     }
 }

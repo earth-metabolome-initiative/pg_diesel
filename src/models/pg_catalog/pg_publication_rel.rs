@@ -20,6 +20,10 @@ pub struct PgPublicationRel {
     pub prpubid: u32,
     /// OID of the relation.
     pub prrelid: u32,
-    /// Optional WHERE clause for row filtering.
+    /// Array of attribute numbers for column-level replication; `NULL` if all columns (`PostgreSQL` 15+).
+    #[cfg(not(feature = "postgres-14"))]
+    pub prattrs: Option<Vec<i16>>,
+    /// Optional WHERE clause for row filtering (`PostgreSQL` 15+).
+    #[cfg(not(feature = "postgres-14"))]
     pub prqual: Option<String>,
 }

@@ -22,5 +22,9 @@ diesel::table! {
         pubtruncate -> Bool,
         /// `true` if operations on partitions are published via the root partitioned table.
         pubviaroot -> Bool,
+        /// `true` if generated columns are published.
+        /// Added in `PostgreSQL` 18.
+        #[cfg(feature = "postgres-18")]
+        pubgencols -> Bool,
     }
 }

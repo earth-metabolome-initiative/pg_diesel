@@ -22,5 +22,6 @@ pub struct PgStatGssapi {
     /// Connection encrypted.
     pub encrypted: Option<bool>,
     /// Credentials delegated.
+    #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
     pub credentials_delegated: Option<bool>,
 }

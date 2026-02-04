@@ -138,4 +138,18 @@ impl TableLike for crate::models::Table {
             .policies()
             .map(AsRef::as_ref)
     }
+
+    fn has_row_level_security(&self, database: &Self::DB) -> bool {
+        database
+            .table_metadata(self)
+            .expect("Table must exist in database")
+            .row_security()
+    }
+
+    fn has_forced_row_level_security(&self, database: &Self::DB) -> bool {
+        database
+            .table_metadata(self)
+            .expect("Table must exist in database")
+            .forced_row_security()
+    }
 }

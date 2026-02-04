@@ -1,7 +1,7 @@
 //! Submodule defining the cached queries methods used in the [`PgAttribute`]
 //! struct.
 
-use diesel::{ExpressionMethods, PgConnection, QueryDsl, RunQueryDsl};
+use diesel::{ExpressionMethods, PgConnection, QueryDsl, RunQueryDsl, SelectableHelper};
 
 use crate::models::{PgAttribute, PgType};
 
@@ -13,5 +13,6 @@ pub(super) fn pg_type(
     use crate::schema::pg_catalog::pg_type::pg_type;
     pg_type::table
         .filter(pg_type::oid.eq(pg_attribute.atttypid))
+        .select(PgType::as_select())
         .first(conn)
 }

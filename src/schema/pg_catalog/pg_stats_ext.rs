@@ -21,8 +21,13 @@ diesel::table! {
         exprs -> Nullable<Array<Text>>,
         /// Types of statistics that are enabled.
         kinds -> Nullable<Array<Text>>,
-        /// If true, the stats include values only from child tables.
+        /// If true, the stats include values only from child tables (`PostgreSQL` 15+).
+        #[cfg(not(feature = "postgres-14"))]
         inherited -> Nullable<Bool>,
+        /// N-distinct counts (`pg_ndistinct` type as bytea).
+        n_distinct -> Nullable<Binary>,
+        /// Functional dependencies (`pg_dependencies` type as bytea).
+        dependencies -> Nullable<Binary>,
         /// Most common combinations of values.
         most_common_vals -> Nullable<Array<Text>>,
         /// Flags showing which of the most common values are null.

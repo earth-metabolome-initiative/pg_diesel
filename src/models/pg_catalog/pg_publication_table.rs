@@ -20,8 +20,10 @@ pub struct PgPublicationTable {
     pub schemaname: Option<String>,
     /// Table name.
     pub tablename: Option<String>,
-    /// Column names included.
+    /// Column names included (`PostgreSQL` 15+).
+    #[cfg(not(feature = "postgres-14"))]
     pub attnames: Option<Vec<String>>,
-    /// Row filter expression.
+    /// Row filter expression (`PostgreSQL` 15+).
+    #[cfg(not(feature = "postgres-14"))]
     pub rowfilter: Option<String>,
 }

@@ -338,3 +338,18 @@ pub(crate) fn policies(
         .select(crate::models::PgPolicyTable::as_select())
         .load(conn)
 }
+
+/// Returns the Row Level Security settings for the table.
+pub(crate) fn pg_class(
+    table: &Table,
+    conn: &mut PgConnection,
+) -> Result<(bool, bool), diesel::result::Error> {
+    use crate::schema::pg_catalog::{pg_class::pg_class, pg_namespace::pg_namespace};
+
+    pg_class::table
+        .inner_join(pg_namespace::table.on(pg_class::relnamespace.eq(pg_namespace::oid)))
+        .filter(pg_class::relname.eq(&table.table_name))
+        .filter(pg_namespace::nspname.eq(&table.table_schema))
+        .select((pg_class::relrowsecurity, pg_class::relforcerowsecurity))
+        .first(conn)
+}

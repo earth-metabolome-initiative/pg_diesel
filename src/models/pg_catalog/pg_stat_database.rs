@@ -69,6 +69,14 @@ pub struct PgStatDatabase {
     pub sessions_fatal: Option<i64>,
     /// Killed sessions.
     pub sessions_killed: Option<i64>,
+    /// Parallel workers to launch.
+    /// Added in `PostgreSQL` 18.
+    #[cfg(feature = "postgres-18")]
+    pub parallel_workers_to_launch: Option<i64>,
+    /// Parallel workers launched.
+    /// Added in `PostgreSQL` 18.
+    #[cfg(feature = "postgres-18")]
+    pub parallel_workers_launched: Option<i64>,
     /// Statistics reset time.
     pub stats_reset: Option<SystemTime>,
 }

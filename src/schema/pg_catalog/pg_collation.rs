@@ -22,9 +22,16 @@ diesel::table! {
         collcollate -> Nullable<Text>,
         /// `LC_CTYPE` setting for this collation.
         collctype -> Nullable<Text>,
-        /// Locale name for ICU collations.
+        /// ICU locale ID for this collation object (`PostgreSQL` 15-16).
+        /// Renamed to `colllocale` in `PostgreSQL` 17.
+        #[cfg(any(feature = "postgres-15", feature = "postgres-16"))]
+        colliculocale -> Nullable<Text>,
+        /// Collation provider locale name for this collation object (`PostgreSQL` 17+).
+        /// Renamed from `colliculocale` in `PostgreSQL` 17.
+        #[cfg(any(feature = "postgres-17", feature = "postgres-18"))]
         colllocale -> Nullable<Text>,
         /// ICU rules for this collation.
+        #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
         collicurules -> Nullable<Text>,
         /// Provider-specific version string.
         collversion -> Nullable<Text>,

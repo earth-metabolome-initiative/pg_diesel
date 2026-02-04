@@ -26,6 +26,8 @@ diesel::table! {
         /// Number of tuples excluded by WHERE clause.
         tuples_excluded -> Nullable<BigInt>,
         /// Number of tuples skipped.
+        /// Only available in `PostgreSQL` 17+.
+        #[cfg(any(feature = "postgres-17", feature = "postgres-18"))]
         tuples_skipped -> Nullable<BigInt>,
     }
 }

@@ -18,6 +18,7 @@ diesel::table! {
         /// Number of index scans initiated on this index.
         idx_scan -> Nullable<BigInt>,
         /// Time of the last scan on this index.
+        #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
         last_idx_scan -> Nullable<Timestamp>,
         /// Number of index entries returned by scans on this index.
         idx_tup_read -> Nullable<BigInt>,

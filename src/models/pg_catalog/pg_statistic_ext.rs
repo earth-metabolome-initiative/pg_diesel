@@ -28,6 +28,8 @@ pub struct PgStatisticExt {
     pub stxowner: u32,
     /// Statistics target.
     pub stxstattarget: Option<i16>,
+    /// Column attribute numbers.
+    pub stxkeys: Vec<i16>,
     /// Statistics kinds.
     pub stxkind: Vec<String>,
     /// Expression tree.

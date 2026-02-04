@@ -1,7 +1,7 @@
 //! Submodule providing the `PgSubscription` struct representing a row of the
 //! `pg_subscription` table in `PostgreSQL`.
 
-use diesel::{Identifiable, Queryable, QueryableByName, Selectable, data_types::PgLsn};
+use diesel::{Identifiable, Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_subscription` table.
 ///
@@ -20,8 +20,9 @@ pub struct PgSubscription {
     pub oid: u32,
     /// Database OID.
     pub subdbid: u32,
-    /// Skip LSN.
-    pub subskiplsn: PgLsn,
+    /// Skip LSN (`PostgreSQL` 15+).
+    #[cfg(not(feature = "postgres-14"))]
+    pub subskiplsn: diesel::data_types::PgLsn,
     /// Subscription name.
     pub subname: String,
     /// Owner OID.
@@ -32,15 +33,21 @@ pub struct PgSubscription {
     pub subbinary: bool,
     /// Stream mode.
     pub substream: String,
-    /// Two-phase state.
+    /// Two-phase state (`PostgreSQL` 15+).
+    #[cfg(not(feature = "postgres-14"))]
     pub subtwophasestate: String,
-    /// Disable on error flag.
+    /// Disable on error flag (`PostgreSQL` 15+).
+    #[cfg(not(feature = "postgres-14"))]
     pub subdisableonerr: bool,
     /// Password required flag.
+    #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
     pub subpasswordrequired: bool,
     /// Run as owner flag.
+    #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
     pub subrunasowner: bool,
     /// Failover flag.
+    /// Added in `PostgreSQL` 17.
+    #[cfg(any(feature = "postgres-17", feature = "postgres-18"))]
     pub subfailover: bool,
     /// Connection info.
     pub subconninfo: String,
@@ -51,5 +58,6 @@ pub struct PgSubscription {
     /// Publications.
     pub subpublications: Vec<String>,
     /// Origin name.
+    #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
     pub suborigin: Option<String>,
 }

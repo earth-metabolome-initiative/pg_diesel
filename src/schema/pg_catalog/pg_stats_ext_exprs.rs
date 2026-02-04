@@ -17,7 +17,8 @@ diesel::table! {
         statistics_owner -> Nullable<Text>,
         /// Expression text.
         expr -> Nullable<Text>,
-        /// If true, the stats include values only from child tables.
+        /// If true, the stats include values only from child tables (`PostgreSQL` 15+).
+        #[cfg(not(feature = "postgres-14"))]
         inherited -> Nullable<Bool>,
         /// Fraction of expression values that are null.
         null_frac -> Nullable<Float>,
@@ -25,10 +26,16 @@ diesel::table! {
         avg_width -> Nullable<Integer>,
         /// Number of distinct nonnull expression values.
         n_distinct -> Nullable<Float>,
+        /// Most common values.
+        most_common_vals -> Nullable<Array<Binary>>,
         /// List of the most common values' frequencies.
         most_common_freqs -> Nullable<Array<Float>>,
+        /// Histogram bounds.
+        histogram_bounds -> Nullable<Array<Binary>>,
         /// Statistical correlation between physical row ordering and logical ordering of the expression values.
         correlation -> Nullable<Float>,
+        /// Most common element values.
+        most_common_elems -> Nullable<Array<Binary>>,
         /// List of the frequencies of the most common element values.
         most_common_elem_freqs -> Nullable<Array<Float>>,
         /// Histogram of counts of distinct element values.

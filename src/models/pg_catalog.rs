@@ -30,6 +30,8 @@
 //! for types with Object Identifiers.
 
 mod pg_aggregate;
+#[cfg(feature = "postgres-18")]
+mod pg_aios;
 mod pg_am;
 mod pg_amop;
 mod pg_amproc;
@@ -172,6 +174,8 @@ mod pg_view;
 mod pg_wait_event;
 
 pub use pg_aggregate::PgAggregate;
+#[cfg(feature = "postgres-18")]
+pub use pg_aios::PgAios;
 pub use pg_am::PgAm;
 pub use pg_amop::PgAmop;
 pub use pg_amproc::PgAmproc;

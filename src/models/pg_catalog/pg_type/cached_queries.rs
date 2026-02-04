@@ -58,5 +58,6 @@ pub(super) fn from_oid(oid: u32, conn: &mut PgConnection) -> Result<PgType, dies
     use crate::schema::pg_catalog::pg_type::pg_type;
     pg_type::table
         .filter(pg_type::oid.eq(oid))
+        .select(PgType::as_select())
         .first::<PgType>(conn)
 }

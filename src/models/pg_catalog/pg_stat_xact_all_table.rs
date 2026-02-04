@@ -36,5 +36,6 @@ pub struct PgStatXactAllTable {
     /// HOT updates in transaction.
     pub n_tup_hot_upd: Option<i64>,
     /// New page updates in transaction.
+    #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
     pub n_tup_newpage_upd: Option<i64>,
 }

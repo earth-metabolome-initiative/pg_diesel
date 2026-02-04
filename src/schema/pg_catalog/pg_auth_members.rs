@@ -1,5 +1,6 @@
 //! Submodule for the `pg_catalog.pg_auth_members` table schema.
 
+#[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
 diesel::table! {
     /// `pg_catalog.pg_auth_members` — catalog of authorization identifier membership relationships.
     /// Contains information about which roles are members of which other roles.
@@ -18,5 +19,21 @@ diesel::table! {
         inherit_option -> Bool,
         /// Whether the member can SET ROLE to this role.
         set_option -> Bool,
+    }
+}
+
+#[cfg(any(feature = "postgres-15", feature = "postgres-14"))]
+diesel::table! {
+    /// `pg_catalog.pg_auth_members` — catalog of authorization identifier membership relationships.
+    /// Contains information about which roles are members of which other roles.
+    pg_catalog.pg_auth_members (roleid, member) {
+        /// OID of the role that has members.
+        roleid -> diesel::sql_types::Oid,
+        /// OID of the role that is a member.
+        member -> diesel::sql_types::Oid,
+        /// OID of the role that granted this membership.
+        grantor -> diesel::sql_types::Oid,
+        /// Whether the member can grant this role to others.
+        admin_option -> Bool,
     }
 }

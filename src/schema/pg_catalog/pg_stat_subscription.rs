@@ -10,10 +10,13 @@ diesel::table! {
         /// Name of the subscription.
         subname -> Nullable<Text>,
         /// Type of the subscription worker (apply, parallel apply, table sync).
+        /// Added in `PostgreSQL` 17.
+        #[cfg(any(feature = "postgres-17", feature = "postgres-18"))]
         worker_type -> Nullable<Text>,
         /// Process ID of the subscription worker process.
         pid -> Nullable<Integer>,
         /// Process ID of the leader apply worker, if this is a parallel apply worker.
+        #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
         leader_pid -> Nullable<Integer>,
         /// OID of the relation that the worker is synchronizing.
         relid -> Nullable<Oid>,

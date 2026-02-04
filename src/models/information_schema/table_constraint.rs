@@ -40,6 +40,7 @@ pub struct TableConstraint {
     /// Whether the constraint is enforced
     pub enforced: String,
     /// The name of the column the constraint is associated with
+    #[cfg(not(feature = "postgres-14"))]
     pub nulls_distinct: Option<String>,
 }
 

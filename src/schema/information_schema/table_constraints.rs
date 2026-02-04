@@ -26,6 +26,7 @@ diesel::table! {
         /// "YES" if the constraint is enforced, "NO" if it is not.
         enforced -> Text,
         /// "YES" if NULL values are treated as distinct for unique constraints; `NULL` otherwise.
+        #[cfg(not(feature = "postgres-14"))]
         nulls_distinct -> Nullable<Text>,
     }
 }

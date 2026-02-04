@@ -31,6 +31,10 @@ pub struct PgConstraint {
     pub condeferred: bool,
     /// Whether the constraint is validated
     pub convalidated: bool,
+    /// Whether the constraint is enforced
+    /// Added in `PostgreSQL` 18.
+    #[cfg(feature = "postgres-18")]
+    pub conenforced: bool,
     /// The OID of the table that the constraint is on
     pub conrelid: u32,
     /// The domain this constraint is on; zero if not a domain constraint
@@ -54,18 +58,20 @@ pub struct PgConstraint {
     /// constraint can be locally defined and inherited simultaneously.
     pub conislocal: bool,
     #[cfg(not(any(
-        feature = "postgres-14",
         feature = "postgres-15",
-        feature = "postgres-17"
+        feature = "postgres-16",
+        feature = "postgres-17",
+        feature = "postgres-18"
     )))]
     /// The number of direct inheritance ancestors this constraint has. A
     /// constraint with a nonzero number of ancestors cannot be dropped nor
     /// renamed.
     pub coninhcount: i32,
     #[cfg(any(
-        feature = "postgres-14",
         feature = "postgres-15",
-        feature = "postgres-17"
+        feature = "postgres-16",
+        feature = "postgres-17",
+        feature = "postgres-18"
     ))]
     /// The number of direct inheritance ancestors this constraint has. A
     /// constraint with a nonzero number of ancestors cannot be dropped nor
@@ -77,6 +83,10 @@ pub struct PgConstraint {
     /// If a table constraint (including foreign keys, but not constraint
     /// triggers), list of the constrained columns
     pub conkey: Option<Vec<i16>>,
+    /// Whether this is a period constraint
+    /// Added in `PostgreSQL` 18.
+    #[cfg(feature = "postgres-18")]
+    pub conperiod: bool,
     /// If a foreign key, list of the referenced columns
     pub confkey: Option<Vec<i16>>,
     /// If a foreign key, list of the equality operators for PK = FK comparisons
@@ -85,13 +95,20 @@ pub struct PgConstraint {
     pub conppeqop: Option<Vec<u32>>,
     /// If a foreign key, list of the equality operators for FK = FK comparisons
     pub conffeqop: Option<Vec<u32>>,
-    #[cfg(feature = "postgres-15")]
+    #[cfg(any(
+        feature = "postgres-15",
+        feature = "postgres-16",
+        feature = "postgres-17",
+        feature = "postgres-18"
+    ))]
     /// If a foreign key with a SET NULL or SET DEFAULT delete action, the
     /// columns that will be updated. If null, all of the referencing columns
     /// will be updated.
     pub confdelsetcols: Option<Vec<i16>>,
     /// If an exclusion constraint, list of the per-column exclusion operators
     pub conexclop: Option<Vec<u32>>,
+    /// Check constraint expression as a human-readable string, or `NULL` if not a check constraint.
+    pub conbin: Option<String>,
 }
 
 impl PgConstraint {

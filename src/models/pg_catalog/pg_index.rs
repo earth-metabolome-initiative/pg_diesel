@@ -30,8 +30,14 @@ pub struct PgIndex {
     pub indnkeyatts: i16,
     /// `true` if the index enforces uniqueness.
     pub indisunique: bool,
-    #[cfg(feature = "postgres-15")]
     /// `true` if nulls are considered distinct in a unique index.
+    /// Added in `PostgreSQL` 15.
+    #[cfg(any(
+        feature = "postgres-15",
+        feature = "postgres-16",
+        feature = "postgres-17",
+        feature = "postgres-18"
+    ))]
     pub indnullsnotdistinct: bool,
     /// `true` if this is the primary key index for the table.
     pub indisprimary: bool,

@@ -1,8 +1,6 @@
 //! Submodule providing the `PgStatUserIndex` struct representing a row of the
 //! `pg_stat_user_indexes` view in `PostgreSQL`.
 
-use std::time::SystemTime;
-
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_stat_user_indexes` view.
@@ -28,7 +26,8 @@ pub struct PgStatUserIndex {
     /// Index scans count.
     pub idx_scan: Option<i64>,
     /// Last index scan time.
-    pub last_idx_scan: Option<SystemTime>,
+    #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
+    pub last_idx_scan: Option<std::time::SystemTime>,
     /// Index entries read.
     pub idx_tup_read: Option<i64>,
     /// Tuples fetched.

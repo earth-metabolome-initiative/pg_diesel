@@ -9,6 +9,10 @@ diesel::table! {
         num_timed -> Nullable<BigInt>,
         /// Number of requested checkpoints that have been performed.
         num_requested -> Nullable<BigInt>,
+        /// Number of checkpoints that have been performed.
+        /// Added in `PostgreSQL` 18.
+        #[cfg(feature = "postgres-18")]
+        num_done -> Nullable<BigInt>,
         /// Number of scheduled restartpoints performed (standby servers only).
         restartpoints_timed -> Nullable<BigInt>,
         /// Number of requested restartpoints performed (standby servers only).
@@ -21,6 +25,10 @@ diesel::table! {
         sync_time -> Nullable<Double>,
         /// Number of buffers written during checkpoints and restartpoints.
         buffers_written -> Nullable<BigInt>,
+        /// Number of SLRU buffers written during checkpoints and restartpoints.
+        /// Added in `PostgreSQL` 18.
+        #[cfg(feature = "postgres-18")]
+        slru_written -> Nullable<BigInt>,
         /// Time at which these statistics were last reset.
         stats_reset -> Nullable<Timestamp>,
     }

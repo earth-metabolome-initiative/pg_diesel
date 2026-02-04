@@ -28,5 +28,6 @@ pub struct PgStatDatabaseConflict {
     /// Deadlock conflicts.
     pub confl_deadlock: Option<i64>,
     /// Active logical slot conflicts.
+    #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
     pub confl_active_logicalslot: Option<i64>,
 }

@@ -8,9 +8,11 @@ diesel = { git = "https://github.com/LucaCappelletti94/diesel", branch = "future
   "postgres",
   "extras",
   "64-column-tables",
+  "numeric",
 ] }
 ipnetwork = { version = "0.21.1", features = ["serde"] }
 serde = { version = "1.0", features = ["derive"], optional = true }
+bigdecimal = { version = "0.4", features = ["serde"] }
 sql-traits = { git = "https://github.com/earth-metabolome-initiative/sql-traits", branch = "main" }
 sqlparser = { version = "0.60.0", features = [
   "serde",
@@ -20,6 +22,10 @@ thiserror = "2.0.17"
 [dev-dependencies]
 tokio = { version = "1.49.0", features = ["full"] }
 testcontainers = { version = "0.26.3" }
+syn = { version = "2.0", features = ["full", "parsing", "visit"] }
+quote = "1.0"
+proc-macro2 = "1.0"
+tempfile = "3.20"
 
 [lints.rust]
 missing_docs = "forbid"
@@ -63,11 +69,13 @@ style = { level = "deny", priority = -1 }
 perf = { level = "deny", priority = -1 }
 
 [features]
-default = ["serde", "postgres-17"]
+default = ["serde", "postgres-18"]
 serde = ["dep:serde"]
 postgres-14 = []
 postgres-15 = []
+postgres-16 = []
 postgres-17 = []
+postgres-18 = []
 # Whether to include routines metadata, which is a rather large
 # table with 88 columns.
 routines = ["diesel/128-column-tables"]

@@ -31,9 +31,16 @@ pub struct PgCollation {
     pub collcollate: Option<String>,
     /// `LC_CTYPE` setting for this collation.
     pub collctype: Option<String>,
-    /// Locale name for ICU collations.
+    /// ICU locale ID for this collation object (`PostgreSQL` 15-16).
+    /// Renamed to `colllocale` in `PostgreSQL` 17.
+    #[cfg(any(feature = "postgres-15", feature = "postgres-16"))]
+    pub colliculocale: Option<String>,
+    /// Collation provider locale name for this collation object (`PostgreSQL` 17+).
+    /// Renamed from `colliculocale` in `PostgreSQL` 17.
+    #[cfg(any(feature = "postgres-17", feature = "postgres-18"))]
     pub colllocale: Option<String>,
     /// ICU rules for this collation.
+    #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
     pub collicurules: Option<String>,
     /// Provider-specific version string.
     pub collversion: Option<String>,

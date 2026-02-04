@@ -14,6 +14,7 @@ diesel::table! {
         /// OIDs of the parameter types.
         parameter_types -> Nullable<Array<Oid>>,
         /// OIDs of the result column types.
+        #[cfg(not(any(feature = "postgres-15", feature = "postgres-14")))]
         result_types -> Nullable<Array<Oid>>,
         /// `true` if the prepared statement was created via SQL PREPARE command.
         from_sql -> Nullable<Bool>,

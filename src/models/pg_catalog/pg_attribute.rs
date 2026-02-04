@@ -28,6 +28,8 @@ pub struct PgAttribute {
     /// The number of the column (its position in the table, starting at 1).
     pub attnum: i16,
     /// The offset of the column in the tuple (if cached), otherwise -1.
+    /// Removed in `PostgreSQL` 18.
+    #[cfg(not(feature = "postgres-18"))]
     pub attcacheoff: i32,
     /// Type-specific data about the column (e.g., precision for numeric types).
     pub atttypmod: i32,
@@ -68,6 +70,8 @@ pub struct PgAttribute {
     pub attfdwoptions: Option<Vec<String>>,
     /// Compression method for the column
     pub attcompression: String,
+    /// Missing value for added columns
+    pub attmissingval: Option<Vec<String>>,
 }
 
 impl PgAttribute {
