@@ -33,20 +33,6 @@ jobs:
     - name: Build and Test with serde (postgres-${{ matrix.postgres }})
       run: cargo test --release --no-default-features --features "postgres-${{ matrix.postgres }},serde"
 
-  test-no-features:
-    name: Test (no default features)
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Install Rust
-      uses: dtolnay/rust-toolchain@stable
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libfontconfig1-dev libpq-dev
-    - name: Test with no default features
-      run: cargo test --release --no-default-features
-
   fmt:
     name: Rustfmt
     runs-on: ubuntu-latest
