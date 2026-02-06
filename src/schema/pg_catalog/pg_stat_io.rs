@@ -40,7 +40,7 @@ diesel::table! {
         /// Time spent extending relations, in milliseconds.
         extend_time -> Nullable<Double>,
         /// Bytes per operation.
-        /// Removed in `PostgreSQL` 18 in favor of read_bytes, write_bytes, extend_bytes.
+        /// Removed in `PostgreSQL` 18 in favor of `read_bytes`, `write_bytes`, `extend_bytes`.
         #[cfg(not(feature = "postgres-18"))]
         op_bytes -> Nullable<BigInt>,
         /// Number of buffer hits.

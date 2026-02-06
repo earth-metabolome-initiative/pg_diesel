@@ -50,7 +50,7 @@ pub struct PgStatIo {
     /// Extend time (milliseconds).
     pub extend_time: Option<f64>,
     /// Bytes per operation.
-    /// Removed in `PostgreSQL` 18 in favor of read_bytes, write_bytes, extend_bytes.
+    /// Removed in `PostgreSQL` 18 in favor of `read_bytes`, `write_bytes`, `extend_bytes`.
     #[cfg(not(feature = "postgres-18"))]
     pub op_bytes: Option<i64>,
     /// Buffer hits.
