@@ -105,18 +105,28 @@ jobs:
     - name: Install tarpaulin
       uses: taiki-e/install-action@cargo-tarpaulin
     - name: Generate coverage for postgres-14
-      run: cargo tarpaulin --engine=llvm --out xml --output-dir ./coverage --workspace --run-types AllTargets --no-default-features --features postgres-14
+      run: |
+        cargo tarpaulin --engine=llvm --out xml --workspace --run-types AllTargets --no-default-features --features postgres-14
+        mv cobertura.xml coverage-postgres-14.xml
     - name: Generate coverage for postgres-15
-      run: cargo tarpaulin --engine=llvm --out xml --output-dir ./coverage --workspace --run-types AllTargets --no-default-features --features postgres-15
+      run: |
+        cargo tarpaulin --engine=llvm --out xml --workspace --run-types AllTargets --no-default-features --features postgres-15
+        mv cobertura.xml coverage-postgres-15.xml
     - name: Generate coverage for postgres-16
-      run: cargo tarpaulin --engine=llvm --out xml --output-dir ./coverage --workspace --run-types AllTargets --no-default-features --features postgres-16
+      run: |
+        cargo tarpaulin --engine=llvm --out xml --workspace --run-types AllTargets --no-default-features --features postgres-16
+        mv cobertura.xml coverage-postgres-16.xml
     - name: Generate coverage for postgres-17
-      run: cargo tarpaulin --engine=llvm --out xml --output-dir ./coverage --workspace --run-types AllTargets --no-default-features --features postgres-17
+      run: |
+        cargo tarpaulin --engine=llvm --out xml --workspace --run-types AllTargets --no-default-features --features postgres-17
+        mv cobertura.xml coverage-postgres-17.xml
     - name: Generate coverage for postgres-18
-      run: cargo tarpaulin --engine=llvm --out xml --output-dir ./coverage --workspace --run-types AllTargets --no-default-features --features postgres-18
+      run: |
+        cargo tarpaulin --engine=llvm --out xml --workspace --run-types AllTargets --no-default-features --features postgres-18
+        mv cobertura.xml coverage-postgres-18.xml
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        directory: ./coverage
+        files: ./coverage-postgres-14.xml,./coverage-postgres-15.xml,./coverage-postgres-16.xml,./coverage-postgres-17.xml,./coverage-postgres-18.xml
         fail_ci_if_error: false
