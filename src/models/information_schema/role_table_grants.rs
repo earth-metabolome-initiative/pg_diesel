@@ -30,3 +30,32 @@ pub struct RoleTableGrants {
     /// Whether the privilege applies to the hierarchy.
     pub with_hierarchy: Option<String>,
 }
+
+impl RoleTableGrants {
+    /// Load all table grants for the given catalog and schemas.
+    ///
+    /// # Arguments
+    ///
+    /// * `table_catalog` - The catalog (database) name.
+    /// * `table_schemas` - The schemas to filter by.
+    /// * `conn` - The database connection.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the database query fails.
+    pub fn load_all(
+        table_catalog: &str,
+        table_schemas: &[String],
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::information_schema::role_table_grants::role_table_grants::dsl::role_table_grants;
+        use crate::schema::information_schema::role_table_grants::role_table_grants::dsl::table_catalog as table_catalog_col;
+        use crate::schema::information_schema::role_table_grants::role_table_grants::dsl::table_schema as table_schema_col;
+
+        role_table_grants
+            .filter(table_catalog_col.eq(table_catalog))
+            .filter(table_schema_col.eq_any(table_schemas))
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+}

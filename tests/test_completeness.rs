@@ -8,8 +8,9 @@ use std::collections::HashSet;
 use diesel::{PgConnection, RunQueryDsl};
 
 use test_utils::{
-    establish_connection, get_active_postgres_features, docker_helpers::get_postgres_version_tag,
-    is_enabled_for_current_features, model_parser::parse_model_file, schema_parser::parse_schema_file, reference_docker,
+    docker_helpers::get_postgres_version_tag, establish_connection, get_active_postgres_features,
+    is_enabled_for_current_features, model_parser::parse_model_file, reference_docker,
+    schema_parser::parse_schema_file,
 };
 
 #[tokio::test]

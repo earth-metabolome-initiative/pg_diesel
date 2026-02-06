@@ -3,13 +3,21 @@
 use std::rc::Rc;
 
 use diesel::PgConnection;
-use sql_traits::{structs::generic_db::GenericDBBuilder, traits::TableLike};
-use sqlparser::{ast::Ident, ast::Owner, dialect::PostgreSqlDialect, parser::Parser};
+use sql_traits::{
+    structs::generic_db::GenericDBBuilder,
+    traits::{ColumnLike, TableLike},
+};
+use sqlparser::{
+    ast::{Grantee, GranteeName, GranteesType, Ident, ObjectName, ObjectNamePart, Owner},
+    dialect::PostgreSqlDialect,
+    parser::Parser,
+};
 
 use crate::{
     PgDieselDatabase,
+    impls::{RoleColumnGrantsMetadata, RoleTableGrantsMetadata, string_to_action},
     model_metadata::TriggerMetadata,
-    models::{PgProc, PgRole, Table},
+    models::{Column, PgProc, PgRole, RoleColumnGrants, RoleTableGrants, Table},
 };
 
 #[derive(Default)]
@@ -166,12 +174,39 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
             )
         });
 
+        // Create lookup maps for tables and columns for grant metadata
+        let mut tables_by_schema_name: std::collections::HashMap<(String, String), Rc<Table>> =
+            std::collections::HashMap::new();
+        let mut columns_by_table_column: std::collections::HashMap<
+            (String, String, String),
+            Rc<Column>,
+        > = std::collections::HashMap::new();
+
         // For each table, we determine all of the foreign keys and for each foreign key
         // we determine which table it references.
         for table in tables {
+            // Add to lookup map
+            tables_by_schema_name.insert(
+                (
+                    table.table_schema().unwrap_or("").to_string(),
+                    table.table_name().to_string(),
+                ),
+                Rc::clone(&table),
+            );
+
             let table_metadata = table.metadata(connection, &value.denylist_types)?;
 
             for column in table_metadata.column_rcs() {
+                // Add to column lookup map
+                columns_by_table_column.insert(
+                    (
+                        table.table_schema().unwrap_or("").to_string(),
+                        table.table_name().to_string(),
+                        column.column_name().to_string(),
+                    ),
+                    Rc::clone(&column),
+                );
+
                 generic_builder = generic_builder.add_column(
                     Rc::clone(&column),
                     column.metadata(Rc::clone(&table), connection)?,
@@ -287,6 +322,69 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
 
             let metadata = crate::model_metadata::RoleMetadata::new(member_of, policies);
             generic_builder = generic_builder.add_role(Rc::clone(role_rc), metadata);
+        }
+
+        // Load table grants
+        let table_grants = RoleTableGrants::load_all(&table_catalog, &table_schemas, connection)?;
+        for grant in table_grants {
+            // Find the table this grant applies to
+            let table_rc = tables_by_schema_name
+                .get(&(
+                    grant.table_schema.clone().unwrap_or_default(),
+                    grant.table_name.clone().unwrap_or_default(),
+                ))
+                .cloned();
+
+            // Parse the privilege type into an Action
+            let privilege = grant.privilege_type.as_deref().map(string_to_action);
+
+            // Create the grantee
+            let grantee = grant.grantee.as_deref().map(|name| Grantee {
+                grantee_type: GranteesType::None,
+                name: Some(GranteeName::ObjectName(ObjectName(vec![
+                    ObjectNamePart::Identifier(Ident::new(name)),
+                ]))),
+            });
+
+            let metadata = RoleTableGrantsMetadata::new(privilege, grantee, table_rc);
+            generic_builder = generic_builder.add_table_grant(Rc::new(grant), metadata);
+        }
+
+        // Load column grants
+        let column_grants = RoleColumnGrants::load_all(&table_catalog, &table_schemas, connection)?;
+        for grant in column_grants {
+            // Find the table this grant applies to
+            let table_rc = tables_by_schema_name
+                .get(&(
+                    grant.table_schema.clone().unwrap_or_default(),
+                    grant.table_name.clone().unwrap_or_default(),
+                ))
+                .cloned();
+
+            // Find the column this grant applies to
+            let column_rc = table_rc.as_ref().and_then(|t| {
+                columns_by_table_column
+                    .get(&(
+                        t.table_schema().unwrap_or_default().to_string(),
+                        t.table_name().to_string(),
+                        grant.column_name.clone().unwrap_or_default(),
+                    ))
+                    .cloned()
+            });
+
+            // Parse the privilege type into an Action
+            let privilege = grant.privilege_type.as_deref().map(string_to_action);
+
+            // Create the grantee
+            let grantee = grant.grantee.as_deref().map(|name| Grantee {
+                grantee_type: GranteesType::None,
+                name: Some(GranteeName::ObjectName(ObjectName(vec![
+                    ObjectNamePart::Identifier(Ident::new(name)),
+                ]))),
+            });
+
+            let metadata = RoleColumnGrantsMetadata::new(privilege, grantee, table_rc, column_rc);
+            generic_builder = generic_builder.add_column_grant(Rc::new(grant), metadata);
         }
 
         Ok(generic_builder.into())
