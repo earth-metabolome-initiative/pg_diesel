@@ -16,6 +16,7 @@
 //!   [`KeyColumnUsage`](crate::models::KeyColumnUsage)
 //! - `FunctionLike`: Implemented for [`PgProc`](crate::models::PgProc)
 //! - `UniqueIndexLike`: Implemented for [`PgIndex`](crate::models::PgIndex)
+//! - `SchemaLike`: Implemented for [`Schemata`](crate::models::Schemata)
 //! - [`HasOid`](crate::traits::HasOid): Implemented for various catalog types
 //! - [`PostgresType`](crate::traits::PostgresType): Implemented for types that
 //!   resolve their Postgres type
@@ -30,6 +31,7 @@ mod oid;
 mod policy_like;
 mod postgres_type;
 mod role_like;
+mod schema_like;
 mod table_grant_like;
 mod table_like;
 mod trigger_like;
