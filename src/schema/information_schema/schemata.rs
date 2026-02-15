@@ -22,3 +22,9 @@ diesel::table! {
         sql_path -> Nullable<Text>,
     }
 }
+
+use crate::schema::pg_catalog::pg_namespace::pg_namespace;
+diesel::allow_tables_to_appear_in_same_query!(schemata, pg_namespace);
+
+use super::tables::tables;
+diesel::allow_tables_to_appear_in_same_query!(schemata, tables);

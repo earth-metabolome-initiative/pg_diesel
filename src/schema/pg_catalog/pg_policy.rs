@@ -22,3 +22,6 @@ diesel::table! {
         polwithcheck -> Nullable<Text>,
     }
 }
+
+use super::pg_roles::pg_roles;
+diesel::allow_tables_to_appear_in_same_query!(pg_policy, pg_roles);

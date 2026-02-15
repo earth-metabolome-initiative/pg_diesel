@@ -54,3 +54,6 @@ diesel::table! {
 
 use super::pg_namespace::pg_namespace;
 diesel::allow_tables_to_appear_in_same_query!(pg_trigger, pg_namespace);
+
+use super::pg_constraint::pg_constraint;
+diesel::allow_tables_to_appear_in_same_query!(pg_trigger, pg_constraint);

@@ -68,3 +68,15 @@ diesel::table! {
         proacl -> Nullable<Array<Text>>,
     }
 }
+
+use super::pg_namespace::pg_namespace;
+diesel::allow_tables_to_appear_in_same_query!(pg_proc, pg_namespace);
+
+use super::pg_type::pg_type;
+diesel::allow_tables_to_appear_in_same_query!(pg_proc, pg_type);
+
+use super::pg_trigger::pg_trigger;
+diesel::allow_tables_to_appear_in_same_query!(pg_proc, pg_trigger);
+
+use super::pg_description::pg_description;
+diesel::allow_tables_to_appear_in_same_query!(pg_proc, pg_description);

@@ -44,3 +44,21 @@ diesel::allow_tables_to_appear_in_same_query!(tables, constraint_table_usage);
 
 use super::table_constraints::table_constraints;
 diesel::allow_tables_to_appear_in_same_query!(tables, table_constraints);
+
+use crate::schema::pg_catalog::pg_namespace::pg_namespace;
+diesel::allow_tables_to_appear_in_same_query!(tables, pg_namespace);
+
+use crate::schema::pg_catalog::pg_index::pg_index;
+diesel::allow_tables_to_appear_in_same_query!(tables, pg_index);
+
+use crate::schema::pg_catalog::pg_constraint::pg_constraint;
+diesel::allow_tables_to_appear_in_same_query!(tables, pg_constraint);
+
+use crate::schema::pg_catalog::pg_attribute::pg_attribute;
+diesel::allow_tables_to_appear_in_same_query!(tables, pg_attribute);
+
+use crate::schema::pg_catalog::pg_trigger::pg_trigger;
+diesel::allow_tables_to_appear_in_same_query!(tables, pg_trigger);
+
+use crate::schema::pg_catalog::pg_policy::pg_policy;
+diesel::allow_tables_to_appear_in_same_query!(tables, pg_policy);

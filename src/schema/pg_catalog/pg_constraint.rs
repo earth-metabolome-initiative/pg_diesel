@@ -103,3 +103,9 @@ diesel::allow_tables_to_appear_in_same_query!(pg_constraint, pg_class);
 
 use super::pg_attribute::pg_attribute;
 diesel::allow_tables_to_appear_in_same_query!(pg_constraint, pg_attribute);
+
+use super::pg_index::pg_index;
+diesel::allow_tables_to_appear_in_same_query!(pg_constraint, pg_index);
+
+use super::pg_type::pg_type;
+diesel::allow_tables_to_appear_in_same_query!(pg_constraint, pg_type);

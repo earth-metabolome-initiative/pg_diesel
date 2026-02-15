@@ -41,3 +41,15 @@ diesel::table! {
         created -> Nullable<Timestamp>,
     }
 }
+
+use crate::schema::pg_catalog::pg_trigger::pg_trigger;
+diesel::allow_tables_to_appear_in_same_query!(triggers, pg_trigger);
+
+use crate::schema::pg_catalog::pg_proc::pg_proc;
+diesel::allow_tables_to_appear_in_same_query!(triggers, pg_proc);
+
+use crate::schema::pg_catalog::pg_class::pg_class;
+diesel::allow_tables_to_appear_in_same_query!(triggers, pg_class);
+
+use crate::schema::pg_catalog::pg_namespace::pg_namespace;
+diesel::allow_tables_to_appear_in_same_query!(triggers, pg_namespace);
