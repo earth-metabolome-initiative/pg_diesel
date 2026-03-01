@@ -662,7 +662,7 @@ dependencies = [
 [[package]]
 name = "geometric-traits"
 version = "0.1.0"
-source = "git+https://github.com/earth-metabolome-initiative/geometric-traits?branch=main#ecd57d8e26217519e2b5b241205c6966005cc48e"
+source = "git+https://github.com/earth-metabolome-initiative/geometric-traits?branch=main#14d90b25b66c01ea81dac84b8b8ae30a957ed593"
 dependencies = [
  "bitvec",
  "hashbrown 0.16.1",
@@ -2113,7 +2113,7 @@ dependencies = [
 [[package]]
 name = "sql-traits"
 version = "0.1.0"
-source = "git+https://github.com/earth-metabolome-initiative/sql-traits?branch=main#618c3c6048182f73e2bbf7a28eacec961c56a1fa"
+source = "git+https://github.com/earth-metabolome-initiative/sql-traits?branch=main#7633edef2de8868d776b2bdead4a2eb01765dc9b"
 dependencies = [
  "geometric-traits",
  "git2",
