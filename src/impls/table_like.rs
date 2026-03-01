@@ -13,7 +13,7 @@
 //! All metadata is loaded from [`TableMetadata`] which is constructed during
 //! database building.
 
-use sql_traits::traits::{DocumentationMetadata, Metadata, TableLike};
+use sql_traits::traits::{DatabaseLike, DocumentationMetadata, Metadata, TableLike};
 
 use crate::{PgDieselDatabase, model_metadata::TableMetadata};
 
@@ -34,6 +34,10 @@ impl TableLike for crate::models::Table {
 
     fn table_schema(&self) -> Option<&str> {
         Some(&self.table_schema)
+    }
+
+    fn table_id(&self, database: &Self::DB) -> Option<usize> {
+        database.table_id(self)
     }
 
     fn table_doc<'db>(&'db self, database: &'db Self::DB) -> Option<&'db str>
