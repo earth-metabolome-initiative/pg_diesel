@@ -1,6 +1,6 @@
 //! Submodule providing the `ColumnMetadata` struct for a [`Column`](crate::models::Column) model.
 
-use std::rc::Rc;
+use std::sync::Arc;
 
 use crate::models::{PgDescription, PgType, Table};
 
@@ -28,7 +28,7 @@ use crate::models::{PgDescription, PgType, Table};
 /// - Array element types for array types
 pub struct ColumnMetadata {
     /// The table the column belongs to.
-    table: Rc<Table>,
+    table: Arc<Table>,
     /// The description of the column, if any.
     description: Option<PgDescription>,
     /// The associated `PgType`.
@@ -38,7 +38,7 @@ pub struct ColumnMetadata {
 impl ColumnMetadata {
     /// Creates a new `ColumnMetadata` instance.
     #[must_use]
-    pub fn new(table: Rc<Table>, description: Option<PgDescription>, pg_type: PgType) -> Self {
+    pub fn new(table: Arc<Table>, description: Option<PgDescription>, pg_type: PgType) -> Self {
         Self {
             table,
             description,
@@ -138,7 +138,7 @@ mod tests {
 
     #[test]
     fn test_column_metadata() {
-        let table = Rc::new(dummy_table());
+        let table = Arc::new(dummy_table());
         let pg_type = dummy_pg_type();
         let description = Some(PgDescription {
             objoid: 1,
@@ -147,7 +147,7 @@ mod tests {
             description: "desc".to_string(),
         });
 
-        let metadata = ColumnMetadata::new(Rc::clone(&table), description, pg_type);
+        let metadata = ColumnMetadata::new(Arc::clone(&table), description, pg_type);
 
         assert_eq!(metadata.table().table_name, "table");
         assert_eq!(metadata.description().unwrap().description, "desc");

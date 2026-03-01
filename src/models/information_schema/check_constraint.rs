@@ -2,7 +2,7 @@
 
 use std::{
     fmt::{Debug, Display},
-    rc::Rc,
+    sync::Arc,
 };
 
 use diesel::{
@@ -166,9 +166,9 @@ impl CheckConstraint {
     ///   not happen if the database is consistent.
     pub fn metadata(
         &self,
-        table: Rc<Table>,
+        table: Arc<Table>,
         table_metadata: &TableMetadata,
-        functions: &[Rc<PgProc>],
+        functions: &[Arc<PgProc>],
         conn: &mut PgConnection,
     ) -> Result<CheckMetadata<CheckConstraint>, diesel::result::Error> {
         use sqlparser::parser::Parser;
@@ -181,7 +181,7 @@ impl CheckConstraint {
         let columns = columns_in_expression(
             &expression,
             &table.table_name,
-            table_metadata.column_rc_slice(),
+            table_metadata.column_arc_slice(),
         )
         .unwrap();
 

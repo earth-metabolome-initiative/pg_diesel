@@ -1,6 +1,6 @@
 //! Implementation of `ColumnGrantLike` trait for `RoleColumnGrants`.
 
-use std::rc::Rc;
+use std::sync::Arc;
 
 use sqlparser::ast::{Action, Grantee};
 
@@ -20,9 +20,9 @@ pub struct RoleColumnGrantsMetadata {
     /// The parsed grantee.
     pub grantee: Option<Grantee>,
     /// The table this grant applies to.
-    pub table: Option<Rc<Table>>,
+    pub table: Option<Arc<Table>>,
     /// The column this grant applies to.
-    pub column: Option<Rc<Column>>,
+    pub column: Option<Arc<Column>>,
 }
 
 impl RoleColumnGrantsMetadata {
@@ -31,8 +31,8 @@ impl RoleColumnGrantsMetadata {
     pub fn new(
         privilege: Option<Action>,
         grantee: Option<Grantee>,
-        table: Option<Rc<Table>>,
-        column: Option<Rc<Column>>,
+        table: Option<Arc<Table>>,
+        column: Option<Arc<Column>>,
     ) -> Self {
         Self {
             privilege,

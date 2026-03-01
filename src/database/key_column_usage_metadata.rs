@@ -10,7 +10,7 @@
 //! provide rich foreign key introspection through the `sql_traits` trait
 //! system.
 
-use std::rc::Rc;
+use std::sync::Arc;
 
 use crate::models::{Column, ReferentialConstraint, Table};
 
@@ -23,7 +23,7 @@ pub struct KeyColumnUsageMetadata {
     /// The columns in the referenced table that the foreign key points to.
     referenced_columns: Vec<Column>,
     /// The table that contains the foreign key.
-    host_table: Rc<Table>,
+    host_table: Arc<Table>,
     /// The columns in the host table that are part of the foreign key.
     host_columns: Vec<Column>,
     /// The referential constraint associated with the foreign key.
@@ -48,7 +48,7 @@ impl KeyColumnUsageMetadata {
     pub(crate) fn new(
         referenced_table: Table,
         referenced_columns: Vec<Column>,
-        host_table: Rc<Table>,
+        host_table: Arc<Table>,
         host_columns: Vec<Column>,
         referential_constraint: ReferentialConstraint,
     ) -> Self {
@@ -145,7 +145,7 @@ mod tests {
     #[test]
     fn test_key_column_usage_metadata() {
         let referenced_table = dummy_table();
-        let host_table = Rc::new(dummy_table());
+        let host_table = Arc::new(dummy_table());
         let referential_constraint = dummy_referential_constraint();
 
         let metadata = KeyColumnUsageMetadata::new(

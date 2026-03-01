@@ -73,23 +73,23 @@ impl Table {
             if denylist_types.contains(&column.pg_type(conn)?.typname) {
                 continue;
             }
-            sql_metadata.add_column(std::rc::Rc::new(column));
+            sql_metadata.add_column(std::sync::Arc::new(column));
         }
         for check_constraint in cached_queries::check_constraints(self, conn)? {
-            sql_metadata.add_check_constraint(std::rc::Rc::new(check_constraint));
+            sql_metadata.add_check_constraint(std::sync::Arc::new(check_constraint));
         }
         for foreign_key in cached_queries::foreign_keys(self, conn)? {
-            sql_metadata.add_foreign_key(std::rc::Rc::new(foreign_key));
+            sql_metadata.add_foreign_key(std::sync::Arc::new(foreign_key));
         }
         for index in cached_queries::unique_indices(self, conn)? {
-            sql_metadata.add_unique_index(std::rc::Rc::new(index));
+            sql_metadata.add_unique_index(std::sync::Arc::new(index));
         }
         let mut primary_key_columns = Vec::new();
         for pk_column in cached_queries::primary_key_columns(self, conn)? {
             primary_key_columns.extend(
                 sql_metadata
-                    .column_rcs()
-                    .filter(|col: &&std::rc::Rc<Column>| col.as_ref() == &pk_column)
+                    .column_arcs()
+                    .filter(|col: &&std::sync::Arc<Column>| col.as_ref() == &pk_column)
                     .cloned(),
             );
         }
@@ -97,12 +97,12 @@ impl Table {
 
         let triggers = cached_queries::triggers(self, conn)?
             .into_iter()
-            .map(|(t, oid)| (std::rc::Rc::new(t), oid))
+            .map(|(t, oid)| (std::sync::Arc::new(t), oid))
             .collect();
 
         let policies = cached_queries::policies(self, conn)?
             .into_iter()
-            .map(std::rc::Rc::new)
+            .map(std::sync::Arc::new)
             .collect();
 
         let (row_security, forced_row_security) = cached_queries::pg_class(self, conn)?;

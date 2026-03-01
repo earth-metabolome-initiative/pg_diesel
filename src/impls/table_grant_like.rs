@@ -1,6 +1,6 @@
 //! Implementation of `TableGrantLike` trait for `RoleTableGrants`.
 
-use std::rc::Rc;
+use std::sync::Arc;
 
 use sqlparser::ast::{Action, Grantee};
 
@@ -18,7 +18,7 @@ pub struct RoleTableGrantsMetadata {
     /// The parsed grantee.
     pub grantee: Option<Grantee>,
     /// The table this grant applies to.
-    pub table: Option<Rc<Table>>,
+    pub table: Option<Arc<Table>>,
 }
 
 impl RoleTableGrantsMetadata {
@@ -27,7 +27,7 @@ impl RoleTableGrantsMetadata {
     pub fn new(
         privilege: Option<Action>,
         grantee: Option<Grantee>,
-        table: Option<Rc<Table>>,
+        table: Option<Arc<Table>>,
     ) -> Self {
         Self {
             privilege,

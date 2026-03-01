@@ -1,6 +1,6 @@
 //! `PostgreSQL` index catalog model.
 
-use std::rc::Rc;
+use std::sync::Arc;
 
 use diesel::{PgConnection, Queryable, QueryableByName, Selectable};
 
@@ -86,7 +86,7 @@ impl PgIndex {
     #[allow(clippy::missing_panics_doc)]
     pub fn metadata(
         &self,
-        table: Rc<Table>,
+        table: Arc<Table>,
         conn: &mut PgConnection,
     ) -> Result<UniqueIndexMetadata<Self>, diesel::result::Error> {
         let expression = if let Some(expression) = expression(self, conn)? {

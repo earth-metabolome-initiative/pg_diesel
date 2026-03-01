@@ -1,6 +1,6 @@
 //! Models for the `information_schema.key_column_usage` table.
 
-use std::rc::Rc;
+use std::sync::Arc;
 
 use diesel::{PgConnection, Queryable, QueryableByName, Selectable};
 
@@ -53,7 +53,7 @@ impl KeyColumnUsage {
     /// Returns a [`diesel::result::Error`] if the database query fails.
     pub fn metadata(
         &self,
-        host_table: Rc<Table>,
+        host_table: Arc<Table>,
         conn: &mut PgConnection,
     ) -> Result<KeyColumnUsageMetadata, diesel::result::Error> {
         Ok(KeyColumnUsageMetadata::new(

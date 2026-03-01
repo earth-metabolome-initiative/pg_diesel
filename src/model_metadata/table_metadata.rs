@@ -1,6 +1,6 @@
 //! Submodule providing the `TableMetadata` struct for a [`Table`](crate::models::Table) model.
 
-use std::rc::Rc;
+use std::sync::Arc;
 
 use crate::models::{
     CheckConstraint, Column, KeyColumnUsage, PgDescription, PgIndex, PgPolicyTable, Triggers,
@@ -27,9 +27,9 @@ pub struct TableMetadata {
     /// The description of the table, if any.
     description: Option<PgDescription>,
     /// The triggers defined on the table, along with the OID of the function they call.
-    triggers: Vec<(Rc<Triggers>, Option<u32>)>,
+    triggers: Vec<(Arc<Triggers>, Option<u32>)>,
     /// The policies defined on the table.
-    policies: Vec<Rc<PgPolicyTable>>,
+    policies: Vec<Arc<PgPolicyTable>>,
     /// Whether the table has row-level security enabled.
     row_security: bool,
     /// Whether the table has row-level security forced.
@@ -42,8 +42,8 @@ impl TableMetadata {
     pub fn new(
         metadata: sql_traits::structs::TableMetadata<crate::models::Table>,
         description: Option<PgDescription>,
-        triggers: Vec<(Rc<Triggers>, Option<u32>)>,
-        policies: Vec<Rc<PgPolicyTable>>,
+        triggers: Vec<(Arc<Triggers>, Option<u32>)>,
+        policies: Vec<Arc<PgPolicyTable>>,
         row_security: bool,
         forced_row_security: bool,
     ) -> Self {
@@ -62,15 +62,15 @@ impl TableMetadata {
         self.metadata.columns()
     }
 
-    /// Returns an iterator over the Rc of columns of the table.
-    pub fn column_rcs(&self) -> impl Iterator<Item = &Rc<Column>> {
-        self.metadata.column_rcs()
+    /// Returns an iterator over the Arc of columns of the table.
+    pub fn column_arcs(&self) -> impl Iterator<Item = &Arc<Column>> {
+        self.metadata.column_arcs()
     }
 
-    /// Returns a slice of Rc of columns of the table.
+    /// Returns a slice of Arc of columns of the table.
     #[must_use]
-    pub fn column_rc_slice(&self) -> &[Rc<Column>] {
-        self.metadata.column_rc_slice()
+    pub fn column_arc_slice(&self) -> &[Arc<Column>] {
+        self.metadata.column_arc_slice()
     }
 
     /// Returns an iterator over the check constraints of the table.
@@ -78,9 +78,9 @@ impl TableMetadata {
         self.metadata.check_constraints()
     }
 
-    /// Returns an iterator over the Rc of check constraints of the table.
-    pub fn check_constraint_rcs(&self) -> impl Iterator<Item = &Rc<CheckConstraint>> {
-        self.metadata.check_constraint_rcs()
+    /// Returns an iterator over the Arc of check constraints of the table.
+    pub fn check_constraint_arcs(&self) -> impl Iterator<Item = &Arc<CheckConstraint>> {
+        self.metadata.check_constraint_arcs()
     }
 
     /// Returns an iterator over the indices of the table.
@@ -88,9 +88,9 @@ impl TableMetadata {
         self.metadata.indices()
     }
 
-    /// Returns an iterator over the Rc of indices of the table.
-    pub fn index_rcs(&self) -> impl Iterator<Item = &Rc<PgIndex>> {
-        self.metadata.index_rcs()
+    /// Returns an iterator over the Arc of indices of the table.
+    pub fn index_arcs(&self) -> impl Iterator<Item = &Arc<PgIndex>> {
+        self.metadata.index_arcs()
     }
 
     /// Returns an iterator over the unique indices of the table.
@@ -98,9 +98,9 @@ impl TableMetadata {
         self.metadata.unique_indices()
     }
 
-    /// Returns an iterator over the Rc of unique indices of the table.
-    pub fn unique_index_rcs(&self) -> impl Iterator<Item = &Rc<PgIndex>> {
-        self.metadata.unique_index_rcs()
+    /// Returns an iterator over the Arc of unique indices of the table.
+    pub fn unique_index_arcs(&self) -> impl Iterator<Item = &Arc<PgIndex>> {
+        self.metadata.unique_index_arcs()
     }
 
     /// Returns an iterator over the foreign keys of the table.
@@ -108,9 +108,9 @@ impl TableMetadata {
         self.metadata.foreign_keys()
     }
 
-    /// Returns an iterator over the Rc of foreign keys of the table.
-    pub fn foreign_key_rcs(&self) -> impl Iterator<Item = &Rc<KeyColumnUsage>> {
-        self.metadata.foreign_key_rcs()
+    /// Returns an iterator over the Arc of foreign keys of the table.
+    pub fn foreign_key_arcs(&self) -> impl Iterator<Item = &Arc<KeyColumnUsage>> {
+        self.metadata.foreign_key_arcs()
     }
 
     /// Returns an iterator over the columns composing the primary key of the
@@ -126,12 +126,12 @@ impl TableMetadata {
     }
 
     /// Returns an iterator over the triggers of the table.
-    pub fn triggers(&self) -> impl Iterator<Item = &(Rc<Triggers>, Option<u32>)> {
+    pub fn triggers(&self) -> impl Iterator<Item = &(Arc<Triggers>, Option<u32>)> {
         self.triggers.iter()
     }
 
     /// Returns an iterator over the policies of the table.
-    pub fn policies(&self) -> impl Iterator<Item = &Rc<PgPolicyTable>> {
+    pub fn policies(&self) -> impl Iterator<Item = &Arc<PgPolicyTable>> {
         self.policies.iter()
     }
 

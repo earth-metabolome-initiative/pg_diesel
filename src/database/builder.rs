@@ -1,6 +1,6 @@
 //! Builder pattern for constructing a [`PgDieselDatabase`] instance.
 
-use std::rc::Rc;
+use std::sync::Arc;
 
 use diesel::PgConnection;
 use sql_traits::{
@@ -147,13 +147,13 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
         // Load all functions first as they may be referenced by other objects
         for function in PgProc::load_all(connection)? {
             let metadata = crate::database::PgProcMetadata::new(&function, connection)?;
-            generic_builder = generic_builder.add_function(std::rc::Rc::new(function), metadata);
+            generic_builder = generic_builder.add_function(std::sync::Arc::new(function), metadata);
         }
 
         // Load all roles
-        let roles: Vec<Rc<PgRole>> = PgRole::load_all(connection)?
+        let roles: Vec<Arc<PgRole>> = PgRole::load_all(connection)?
             .into_iter()
-            .map(Rc::new)
+            .map(Arc::new)
             .collect();
 
         let mut tables = Vec::new();
@@ -161,7 +161,7 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
             tables.extend(
                 Table::load_all(connection, &table_catalog, table_schema)?
                     .into_iter()
-                    .map(Rc::new),
+                    .map(Arc::new),
             );
         }
 
@@ -175,11 +175,11 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
         });
 
         // Create lookup maps for tables and columns for grant metadata
-        let mut tables_by_schema_name: std::collections::HashMap<(String, String), Rc<Table>> =
+        let mut tables_by_schema_name: std::collections::HashMap<(String, String), Arc<Table>> =
             std::collections::HashMap::new();
         let mut columns_by_table_column: std::collections::HashMap<
             (String, String, String),
-            Rc<Column>,
+            Arc<Column>,
         > = std::collections::HashMap::new();
 
         // For each table, we determine all of the foreign keys and for each foreign key
@@ -191,12 +191,12 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
                     table.table_schema().unwrap_or("").to_string(),
                     table.table_name().to_string(),
                 ),
-                Rc::clone(&table),
+                Arc::clone(&table),
             );
 
             let table_metadata = table.metadata(connection, &value.denylist_types)?;
 
-            for column in table_metadata.column_rcs() {
+            for column in table_metadata.column_arcs() {
                 // Add to column lookup map
                 columns_by_table_column.insert(
                     (
@@ -204,45 +204,45 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
                         table.table_name().to_string(),
                         column.column_name().to_string(),
                     ),
-                    Rc::clone(&column),
+                    Arc::clone(&column),
                 );
 
                 generic_builder = generic_builder.add_column(
-                    Rc::clone(&column),
-                    column.metadata(Rc::clone(&table), connection)?,
+                    Arc::clone(&column),
+                    column.metadata(Arc::clone(&table), connection)?,
                 );
             }
 
-            for check_constraint in table_metadata.check_constraint_rcs() {
+            for check_constraint in table_metadata.check_constraint_arcs() {
                 let metadata = check_constraint.metadata(
-                    Rc::clone(&table),
+                    Arc::clone(&table),
                     &table_metadata,
-                    generic_builder.function_rc_vec().as_slice(),
+                    generic_builder.function_arc_vec().as_slice(),
                     connection,
                 )?;
                 generic_builder =
-                    generic_builder.add_check_constraint(Rc::clone(&check_constraint), metadata);
+                    generic_builder.add_check_constraint(Arc::clone(&check_constraint), metadata);
             }
 
-            for fk in table_metadata.foreign_key_rcs() {
+            for fk in table_metadata.foreign_key_arcs() {
                 generic_builder = generic_builder
-                    .add_foreign_key(Rc::clone(&fk), fk.metadata(Rc::clone(&table), connection)?);
+                    .add_foreign_key(Arc::clone(&fk), fk.metadata(Arc::clone(&table), connection)?);
             }
 
-            for index in table_metadata.unique_index_rcs() {
+            for index in table_metadata.unique_index_arcs() {
                 generic_builder = generic_builder.add_unique_index(
-                    Rc::clone(&index),
-                    index.metadata(Rc::clone(&table), connection)?,
+                    Arc::clone(&index),
+                    index.metadata(Arc::clone(&table), connection)?,
                 );
             }
 
             for (trigger, function_oid) in table_metadata.triggers() {
                 let metadata = TriggerMetadata::new(
                     trigger.as_ref().clone(),
-                    Rc::clone(&table),
+                    Arc::clone(&table),
                     *function_oid,
                 );
-                generic_builder = generic_builder.add_trigger(Rc::new(metadata), ());
+                generic_builder = generic_builder.add_trigger(Arc::new(metadata), ());
             }
 
             for policy in table_metadata.policies() {
@@ -267,7 +267,7 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
 
                 // Initialize Metadata with empty dependencies and table (functions will be filled later if we had logic for it)
                 let metadata = crate::model_metadata::PolicyMetadata::new(
-                    Rc::clone(&table),
+                    Arc::clone(&table),
                     Vec::new(), // using_functions
                     Vec::new(), // check_functions
                     using_expression,
@@ -275,7 +275,7 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
                     roles,
                 );
 
-                generic_builder = generic_builder.add_policy(Rc::clone(policy), metadata);
+                generic_builder = generic_builder.add_policy(Arc::clone(policy), metadata);
             }
 
             generic_builder = generic_builder.add_table(table, table_metadata);
@@ -284,15 +284,15 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
         // Collect all roles' membership data and prepare role Rcs
         let mut role_memberships: std::collections::HashMap<u32, Vec<u32>> =
             std::collections::HashMap::new();
-        let mut roles_map: std::collections::HashMap<u32, Rc<PgRole>> =
+        let mut roles_map: std::collections::HashMap<u32, Arc<PgRole>> =
             std::collections::HashMap::new();
 
-        // First, create Rc for all roles and query their memberships
+        // First, create Arc for all roles and query their memberships
         for role in roles {
-            let role_rc = Rc::clone(&role);
+            let role_rc = Arc::clone(&role);
 
             if let Some(role_oid) = role.oid {
-                roles_map.insert(role_oid, Rc::clone(&role_rc));
+                roles_map.insert(role_oid, Arc::clone(&role_rc));
 
                 // Query pg_auth_members for this role's memberships
                 let member_of_oids =
@@ -312,7 +312,7 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
             };
 
             // Find the actual role Rcs from our map
-            let member_of: Vec<Rc<PgRole>> = member_of_oids
+            let member_of: Vec<Arc<PgRole>> = member_of_oids
                 .iter()
                 .filter_map(|oid| roles_map.get(oid).cloned())
                 .collect();
@@ -321,7 +321,7 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
             let policies = Vec::new();
 
             let metadata = crate::model_metadata::RoleMetadata::new(member_of, policies);
-            generic_builder = generic_builder.add_role(Rc::clone(role_rc), metadata);
+            generic_builder = generic_builder.add_role(Arc::clone(role_rc), metadata);
         }
 
         // Load table grants
@@ -347,7 +347,7 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
             });
 
             let metadata = RoleTableGrantsMetadata::new(privilege, grantee, table_rc);
-            generic_builder = generic_builder.add_table_grant(Rc::new(grant), metadata);
+            generic_builder = generic_builder.add_table_grant(Arc::new(grant), metadata);
         }
 
         // Load column grants
@@ -384,7 +384,7 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
             });
 
             let metadata = RoleColumnGrantsMetadata::new(privilege, grantee, table_rc, column_rc);
-            generic_builder = generic_builder.add_column_grant(Rc::new(grant), metadata);
+            generic_builder = generic_builder.add_column_grant(Arc::new(grant), metadata);
         }
 
         Ok(generic_builder.into())

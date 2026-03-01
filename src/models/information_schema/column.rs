@@ -1,6 +1,6 @@
 //! Column model.
 
-use std::{fmt::Display, rc::Rc};
+use std::{fmt::Display, sync::Arc};
 
 use diesel::{OptionalExtension, PgConnection, Queryable, QueryableByName, Selectable};
 
@@ -139,7 +139,7 @@ impl Column {
     /// * If an error occurs while querying the database
     pub fn metadata(
         &self,
-        table: Rc<Table>,
+        table: Arc<Table>,
         conn: &mut PgConnection,
     ) -> Result<ColumnMetadata, diesel::result::Error> {
         Ok(ColumnMetadata::new(

@@ -1,6 +1,6 @@
 //! Submodule providing the `TriggerMetadata` struct for a [`Triggers`] model.
 
-use std::rc::Rc;
+use std::sync::Arc;
 
 use sqlparser::ast::{TriggerEvent, TriggerObject, TriggerObjectKind, TriggerPeriod};
 
@@ -12,7 +12,7 @@ pub struct TriggerMetadata {
     /// The underlying trigger model.
     pub model: Triggers,
     /// The table that the trigger is defined on.
-    pub table: Rc<Table>,
+    pub table: Arc<Table>,
     /// The events that fire the trigger.
     pub events: Vec<TriggerEvent>,
     /// The timing of the trigger.
@@ -26,7 +26,7 @@ pub struct TriggerMetadata {
 impl TriggerMetadata {
     /// Creates a new `TriggerMetadata` instance.
     #[must_use]
-    pub fn new(model: Triggers, table: Rc<Table>, function_oid: Option<u32>) -> Self {
+    pub fn new(model: Triggers, table: Arc<Table>, function_oid: Option<u32>) -> Self {
         let events = parse_events(&model);
         let timing = parse_timing(&model);
         let orientation = parse_orientation(&model);
