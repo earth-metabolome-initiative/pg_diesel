@@ -225,8 +225,10 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
             }
 
             for fk in table_metadata.foreign_key_arcs() {
-                generic_builder = generic_builder
-                    .add_foreign_key(Arc::clone(&fk), fk.metadata(Arc::clone(&table), connection)?);
+                generic_builder = generic_builder.add_foreign_key(
+                    Arc::clone(&fk),
+                    fk.metadata(Arc::clone(&table), connection)?,
+                );
             }
 
             for index in table_metadata.unique_index_arcs() {
