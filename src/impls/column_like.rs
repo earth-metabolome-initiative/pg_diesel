@@ -49,6 +49,19 @@ impl ColumnLike for crate::models::Column {
             .table()
     }
 
+    fn column_id(&self, database: &Self::DB) -> Option<usize> {
+        let table = database
+            .column_metadata(self)
+            .expect("Column must exist in database")
+            .table();
+
+        database
+            .table_metadata(table)
+            .expect("Table must exist in database")
+            .columns()
+            .position(|column| column == self)
+    }
+
     fn is_generated(&self) -> bool {
         self.is_generated == "ALWAYS"
             || self
