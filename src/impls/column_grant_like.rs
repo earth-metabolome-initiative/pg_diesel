@@ -2,17 +2,23 @@
 
 use std::sync::Arc;
 
+use sql_traits::{
+    errors::LookupError,
+    structs::TargetName,
+    traits::{
+        ColumnGrantLike, ColumnLike, DatabaseLike, GrantLike, Metadata, RoleLike, TableLike,
+        ViewLike, grant::GrantRelation,
+    },
+};
 use sqlparser::ast::{Action, Grantee};
 
-use crate::PgDieselDatabase;
-use crate::models::{Column, RoleColumnGrants, Table};
-use sql_traits::traits::{
-    ColumnGrantLike, ColumnLike, DatabaseLike, GrantLike, Metadata, RoleLike, TableLike,
+use crate::{
+    PgDieselDatabase,
+    model_metadata::PgTable,
+    models::{Column, RoleColumnGrants},
 };
 
 /// Metadata for `RoleColumnGrants`.
-///
-/// Stores the parsed privilege (Action), grantee, table, and column for efficient access.
 #[derive(Debug, Clone)]
 pub struct RoleColumnGrantsMetadata {
     /// The parsed privilege action.
@@ -20,7 +26,7 @@ pub struct RoleColumnGrantsMetadata {
     /// The parsed grantee.
     pub grantee: Option<Grantee>,
     /// The table this grant applies to.
-    pub table: Option<Arc<Table>>,
+    pub table: Option<Arc<PgTable>>,
     /// The column this grant applies to.
     pub column: Option<Arc<Column>>,
 }
@@ -31,7 +37,7 @@ impl RoleColumnGrantsMetadata {
     pub fn new(
         privilege: Option<Action>,
         grantee: Option<Grantee>,
-        table: Option<Arc<Table>>,
+        table: Option<Arc<PgTable>>,
         column: Option<Arc<Column>>,
     ) -> Self {
         Self {
@@ -56,7 +62,7 @@ impl RoleColumnGrantsMetadata {
 
     /// Returns the table.
     #[must_use]
-    pub fn table(&self) -> Option<&Table> {
+    pub fn table(&self) -> Option<&PgTable> {
         self.table.as_deref()
     }
 
@@ -80,7 +86,7 @@ impl GrantLike for RoleColumnGrants {
     {
         database
             .column_grant_metadata(self)
-            .and_then(|m| m.privilege())
+            .and_then(RoleColumnGrantsMetadata::privilege)
             .into_iter()
     }
 
@@ -96,8 +102,31 @@ impl GrantLike for RoleColumnGrants {
     {
         database
             .column_grant_metadata(self)
-            .and_then(|m| m.grantee())
+            .and_then(RoleColumnGrantsMetadata::grantee)
             .into_iter()
+    }
+
+    fn applies_to_public(&self) -> bool {
+        self.grantee
+            .as_deref()
+            .is_some_and(|grantee| grantee.eq_ignore_ascii_case("PUBLIC"))
+    }
+
+    fn target_table_names(&self) -> impl Iterator<Item = TargetName<'_>> {
+        self.table_name
+            .as_deref()
+            .map(|name| {
+                let target = TargetName::new(name, true);
+                match self.table_schema.as_deref() {
+                    Some(schema) => target.with_schema(schema, true),
+                    None => target,
+                }
+            })
+            .into_iter()
+    }
+
+    fn target_schema_names(&self) -> impl Iterator<Item = TargetName<'_>> {
+        core::iter::empty()
     }
 
     fn with_grant_option(&self) -> bool {
@@ -124,21 +153,37 @@ impl ColumnGrantLike for RoleColumnGrants {
         &'a self,
         table: &'a <Self::DB as DatabaseLike>::Table,
         database: &'a Self::DB,
-    ) -> impl Iterator<Item = &'a <Self::DB as DatabaseLike>::Column> {
-        let column_name = self.column_name.clone();
-        table.columns(database).filter(move |c| {
-            // Match column name
-            column_name
-                .as_deref()
-                .zip(Some(c.column_name()))
-                .is_some_and(|(gn, cn)| gn == cn)
-        })
+    ) -> Result<impl Iterator<Item = &'a <Self::DB as DatabaseLike>::Column>, LookupError> {
+        Ok(table
+            .columns(database)?
+            .filter(move |column| self.column_name.as_deref() == Some(column.column_name())))
     }
 
     fn table<'a>(
         &'a self,
         database: &'a Self::DB,
     ) -> Option<&'a <Self::DB as DatabaseLike>::Table> {
-        database.column_grant_metadata(self).and_then(|m| m.table())
+        database
+            .column_grant_metadata(self)
+            .and_then(RoleColumnGrantsMetadata::table)
+    }
+
+    fn relation<'a>(&'a self, database: &'a Self::DB) -> Option<GrantRelation<'a, Self::DB>> {
+        if let Some(table) = self.table(database) {
+            return Some(GrantRelation::Table(table));
+        }
+        let names = |schema: Option<&str>, name: &str| {
+            self.table_schema.as_deref() == schema && self.table_name.as_deref() == Some(name)
+        };
+        if let Some(view) = database
+            .views()
+            .find(|v| names(v.view_schema(), v.view_name()))
+        {
+            return Some(GrantRelation::View(view));
+        }
+        database
+            .materialized_views()
+            .find(|v| names(v.view_schema(), v.view_name()))
+            .map(GrantRelation::MaterializedView)
     }
 }

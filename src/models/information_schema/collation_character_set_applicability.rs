@@ -5,16 +5,6 @@ use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Struct defining the
 /// `information_schema.collation_character_set_applicability` table.
-///
-/// The `collation_character_set_applicability` view contains one row for each
-/// collation that is applicable to a character set. This view establishes the
-/// relationship between collations and the character sets they can be used
-/// with, providing essential information for understanding which collations are
-/// valid for specific character encodings.
-///
-/// This relationship is fundamental for database text processing, as collations
-/// define how text data is sorted and compared, and they must be compatible
-/// with the underlying character set encoding.
 #[derive(
     Queryable, QueryableByName, Selectable, PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Hash,
 )]

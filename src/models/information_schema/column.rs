@@ -1,16 +1,13 @@
 //! Column model.
 
-use std::{fmt::Display, sync::Arc};
+use std::fmt::Display;
 
-use diesel::{OptionalExtension, PgConnection, Queryable, QueryableByName, Selectable};
+use diesel::{PgConnection, Queryable, QueryableByName, Selectable};
 
 mod cached_queries;
 
 use super::check_constraint::CheckConstraint;
-use crate::{
-    model_metadata::ColumnMetadata,
-    models::{GeographyColumn, GeometryColumn, KeyColumnUsage, PgType, Table},
-};
+use crate::models::{GeographyColumn, GeometryColumn, KeyColumnUsage, PgType, Table};
 
 /// Struct defining the `information_schema.columns` table.
 #[derive(
@@ -127,28 +124,6 @@ impl AsRef<Column> for Column {
 }
 
 impl Column {
-    /// Returns the metadata of the column.
-    ///
-    /// # Arguments
-    ///
-    /// * `table` - The table the column belongs to.
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Errors
-    ///
-    /// * If an error occurs while querying the database
-    pub fn metadata(
-        &self,
-        table: Arc<Table>,
-        conn: &mut PgConnection,
-    ) -> Result<ColumnMetadata, diesel::result::Error> {
-        Ok(ColumnMetadata::new(
-            table,
-            cached_queries::pg_description(self, conn).optional()?,
-            self.pg_type(conn)?,
-        ))
-    }
-
     #[must_use]
     /// Returns the column as a nullable column
     pub fn into_nullable(self) -> Self {
@@ -192,17 +167,9 @@ impl Column {
 
     /// Returns all the check constraint associated to the current column.
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
     /// # Errors
     ///
     /// * If their is an error while querying the [`CheckConstraint`].
-    ///
-    /// # Returns
-    ///
-    /// * A `Vec` of all the [`CheckConstraint`]
     pub fn check_constraints(
         &self,
         conn: &mut PgConnection,
@@ -212,10 +179,6 @@ impl Column {
 
     /// Returns the associated geometry column if the column is a geometry
     /// column
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
     ///
@@ -229,10 +192,6 @@ impl Column {
 
     /// Returns the associated geography column if the column is a geography
     /// column.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
     ///
@@ -263,15 +222,6 @@ impl Column {
 
     /// Returns the [`PgType`] associated with the column
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Returns
-    ///
-    /// A `Result` containing the [`PgType`] of the column if the operation was
-    /// successful, or a `diesel::result::Error` if an error occurred
-    ///
     /// # Errors
     ///
     /// If an error occurs while querying the database
@@ -287,10 +237,6 @@ impl Column {
 
     /// Returns the table which contains the current column.
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
     /// # Errors
     ///
     /// * If an error occurs while querying the database
@@ -300,10 +246,6 @@ impl Column {
 
     /// Returns whether the column is part of a single-column unique constraint.
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
     /// # Errors
     ///
     /// * If an error occurs while querying the database
@@ -312,7 +254,7 @@ impl Column {
         let pg_indices = table.unique_indices(conn)?;
 
         for index in pg_indices {
-            let Ok(columns) = index.columns(conn) else {
+            let Ok(columns) = index.model().columns(conn) else {
                 return Ok(false);
             };
             if columns.len() == 1 && columns[0].column_name == self.column_name {
@@ -345,10 +287,6 @@ impl Column {
     /// Returns the foreign table of the column if it is a foreign key.
     /// If the column is not a foreign key, returns `None`.
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
     /// # Errors
     ///
     /// If an error occurs while querying the database
@@ -360,10 +298,6 @@ impl Column {
     }
 
     /// Returns whether the column has foreign keys.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
     pub fn has_foreign_keys(&self, conn: &mut PgConnection) -> bool {
         self.foreign_keys(conn).is_ok_and(|keys| !keys.is_empty())
     }

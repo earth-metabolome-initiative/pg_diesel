@@ -7,9 +7,6 @@ mod cached_queries;
 use super::{PgAttribute, PgEnum, PgExtension};
 
 /// Represents a `PostgreSQL` type.
-///
-/// This struct contains metadata about a `PostgreSQL` type, including its name,
-/// OID (Object Identifier), namespace, and other properties.
 #[derive(
     Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone,
 )]
@@ -86,21 +83,10 @@ pub struct PgType {
     pub typdefaultbin: Option<Vec<u8>>,
     /// The default text representation of the type.
     pub typdefault: Option<String>,
-    /// Access privileges for the type.
-    pub typacl: Option<Vec<String>>,
 }
 
 impl PgType {
     /// Returns the extension of the `PgType`, if any.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - The Postgres connection.
-    ///
-    /// # Returns
-    ///
-    /// An option containing the `PgExtension` of the `PgType`,
-    /// or None if the type is not from an extension.
     ///
     /// # Errors
     ///
@@ -110,15 +96,6 @@ impl PgType {
     }
 
     /// Returns the internal custom types of the `PgType`, if any.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - The Postgres connection.
-    ///
-    /// # Returns
-    ///
-    /// A Result containing the internal custom types of the `PgType`, or an
-    /// error if the type is not supported.
     ///
     /// # Errors
     ///
@@ -141,15 +118,6 @@ impl PgType {
 
     /// Returns the Type Base Type of the `PgType`.
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - The Postgres connection.
-    ///
-    /// # Returns
-    ///
-    /// A Result containing the Type Base Type of the `PgType`, or an error if
-    /// the type is not supported.
-    ///
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
@@ -166,11 +134,6 @@ impl PgType {
 
     /// Returns the [`PgType`] from the given OID.
     ///
-    /// # Arguments
-    ///
-    /// * `oid` - The OID of the type.
-    /// * `conn` - A mutable reference to a `PgConnection`.
-    ///
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
@@ -179,15 +142,6 @@ impl PgType {
     }
 
     /// Returns whether the Postgres type is a user-defined type.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - The Postgres connection.
-    ///
-    /// # Returns
-    ///
-    /// A Result containing a boolean indicating whether the Postgres type is a
-    /// user-defined type, or an error if the type is not supported.
     ///
     /// # Errors
     ///
@@ -210,15 +164,6 @@ impl PgType {
 
     /// Returns the attributes of the type, if it is a composite type.
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - The Postgres connection.
-    ///
-    /// # Returns
-    ///
-    /// A Result containing the attributes of the type if it is a composite
-    /// type, or an error if it is not.
-    ///
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
@@ -230,15 +175,6 @@ impl PgType {
     }
 
     /// Returns the variants of the type, if it is an enum type.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - The Postgres connection.
-    ///
-    /// # Returns
-    ///
-    /// A Result containing the variants of the type if it is an enum type, or
-    /// an error if it is not.
     ///
     /// # Errors
     ///
@@ -292,7 +228,6 @@ mod tests {
             typcollation: 0,
             typdefaultbin: None,
             typdefault: None,
-            typacl: None,
         }
     }
 

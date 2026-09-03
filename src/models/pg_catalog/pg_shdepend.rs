@@ -4,12 +4,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_shdepend` table.
-///
-/// The `pg_shdepend` catalog records dependency relationships between database
-/// objects and shared objects such as roles. This allows the system to prevent
-/// dropping shared objects that are still needed.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/catalog-pg-shdepend.html).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_shdepend::pg_shdepend)]

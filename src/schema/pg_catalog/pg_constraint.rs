@@ -52,10 +52,10 @@ diesel::table! {
         conislocal -> Bool,
 
         /// Number of times this constraint is inherited by child tables.
-        #[cfg(not(any(feature = "postgres-15", feature = "postgres-16", feature = "postgres-17", feature = "postgres-18")))]
+        #[cfg(not(any(feature = "postgres-16", feature = "postgres-17", feature = "postgres-18")))]
         coninhcount -> Integer,
         /// Number of times this constraint is inherited by child tables.
-        #[cfg(any(feature = "postgres-15", feature = "postgres-16", feature = "postgres-17", feature = "postgres-18"))]
+        #[cfg(any(feature = "postgres-16", feature = "postgres-17", feature = "postgres-18"))]
         coninhcount -> SmallInt,
 
         /// `true` if the constraint cannot be inherited.

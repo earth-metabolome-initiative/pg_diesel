@@ -1,14 +1,8 @@
 //! Model struct for the `information_schema.foreign_data_wrapper_options` view.
-//!
-//! This view contains one row for each option of a foreign data wrapper in the
-//! current database.
 
 use diesel::prelude::*;
 
 /// Model struct for `information_schema.foreign_data_wrapper_options`.
-///
-/// This view contains one row for each option of a foreign data wrapper in the
-/// current database.
 #[derive(
     Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, Queryable, QueryableByName, Selectable,
 )]

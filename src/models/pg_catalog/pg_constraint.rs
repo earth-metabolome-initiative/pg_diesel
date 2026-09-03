@@ -58,7 +58,6 @@ pub struct PgConstraint {
     /// constraint can be locally defined and inherited simultaneously.
     pub conislocal: bool,
     #[cfg(not(any(
-        feature = "postgres-15",
         feature = "postgres-16",
         feature = "postgres-17",
         feature = "postgres-18"
@@ -68,7 +67,6 @@ pub struct PgConstraint {
     /// renamed.
     pub coninhcount: i32,
     #[cfg(any(
-        feature = "postgres-15",
         feature = "postgres-16",
         feature = "postgres-17",
         feature = "postgres-18"
@@ -115,10 +113,6 @@ impl PgConstraint {
     /// Returns the vector of [`PgProc`] functions that are used in the
     /// constraint.
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
     /// # Errors
     ///
     /// * If an error occurs while querying the database
@@ -128,10 +122,6 @@ impl PgConstraint {
 
     /// Returns the vector of [`PgOperator`] functions that are used in the
     /// constraint.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
     ///

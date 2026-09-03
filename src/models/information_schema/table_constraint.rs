@@ -131,10 +131,6 @@ impl FromSql<diesel::sql_types::Text, diesel::pg::Pg> for ConstraintType {
 impl TableConstraint {
     /// Returns the table associated with this table constraint
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
     /// # Errors
     ///
     /// * If an error occurs while querying the database

@@ -4,10 +4,6 @@ use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row in the `constraint_table_usage` table in the `PostgreSQL`
 /// database.
-///
-/// The `constraint_table_usage` table contains information about table
-/// constraints defined in the database, including catalogs, schemas, and names
-/// of tables and constraints.
 #[derive(
     Queryable, QueryableByName, Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Selectable,
 )]

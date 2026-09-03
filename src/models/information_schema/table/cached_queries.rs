@@ -1,15 +1,16 @@
 //! Submodule defining the cached queries methods used in the [`Table`] struct.
 
 use diesel::{
-    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, NullableExpressionMethods, PgConnection,
-    QueryDsl, RunQueryDsl, SelectableHelper,
+    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, NullableExpressionMethods,
+    OptionalExtension, PgConnection, QueryDsl, RunQueryDsl, SelectableHelper,
 };
 
 use crate::models::{
     CheckConstraint, Column, KeyColumnUsage, PgDescription, PgIndex, PgTrigger, Table, Triggers,
 };
 
-/// Loads all tables from the information schema for the given catalog and schema.
+/// Loads all base tables from the information schema for the given catalog and
+/// schema.
 pub(crate) fn load_all_tables(
     table_catalog: &str,
     table_schema: &str,
@@ -19,6 +20,7 @@ pub(crate) fn load_all_tables(
     tables::table
         .filter(tables::table_catalog.eq(table_catalog))
         .filter(tables::table_schema.eq(table_schema))
+        .filter(tables::table_type.eq("BASE TABLE"))
         .filter(tables::table_name.ne("__diesel_schema_migrations"))
         .order_by(tables::table_name)
         .select(Table::as_select())
@@ -55,11 +57,6 @@ pub(crate) fn columns(
 }
 
 /// Returns the columns that are part of the primary key for the given table.
-///
-/// # Arguments
-///
-/// * `table` - The table for which to retrieve the primary key columns.
-/// * `conn` - The database connection.
 ///
 /// # Errors
 ///
@@ -165,11 +162,12 @@ pub(crate) fn foreign_keys(
         .load::<KeyColumnUsage>(conn)
 }
 
-/// Returns the unique indices of the table.
+/// Returns the unique indices of the table, each with the name `pg_class`
+/// records the index relation under.
 pub(crate) fn unique_indices(
     table: &Table,
     conn: &mut PgConnection,
-) -> Result<Vec<PgIndex>, diesel::result::Error> {
+) -> Result<Vec<(PgIndex, String)>, diesel::result::Error> {
     use crate::schema::pg_catalog::{pg_class::pg_class, pg_index::pg_index};
 
     let (pg_class1, pg_class2) = diesel::alias!(pg_class as pg_class1, pg_class as pg_class2);
@@ -188,15 +186,16 @@ pub(crate) fn unique_indices(
                 ),
         )
         .filter(pg_index::indisunique.eq(true))
-        .select(PgIndex::as_select())
-        .load::<PgIndex>(conn)
+        .select((PgIndex::as_select(), pg_class1.field(pg_class::relname)))
+        .load::<(PgIndex, String)>(conn)
 }
 
-/// Returns all indices of the table.
+/// Returns all indices of the table, each with the name `pg_class` records the
+/// index relation under.
 pub(crate) fn indices(
     table: &Table,
     conn: &mut PgConnection,
-) -> Result<Vec<PgIndex>, diesel::result::Error> {
+) -> Result<Vec<(PgIndex, String)>, diesel::result::Error> {
     use crate::schema::pg_catalog::{pg_class::pg_class, pg_index::pg_index};
 
     let (pg_class1, pg_class2) = diesel::alias!(pg_class as pg_class1, pg_class as pg_class2);
@@ -214,8 +213,36 @@ pub(crate) fn indices(
                         .eq(pg_class1.field(pg_class::relnamespace)),
                 ),
         )
-        .select(PgIndex::as_select())
-        .load::<PgIndex>(conn)
+        .select((PgIndex::as_select(), pg_class1.field(pg_class::relname)))
+        .load::<(PgIndex, String)>(conn)
+}
+
+/// Returns the indices of the table that enforce no uniqueness, each with the
+/// name `pg_class` records the index relation under.
+pub(crate) fn non_unique_indices(
+    table: &Table,
+    conn: &mut PgConnection,
+) -> Result<Vec<(PgIndex, String)>, diesel::result::Error> {
+    use crate::schema::pg_catalog::{pg_class::pg_class, pg_index::pg_index};
+
+    let (pg_class1, pg_class2) = diesel::alias!(pg_class as pg_class1, pg_class as pg_class2);
+
+    pg_index::table
+        .inner_join(pg_class1.on(pg_class1.field(pg_class::oid).eq(pg_index::indexrelid)))
+        .inner_join(pg_class2.on(pg_class2.field(pg_class::oid).eq(pg_index::indrelid)))
+        .filter(
+            pg_class2
+                .field(pg_class::relname)
+                .eq(&table.table_name)
+                .and(
+                    pg_class2
+                        .field(pg_class::relnamespace)
+                        .eq(pg_class1.field(pg_class::relnamespace)),
+                ),
+        )
+        .filter(pg_index::indisunique.eq(false))
+        .select((PgIndex::as_select(), pg_class1.field(pg_class::relname)))
+        .load::<(PgIndex, String)>(conn)
 }
 
 /// Returns the check constraints of the table.
@@ -258,27 +285,6 @@ pub(crate) fn column_by_name(
         .first::<Column>(conn)
 }
 
-/// Returns the description of the table from `pg_description`.
-pub(super) fn pg_description(
-    table: &Table,
-    conn: &mut PgConnection,
-) -> Result<PgDescription, diesel::result::Error> {
-    use crate::schema::pg_catalog::{
-        pg_attribute::pg_attribute, pg_class::pg_class, pg_description::pg_description,
-        pg_namespace::pg_namespace,
-    };
-
-    pg_description::table
-        .inner_join(pg_attribute::table.on(pg_description::objoid.eq(pg_attribute::attrelid)))
-        .inner_join(pg_class::table.on(pg_attribute::attrelid.eq(pg_class::oid)))
-        .inner_join(pg_namespace::table.on(pg_class::relnamespace.eq(pg_namespace::oid)))
-        .filter(pg_class::relname.eq(&table.table_name))
-        .filter(pg_namespace::nspname.eq(&table.table_schema))
-        .filter(pg_attribute::attname.eq(&table.table_name))
-        .select(PgDescription::as_select())
-        .first::<PgDescription>(conn)
-}
-
 /// Returns the triggers of the table, along with the OID of the function they call.
 pub(crate) fn triggers(
     table: &Table,
@@ -318,20 +324,10 @@ pub(crate) fn triggers(
 
 /// Returns the policies associated with the table.
 pub(crate) fn policies(
-    table: &Table,
+    table_oid: u32,
     conn: &mut PgConnection,
 ) -> Result<Vec<crate::models::PgPolicyTable>, diesel::result::Error> {
-    use crate::schema::pg_catalog::{
-        pg_class::pg_class, pg_namespace::pg_namespace, pg_policy::pg_policy,
-    };
-
-    // First find Table OID reliably
-    let table_oid: u32 = pg_class::table
-        .inner_join(pg_namespace::table.on(pg_class::relnamespace.eq(pg_namespace::oid)))
-        .filter(pg_class::relname.eq(&table.table_name))
-        .filter(pg_namespace::nspname.eq(&table.table_schema))
-        .select(pg_class::oid)
-        .first(conn)?;
+    use crate::schema::pg_catalog::pg_policy::pg_policy;
 
     pg_policy::table
         .filter(pg_policy::polrelid.eq(table_oid))
@@ -339,17 +335,156 @@ pub(crate) fn policies(
         .load(conn)
 }
 
-/// Returns the Row Level Security settings for the table.
-pub(crate) fn pg_class(
+/// What a table's `pg_attribute` row says about one of its columns.
+#[derive(Debug, Clone)]
+pub(crate) struct AttributeFacts {
+    /// The name of the column.
+    pub(crate) name: String,
+    /// The position the column holds, which a description refers to.
+    pub(crate) number: i16,
+    /// The OID of the column's type.
+    pub(crate) type_oid: u32,
+    /// Whether the column comes from a parent rather than this table.
+    pub(crate) inherited: bool,
+}
+
+/// What `pg_catalog.pg_class` records about a table beyond its columns.
+#[derive(Debug, Clone)]
+pub(crate) struct TableCatalogFacts {
+    /// The OID `pg_class` records the table under.
+    pub(crate) oid: u32,
+    /// Whether Row Level Security is enabled on the table.
+    pub(crate) row_security: bool,
+    /// Whether Row Level Security applies to the table's owner too.
+    pub(crate) forced_row_security: bool,
+    /// The OID of the role owning the table.
+    pub(crate) owner: u32,
+    /// Whether the table is a partition of another one, as opposed to an
+    /// `INHERITS` child.
+    pub(crate) is_partition: bool,
+}
+
+/// Returns the identity, row security settings, owner and partition status of
+/// the table.
+pub(crate) fn catalog_facts(
     table: &Table,
     conn: &mut PgConnection,
-) -> Result<(bool, bool), diesel::result::Error> {
+) -> Result<TableCatalogFacts, diesel::result::Error> {
     use crate::schema::pg_catalog::{pg_class::pg_class, pg_namespace::pg_namespace};
 
-    pg_class::table
+    let (oid, row_security, forced_row_security, owner, is_partition) = pg_class::table
         .inner_join(pg_namespace::table.on(pg_class::relnamespace.eq(pg_namespace::oid)))
         .filter(pg_class::relname.eq(&table.table_name))
         .filter(pg_namespace::nspname.eq(&table.table_schema))
-        .select((pg_class::relrowsecurity, pg_class::relforcerowsecurity))
-        .first(conn)
+        .select((
+            pg_class::oid,
+            pg_class::relrowsecurity,
+            pg_class::relforcerowsecurity,
+            pg_class::relowner,
+            pg_class::relispartition,
+        ))
+        .first::<(u32, bool, bool, u32, bool)>(conn)?;
+
+    Ok(TableCatalogFacts {
+        oid,
+        row_security,
+        forced_row_security,
+        owner,
+        is_partition,
+    })
+}
+
+/// Returns what `pg_attribute` records for every live column of the table.
+pub(crate) fn attributes(
+    table_oid: u32,
+    conn: &mut PgConnection,
+) -> Result<Vec<AttributeFacts>, diesel::result::Error> {
+    use crate::schema::pg_catalog::pg_attribute::pg_attribute;
+
+    Ok(pg_attribute::table
+        .filter(pg_attribute::attrelid.eq(table_oid))
+        .filter(pg_attribute::attnum.gt(0))
+        .filter(pg_attribute::attisdropped.eq(false))
+        .order_by(pg_attribute::attnum)
+        .select((
+            pg_attribute::attname,
+            pg_attribute::attnum,
+            pg_attribute::atttypid,
+            pg_attribute::attislocal,
+        ))
+        .load::<(String, i16, u32, bool)>(conn)?
+        .into_iter()
+        .map(|(name, number, type_oid, local)| AttributeFacts {
+            name,
+            number,
+            type_oid,
+            inherited: !local,
+        })
+        .collect())
+}
+
+/// Returns every comment recorded against the table, its own and its columns'.
+///
+/// A comment on the table itself carries `objsubid` zero, and a comment on a
+/// column carries that column's `attnum`.
+pub(crate) fn descriptions(
+    table_oid: u32,
+    conn: &mut PgConnection,
+) -> Result<Vec<PgDescription>, diesel::result::Error> {
+    use crate::schema::pg_catalog::{pg_class::pg_class, pg_description::pg_description};
+
+    pg_description::table
+        .inner_join(pg_class::table.on(pg_description::classoid.eq(pg_class::oid)))
+        .filter(pg_description::objoid.eq(table_oid))
+        .filter(pg_class::relname.eq("pg_class"))
+        .select(PgDescription::as_select())
+        .load::<PgDescription>(conn)
+}
+
+/// Returns the partitioning strategy of the table, when it is partitioned.
+pub(crate) fn partition_strategy(
+    table_oid: u32,
+    conn: &mut PgConnection,
+) -> Result<Option<String>, diesel::result::Error> {
+    use crate::schema::pg_catalog::pg_partitioned_table::pg_partitioned_table;
+
+    pg_partitioned_table::table
+        .filter(pg_partitioned_table::partrelid.eq(table_oid))
+        .select(pg_partitioned_table::partstrat)
+        .first::<String>(conn)
+        .optional()
+}
+
+/// Returns the schema and name of every relation the table descends from.
+pub(crate) fn parents(
+    table_oid: u32,
+    conn: &mut PgConnection,
+) -> Result<Vec<(String, String)>, diesel::result::Error> {
+    use crate::schema::pg_catalog::{
+        pg_class::pg_class, pg_inherits::pg_inherits, pg_namespace::pg_namespace,
+    };
+
+    let parent_oids = pg_inherits::table
+        .filter(pg_inherits::inhrelid.eq(table_oid))
+        .order_by(pg_inherits::inhseqno)
+        .select(pg_inherits::inhparent)
+        .load::<u32>(conn)?;
+
+    if parent_oids.is_empty() {
+        return Ok(Vec::new());
+    }
+
+    let names: std::collections::HashMap<u32, (String, String)> = pg_class::table
+        .inner_join(pg_namespace::table.on(pg_class::relnamespace.eq(pg_namespace::oid)))
+        .filter(pg_class::oid.eq_any(&parent_oids))
+        .select((pg_class::oid, pg_namespace::nspname, pg_class::relname))
+        .load::<(u32, String, String)>(conn)?
+        .into_iter()
+        .map(|(oid, schema, name)| (oid, (schema, name)))
+        .collect();
+
+    Ok(parent_oids
+        .iter()
+        .filter_map(|oid| names.get(oid).cloned())
+        .collect())
 }

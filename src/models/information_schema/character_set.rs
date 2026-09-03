@@ -3,15 +3,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Struct defining the `information_schema.character_sets` table.
-///
-/// The `character_sets` view contains one row for each character set available
-/// in the current database. This includes information about character sets that
-/// can be used for character data types, providing details about their catalog,
-/// schema, repertoire, form of use, and default collation settings.
-///
-/// Character sets define the encoding and representation of text data, and this
-/// view is essential for understanding what character encodings are available
-/// and their associated properties within the database system.
 #[derive(
     Queryable, QueryableByName, Selectable, PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Hash,
 )]

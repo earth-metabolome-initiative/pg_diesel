@@ -3,9 +3,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Struct defining the `information_schema.domains` table.
-///
-/// The `domains` view contains one row for each domain in the current database
-/// that the current user has access to.
 #[derive(
     Queryable, QueryableByName, Selectable, PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Hash,
 )]

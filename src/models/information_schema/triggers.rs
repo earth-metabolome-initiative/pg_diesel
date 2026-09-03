@@ -1,8 +1,4 @@
 //! Model struct for the `information_schema.triggers` view.
-//!
-//! This view contains one row for each trigger in the current database that the
-//! current user owns or has some privilege on, providing comprehensive metadata
-//! about triggers including timing, events, and actions.
 
 use std::time::SystemTime;
 

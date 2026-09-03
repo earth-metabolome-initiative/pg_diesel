@@ -7,9 +7,6 @@
 use diesel::prelude::*;
 
 /// Model struct for `information_schema.routines`.
-///
-/// This view contains one row for each function and procedure in the current
-/// database.
 #[derive(
     Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, Queryable, QueryableByName, Selectable,
 )]

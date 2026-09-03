@@ -87,8 +87,6 @@ diesel::table! {
         relfrozenxid -> Oid,
         /// Minimum frozen multixact ID for the relation (used by VACUUM).
         relminmxid -> Oid,
-        /// Access privileges (ACL) for the relation.
-        relacl -> Nullable<Array<Text>>,
         /// Relation-level options for the relation.
         reloptions -> Nullable<Array<Text>>,
         /// Partition bound for partitioned tables.

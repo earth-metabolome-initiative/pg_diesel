@@ -3,10 +3,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents an entry in the `PostGIS` `geography_columns` system table.
-///
-/// The `geography_columns` table provides metadata about all geography columns
-/// stored in the database, including their spatial reference system (SRID)
-/// and geography type.
 #[derive(Queryable, QueryableByName, Selectable, Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::public::geography_columns::geography_columns)]

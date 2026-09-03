@@ -4,13 +4,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_foreign_table` table.
-///
-/// The `pg_foreign_table` system catalog contains auxiliary information about
-/// foreign tables. A foreign table is primarily represented by a `pg_class`
-/// entry, just like a regular table. This catalog entry contains information
-/// that is specific to foreign tables.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/catalog-pg-foreign-table.html).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_foreign_table::pg_foreign_table)]

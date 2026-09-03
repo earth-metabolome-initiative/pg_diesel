@@ -8,14 +8,6 @@ use diesel::{
 };
 
 /// Represents a row from the `pg_stat_replication` view.
-///
-/// The `pg_stat_replication` view shows statistics about replication
-/// to connected standby servers.
-///
-/// Note: This struct does not derive serde traits because `PgInterval` does not
-/// implement them.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-REPLICATION-VIEW).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone)]
 #[diesel(table_name = crate::schema::pg_catalog::pg_stat_replication::pg_stat_replication)]
 pub struct PgStatReplication {

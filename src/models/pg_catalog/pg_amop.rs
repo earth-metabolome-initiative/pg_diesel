@@ -1,13 +1,6 @@
 //! `PostgreSQL` access method operators catalog model.
-//!
-//! This module provides the `PgAmop` struct for working with the
-//! `pg_catalog.pg_amop` system catalog table.
 
 /// Represents a row from the `pg_catalog.pg_amop` table.
-///
-/// Contains information about operators that can be used with particular access
-/// method operator families. This table defines which operators are supported
-/// by various index access methods.
 #[derive(diesel::Queryable, diesel::QueryableByName, diesel::Selectable)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]

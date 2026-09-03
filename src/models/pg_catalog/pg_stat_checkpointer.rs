@@ -6,11 +6,6 @@ use std::time::SystemTime;
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_stat_checkpointer` view.
-///
-/// The `pg_stat_checkpointer` view shows statistics about the checkpointer
-/// process's activity. It contains only one row with cluster-wide data.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-CHECKPOINTER-VIEW).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_stat_checkpointer::pg_stat_checkpointer)]

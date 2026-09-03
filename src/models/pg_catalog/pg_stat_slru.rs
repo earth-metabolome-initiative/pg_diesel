@@ -6,11 +6,6 @@ use std::time::SystemTime;
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_stat_slru` view.
-///
-/// The `pg_stat_slru` view shows statistics about SLRU (Simple Least Recently
-/// Used) caches, which are used for various internal caching purposes.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-SLRU-VIEW).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_stat_slru::pg_stat_slru)]

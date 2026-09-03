@@ -1,8 +1,4 @@
 //! Model struct for the `information_schema.user_mapping_options` view.
-//!
-//! This view contains one row for each option of a user mapping accessible to
-//! the current user, used with foreign data wrappers to configure connection
-//! and authentication options.
 
 use diesel::prelude::*;
 

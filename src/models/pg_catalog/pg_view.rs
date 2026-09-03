@@ -19,3 +19,23 @@ pub struct PgView {
     /// View definition (SELECT statement)
     pub definition: Option<String>,
 }
+
+impl PgView {
+    /// Loads every view declared in the given schemas.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the database query fails.
+    pub fn load_all(
+        schemas: &[String],
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::pg_catalog::pg_views::pg_views;
+
+        pg_views::table
+            .filter(pg_views::schemaname.eq_any(schemas))
+            .order_by(pg_views::viewname)
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+}

@@ -1,13 +1,6 @@
 //! `PostgreSQL` backend memory contexts view model.
-//!
-//! This module provides the `PgBackendMemoryContexts` struct for working with
-//! the `pg_catalog.pg_backend_memory_contexts` system view.
 
 /// Represents a row from the `pg_catalog.pg_backend_memory_contexts` view.
-///
-/// Shows memory context information for the current backend process.
-/// This view provides insights into memory allocation and usage patterns
-/// within the `PostgreSQL` backend, useful for debugging and monitoring.
 #[derive(diesel::Queryable, diesel::QueryableByName, diesel::Selectable)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]

@@ -4,15 +4,6 @@
 use diesel::{Identifiable, Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_statistic` table.
-///
-/// The `pg_statistic` table stores statistical data about the contents of the
-/// database. Rows are created by ANALYZE and subsequently used by the query
-/// planner.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/catalog-pg-statistic.html).
-///
-/// Note: This struct does not derive `Hash`, `Eq`, or `Ord` because it contains
-/// `f32` fields.
 #[derive(Identifiable, Queryable, QueryableByName, Selectable, Debug, PartialEq, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_statistic::pg_statistic)]

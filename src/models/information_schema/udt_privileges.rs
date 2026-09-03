@@ -1,7 +1,4 @@
 //! Model struct for the `information_schema.udt_privileges` view.
-//!
-//! This view contains one row for each privilege granted on a user-defined type
-//! to a currently enabled role or granted by a currently enabled role.
 
 use diesel::prelude::*;
 

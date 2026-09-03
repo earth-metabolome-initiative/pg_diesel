@@ -6,8 +6,7 @@ use diesel::{
 };
 
 use crate::models::{
-    CheckConstraint, Column, GeographyColumn, GeometryColumn, KeyColumnUsage, PgDescription,
-    PgType, Table,
+    CheckConstraint, Column, GeographyColumn, GeometryColumn, KeyColumnUsage, PgType, Table,
 };
 
 /// Returns the foreign keys that reference this column.
@@ -162,25 +161,4 @@ pub(super) fn pg_type(
         .filter(pg_attribute::attname.eq(&column.column_name))
         .select(PgType::as_select())
         .first::<PgType>(conn)
-}
-
-/// Returns the description of this column from `pg_description`.
-pub(super) fn pg_description(
-    column: &Column,
-    conn: &mut PgConnection,
-) -> Result<PgDescription, diesel::result::Error> {
-    use crate::schema::pg_catalog::{
-        pg_attribute::pg_attribute, pg_class::pg_class, pg_description::pg_description,
-        pg_namespace::pg_namespace,
-    };
-
-    pg_description::table
-        .inner_join(pg_attribute::table.on(pg_description::objoid.eq(pg_attribute::attrelid)))
-        .inner_join(pg_class::table.on(pg_attribute::attrelid.eq(pg_class::oid)))
-        .inner_join(pg_namespace::table.on(pg_class::relnamespace.eq(pg_namespace::oid)))
-        .filter(pg_class::relname.eq(&column.table_name))
-        .filter(pg_namespace::nspname.eq(&column.table_schema))
-        .filter(pg_attribute::attname.eq(&column.column_name))
-        .select(PgDescription::as_select())
-        .first::<PgDescription>(conn)
 }

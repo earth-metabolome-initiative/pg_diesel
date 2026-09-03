@@ -4,12 +4,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_partitioned_table` table.
-///
-/// The `pg_partitioned_table` catalog contains partitioning information for
-/// tables that are partitioned. It describes the partitioning strategy and
-/// related metadata.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/catalog-pg-partitioned-table.html).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_partitioned_table::pg_partitioned_table)]

@@ -4,10 +4,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Struct defining the `information_schema.domain_udt_usage` table.
-///
-/// The `domain_udt_usage` view contains one row for each domain that is
-/// based on a user-defined type. This tracks which domains depend on specific
-/// UDTs.
 #[derive(
     Queryable, QueryableByName, Selectable, PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Hash,
 )]

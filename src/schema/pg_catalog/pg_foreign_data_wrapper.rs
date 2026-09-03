@@ -15,8 +15,6 @@ diesel::table! {
         fdwhandler -> Oid,
         /// OID of the validator function (0 if none).
         fdwvalidator -> Oid,
-        /// Access privileges for the foreign data wrapper.
-        fdwacl -> Nullable<Array<Text>>,
         /// Foreign data wrapper-specific options, stored as "name=value" strings.
         fdwoptions -> Nullable<Array<Text>>,
     }

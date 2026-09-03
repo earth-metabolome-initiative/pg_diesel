@@ -9,9 +9,7 @@ use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, OptionalExtension, PgConnection, QueryDsl,
     Queryable, QueryableByName, Selectable, SelectableHelper,
 };
-use sql_traits::{
-    structs::metadata::CheckMetadata, traits::FunctionLike, utils::columns_in_expression,
-};
+use sql_traits::{structs::metadata::CheckMetadata, utils::columns_in_expression};
 
 use crate::{
     model_metadata::TableMetadata,
@@ -61,10 +59,6 @@ impl CheckConstraint {
     /// Returns the vector of [`PgProc`] functions that are used in the check
     /// clause
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
     /// # Errors
     ///
     /// * If an error occurs while querying the database
@@ -77,10 +71,6 @@ impl CheckConstraint {
     /// Returns the vector of [`PgOperator`] operators that are used in the
     /// check clause
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
     /// # Errors
     ///
     /// * If an error occurs while querying the database
@@ -92,10 +82,6 @@ impl CheckConstraint {
     }
 
     /// Returns the [`PgConstraint`] that corresponds to this check constraint
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
     ///
@@ -121,10 +107,6 @@ impl CheckConstraint {
 
     /// Returns the table constraint associated with this check constraint
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
     /// # Errors
     ///
     /// * If an error occurs while querying the database
@@ -137,10 +119,6 @@ impl CheckConstraint {
 
     /// Returns the table that this check constraint belongs to
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
     /// # Errors
     ///
     /// * If an error occurs while querying the database
@@ -150,25 +128,14 @@ impl CheckConstraint {
 
     /// Returns the metadata for this check constraint
     ///
-    /// # Arguments
-    ///
-    /// * `table` - The table this check constraint belongs to
-    /// * `table_metadata` - The metadata of the table
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
     /// # Errors
     ///
     /// * If there is an error while querying the database.
-    ///
-    /// # Panics
-    ///
-    /// * If the check clause cannot be parsed into an expression, which should
-    ///   not happen if the database is consistent.
     pub fn metadata(
         &self,
-        table: Arc<Table>,
+        table: Arc<crate::model_metadata::PgTable>,
         table_metadata: &TableMetadata,
-        functions: &[Arc<PgProc>],
+        functions: &[Arc<crate::model_metadata::PgFunction>],
         conn: &mut PgConnection,
     ) -> Result<CheckMetadata<CheckConstraint>, diesel::result::Error> {
         use sqlparser::parser::Parser;
@@ -178,12 +145,15 @@ impl CheckConstraint {
             .parse_expr()
             .expect("No expression found in parsed unique constraint");
 
+        let target = sql_traits::structs::TargetName::new(table.name(), true)
+            .with_schema(table.schema(), true);
         let columns = columns_in_expression(
             &expression,
-            &table.table_name,
+            table.catalog(),
+            &target,
             table_metadata.column_arc_slice(),
         )
-        .unwrap();
+        .expect("The check clause of a catalog constraint names only its own columns");
 
         Ok(CheckMetadata::new(
             expression,
@@ -194,7 +164,7 @@ impl CheckConstraint {
                 .filter_map(|func| {
                     functions
                         .iter()
-                        .find(|table_func| table_func.name() == func.proname.as_str())
+                        .find(|candidate| candidate.model().proname == func.proname)
                         .cloned()
                 })
                 .collect(),

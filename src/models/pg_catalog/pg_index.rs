@@ -1,12 +1,10 @@
 //! `PostgreSQL` index catalog model.
 
-use std::sync::Arc;
-
 use diesel::{PgConnection, Queryable, QueryableByName, Selectable};
 
 mod cached_queries;
 pub(crate) use cached_queries::*;
-use sql_traits::{structs::metadata::UniqueIndexMetadata, traits::ColumnLike};
+use sql_traits::traits::ColumnLike;
 use sqlparser::parser::Parser;
 
 use crate::models::{Column, Table};
@@ -72,48 +70,35 @@ pub struct PgIndex {
 }
 
 impl PgIndex {
-    /// Returns the metadata for the index.
-    ///
-    /// # Arguments
-    ///
-    /// * `table` - A reference-counted pointer to the `Table` this index
-    ///   belongs to.
-    /// * `conn` - A mutable reference to a `PgConnection`
+    /// Returns the expression the index is defined over.
     ///
     /// # Errors
     ///
-    /// * If an error occurs while loading the metadata from the database
+    /// * If an error occurs while loading the expression from the database
     #[allow(clippy::missing_panics_doc)]
-    pub fn metadata(
+    pub fn index_expression(
         &self,
-        table: Arc<Table>,
         conn: &mut PgConnection,
-    ) -> Result<UniqueIndexMetadata<Self>, diesel::result::Error> {
-        let expression = if let Some(expression) = expression(self, conn)? {
-            expression
-        } else {
-            let expression_string = format!(
-                "({})",
-                self.columns(conn)?
-                    .iter()
-                    .map(|column| column.column_name().to_owned())
-                    .collect::<Vec<_>>()
-                    .join(", ")
-            );
-            Parser::new(&sqlparser::dialect::GenericDialect {})
-                .try_with_sql(expression_string.as_str())
-                .expect("Failed to parse unique constraint expression")
-                .parse_expr()
-                .expect("No expression found in parsed unique constraint")
-        };
-        Ok(UniqueIndexMetadata::new(expression, table))
+    ) -> Result<sqlparser::ast::Expr, diesel::result::Error> {
+        if let Some(expression) = expression(self, conn)? {
+            return Ok(expression);
+        }
+        let expression_string = format!(
+            "({})",
+            self.columns(conn)?
+                .iter()
+                .map(|column| column.column_name().to_owned())
+                .collect::<Vec<_>>()
+                .join(", ")
+        );
+        Ok(Parser::new(&sqlparser::dialect::GenericDialect {})
+            .try_with_sql(expression_string.as_str())
+            .expect("Failed to parse unique constraint expression")
+            .parse_expr()
+            .expect("No expression found in parsed unique constraint"))
     }
 
     /// Returns the table that this index belongs to.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
     ///
@@ -123,10 +108,6 @@ impl PgIndex {
     }
 
     /// Returns the columns that are involved in the index
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
     ///

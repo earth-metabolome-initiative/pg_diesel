@@ -1,7 +1,6 @@
 //! This module defines the `PgOperator` model representing the
 //! `pg_catalog.pg_operator` system catalog table in `PostgreSQL`.
-//! It includes methods to access related information such as the
-//! associated function and operand/result types.
+
 use super::{PgExtension, PgProc, PgType};
 use diesel::{PgConnection, Queryable, QueryableByName, RunQueryDsl, Selectable};
 
@@ -49,10 +48,6 @@ pub struct PgOperator {
 impl PgOperator {
     /// Loads all of the [`PgExtension`]s from the database.
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
     /// # Errors
     ///
     /// * If an error occurs while querying the database
@@ -69,10 +64,6 @@ impl PgOperator {
 
     /// Returns the [`PgProc`] associated with this operator.
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
     /// # Errors
     ///
     /// * If an error occurs while querying the database
@@ -82,11 +73,6 @@ impl PgOperator {
 
     /// Returns the [`PgExtension`] that contains this function, if any.
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a
-    ///   [`PgConnection`].
-    ///
     /// # Errors
     ///
     /// * If the function is not contained in an extension
@@ -95,10 +81,6 @@ impl PgOperator {
     }
 
     /// Returns the left operand type [`PgType`] of the operator.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
     ///
@@ -112,10 +94,6 @@ impl PgOperator {
 
     /// Returns the right operand type [`PgType`] of the operator.
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
     /// # Errors
     ///
     /// * If an error occurs while querying the database
@@ -127,10 +105,6 @@ impl PgOperator {
     }
 
     /// Returns the result type [`PgType`] of the operator.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
     ///

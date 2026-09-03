@@ -60,14 +60,16 @@ diesel::table! {
         /// `true` if the column is locally defined (not inherited).
         attislocal -> Bool,
         /// Number of times this column is inherited from parent tables.
+        #[cfg(not(any(feature = "postgres-16", feature = "postgres-17", feature = "postgres-18")))]
+        attinhcount -> Integer,
+        /// Number of times this column is inherited from parent tables.
+        #[cfg(any(feature = "postgres-16", feature = "postgres-17", feature = "postgres-18"))]
         attinhcount -> SmallInt,
         /// OID of the collation of the column, or 0 if not collatable.
         attcollation -> Oid,
         /// Target number of statistics samples for `ANALYZE`;
         /// -1 uses default setting; `NULL` if not set.
         attstattarget -> Nullable<SmallInt>,
-        /// Column-level access privileges (ACL); `NULL` if none.
-        attacl -> Nullable<Array<Text>>,
         /// Column-level options (e.g., for storage parameters); `NULL` if none.
         attoptions -> Nullable<Array<Text>>,
         /// Options for foreign data wrapper columns; `NULL` if none.

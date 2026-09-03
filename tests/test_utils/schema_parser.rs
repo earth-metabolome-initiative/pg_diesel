@@ -17,16 +17,6 @@ pub struct SchemaParseResult {
 }
 
 /// Parse a schema file and extract column definitions with their feature gates.
-///
-/// This parser handles the `diesel::table!` macro format and extracts:
-/// - Column names
-/// - Feature gates from `#[cfg(...)]` attributes on `diesel::table!` macro
-/// - Feature gates from `#[cfg(...)]` attributes on individual columns
-/// - `#[sql_name = "..."]` attributes for mapping Rust names to SQL names
-///
-/// When there are multiple table definitions with different feature gates (e.g., for different
-/// `PostgreSQL` versions), columns from all definitions are collected. Columns appearing in multiple
-/// definitions have their feature gates combined using OR logic.
 pub fn parse_schema_file(path: &Path) -> Result<SchemaParseResult, String> {
     let content = std::fs::read_to_string(path).map_err(|e| format!("Failed to read file: {e}"))?;
 

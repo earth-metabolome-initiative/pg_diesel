@@ -44,10 +44,6 @@ impl AsRef<PgExtension> for PgExtension {
 impl PgExtension {
     /// Loads all of the [`PgExtension`]s from the database.
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
     /// # Errors
     ///
     /// * If an error occurs while querying the database
@@ -58,11 +54,6 @@ impl PgExtension {
 
     /// Loads the [`PgExtension`] with the given name amd namespace from the
     /// database.
-    ///
-    /// # Arguments
-    ///
-    /// * `name` - The name of the extension
-    /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
     ///
@@ -78,10 +69,6 @@ impl PgExtension {
 
     /// Returns all [`PgProc`] functions associated with this extension.
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
     /// # Errors
     ///
     /// * If an error occurs while querying the database
@@ -92,10 +79,6 @@ impl PgExtension {
     /// Returns all [`PgType`] types associated with this
     /// extension.
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
     /// # Errors
     ///
     /// * If an error occurs while querying the database
@@ -105,10 +88,6 @@ impl PgExtension {
 
     /// Returns all [`PgEnum`] enums associated with this
     /// extension.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
     ///

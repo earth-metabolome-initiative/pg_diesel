@@ -4,10 +4,6 @@ diesel::table! {
     use diesel::sql_types::{Oid, Text};
 
     /// Text search configurations
-    ///
-    /// The catalog `pg_ts_config` contains entries representing text search configurations.
-    /// A configuration specifies a particular text search parser and a list of dictionaries
-    /// to use for each of the parser's output token types.
     pg_catalog.pg_ts_config (oid) {
         /// Row identifier
         oid -> Oid,

@@ -1,14 +1,8 @@
 //! Model struct for the `information_schema.element_types` view.
-//!
-//! This view contains one row for each data type descriptor that is used by
-//! elements in SQL data structures in the current database.
 
 use diesel::prelude::*;
 
 /// Model struct for `information_schema.element_types`.
-///
-/// This view contains one row for each data type descriptor that is used by
-/// elements in SQL data structures in the current database.
 #[derive(
     Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, Queryable, QueryableByName, Selectable,
 )]

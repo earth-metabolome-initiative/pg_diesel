@@ -6,12 +6,6 @@ use crate::models::PgType;
 mod cached_queries;
 
 /// Represents a `PostgreSQL` attribute (column) in a table.
-///
-/// This struct maps to the `pg_attribute` system catalog table in `PostgreSQL`,
-/// which stores metadata about table columns. Each instance of `PgAttribute`
-/// corresponds to a single column in a table.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/catalog-pg-attribute.html).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Hash, Clone)]
 #[diesel(table_name = crate::schema::pg_catalog::pg_attribute::pg_attribute)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -56,14 +50,24 @@ pub struct PgAttribute {
     pub attisdropped: bool,
     /// Whether the column is a local definition.
     pub attislocal: bool,
+    #[cfg(not(any(
+        feature = "postgres-16",
+        feature = "postgres-17",
+        feature = "postgres-18"
+    )))]
+    /// The number of times the column is inherited.
+    pub attinhcount: i32,
+    #[cfg(any(
+        feature = "postgres-16",
+        feature = "postgres-17",
+        feature = "postgres-18"
+    ))]
     /// The number of times the column is inherited.
     pub attinhcount: i16,
     /// The collation of the column.
     pub attcollation: u32,
     /// The statistics target for the column (if any).
     pub attstattarget: Option<i16>,
-    /// The access control list for the column (if any).
-    pub attacl: Option<Vec<String>>,
     /// The column options (if any).
     pub attoptions: Option<Vec<String>>,
     /// The foreign data wrapper options for the column (if any).

@@ -4,12 +4,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_matviews` view.
-///
-/// The `pg_matviews` view provides information about materialized views
-/// in the database. Materialized views are snapshots of query results that
-/// can be refreshed periodically.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/view-pg-matviews.html).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_matviews::pg_matviews)]
@@ -28,4 +22,25 @@ pub struct PgMatview {
     pub ispopulated: Option<bool>,
     /// SQL definition of the materialized view.
     pub definition: Option<String>,
+}
+
+impl PgMatview {
+    /// Loads every materialized view declared in the given schemas.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the database query fails.
+    pub fn load_all(
+        schemas: &[String],
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::pg_catalog::pg_matviews::pg_matviews;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
+
+        pg_matviews::table
+            .filter(pg_matviews::schemaname.eq_any(schemas))
+            .order_by(pg_matviews::matviewname)
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
 }

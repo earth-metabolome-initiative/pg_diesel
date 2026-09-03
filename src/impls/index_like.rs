@@ -1,20 +1,39 @@
-//! Implementation of [`IndexLike`] for [`PgIndex`].
+//! Implementation of [`IndexLike`] for [`PgIndexEntry`].
 
 use sql_traits::{
+    errors::{LookupError, ObjectKind},
     structs::metadata::UniqueIndexMetadata,
-    traits::{IndexLike, Metadata},
+    traits::{DatabaseLike, IndexLike, Metadata},
 };
 use sqlparser::ast::Expr;
 
-use crate::{PgDieselDatabase, models::PgIndex};
+use crate::{PgDieselDatabase, model_metadata::PgIndexEntry};
 
-impl IndexLike for PgIndex {
+impl Metadata for PgIndexEntry {
+    type Meta = UniqueIndexMetadata<Self>;
+}
+
+impl IndexLike for PgIndexEntry {
     type DB = PgDieselDatabase;
 
-    fn table<'db>(
-        &'db self,
-        database: &'db Self::DB,
-    ) -> &'db <Self::DB as sql_traits::traits::DatabaseLike>::Table
+    fn name(&self) -> Option<&str> {
+        Some(PgIndexEntry::name(self))
+    }
+
+    fn name_is_quoted(&self) -> bool {
+        // Catalog names are stored names: folding again would rename them.
+        true
+    }
+
+    fn schema(&self) -> Option<&str> {
+        Some(PgIndexEntry::schema(self))
+    }
+
+    fn schema_is_quoted(&self) -> bool {
+        true
+    }
+
+    fn table<'db>(&'db self, database: &'db Self::DB) -> &'db <Self::DB as DatabaseLike>::Table
     where
         Self: 'db,
     {
@@ -24,17 +43,20 @@ impl IndexLike for PgIndex {
             .table()
     }
 
-    fn expression<'db>(&'db self, database: &'db Self::DB) -> &'db Expr
+    fn expression<'db>(&'db self, database: &'db Self::DB) -> Result<&'db Expr, LookupError>
     where
         Self: 'db,
     {
-        database
+        Ok(database
             .index_metadata(self)
-            .expect("Index must exist in database")
-            .expression()
+            .ok_or_else(|| LookupError::ObjectNotInDatabase {
+                object_kind: ObjectKind::Index,
+                object: format!(
+                    "{}.{}",
+                    PgIndexEntry::schema(self),
+                    PgIndexEntry::name(self)
+                ),
+            })?
+            .expression())
     }
-}
-
-impl Metadata for PgIndex {
-    type Meta = UniqueIndexMetadata<Self>;
 }

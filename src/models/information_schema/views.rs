@@ -1,11 +1,6 @@
 //! Views model.
 
 /// Represents a row from the `information_schema.views` table.
-///
-/// Contains metadata about database views including their definitions and
-/// capabilities. Views are virtual tables based on the result of a SQL query,
-/// and this table provides information about their properties such as whether
-/// they're updatable, insertable, or support trigger operations.
 #[derive(diesel::Queryable, diesel::QueryableByName, diesel::Selectable)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]

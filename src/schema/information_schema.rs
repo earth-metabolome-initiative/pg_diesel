@@ -1,23 +1,4 @@
 //! Diesel schema definitions for the SQL standard `information_schema` views.
-//!
-//! The `information_schema` is a set of ANSI SQL standard views that provide
-//! metadata about database objects in a database-independent way. This module
-//! contains Diesel `table!` macro definitions for all accessible
-//! `information_schema` views in `PostgreSQL`.
-//!
-//! ## Covered Views
-//!
-//! This module includes schemas for views covering:
-//! - Tables, columns, and constraints
-//! - Domains, user-defined types, and character sets
-//! - Views, routines (functions/procedures), and triggers
-//! - Privileges and security settings
-//! - Foreign data wrappers and foreign tables
-//! - Roles and authorization information
-//! - SQL features and implementation details
-//!
-//! Each view is defined in its own submodule with complete column
-//! documentation.
 
 pub mod administrable_role_authorizations;
 pub mod applicable_roles;

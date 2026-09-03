@@ -20,7 +20,5 @@ diesel::table! {
         laninline -> Oid,
         /// OID of the validator function (0 if none).
         lanvalidator -> Oid,
-        /// Access privileges for the language.
-        lanacl -> Nullable<Array<Text>>,
     }
 }

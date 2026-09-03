@@ -1,6 +1,6 @@
 //! `RoleMetadata` struct.
 
-use crate::models::{PgPolicyTable, PgRole};
+use crate::{model_metadata::PgPolicy, models::PgRole};
 use std::sync::Arc;
 
 #[derive(Debug, Clone)]
@@ -9,13 +9,13 @@ pub struct RoleMetadata {
     /// Roles that this role is a member of (roles granted to this role).
     pub member_of: Vec<Arc<PgRole>>,
     /// Policies that reference this role.
-    pub policies: Vec<Arc<PgPolicyTable>>,
+    pub policies: Vec<Arc<PgPolicy>>,
 }
 
 impl RoleMetadata {
     /// Creates a new `RoleMetadata`.
     #[must_use]
-    pub fn new(member_of: Vec<Arc<PgRole>>, policies: Vec<Arc<PgPolicyTable>>) -> Self {
+    pub fn new(member_of: Vec<Arc<PgRole>>, policies: Vec<Arc<PgPolicy>>) -> Self {
         Self {
             member_of,
             policies,
@@ -28,7 +28,7 @@ impl RoleMetadata {
     }
 
     /// Returns the policies that reference this role.
-    pub fn policies(&self) -> impl Iterator<Item = &Arc<PgPolicyTable>> {
+    pub fn policies(&self) -> impl Iterator<Item = &Arc<PgPolicy>> {
         self.policies.iter()
     }
 }

@@ -3,9 +3,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Struct defining the `information_schema.column_options` table.
-///
-/// The `column_options` view contains one row for each option set on a column.
-/// This provides access to column-specific configuration options.
 #[derive(
     Queryable, QueryableByName, Selectable, PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Hash,
 )]

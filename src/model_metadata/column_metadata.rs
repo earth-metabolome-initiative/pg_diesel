@@ -2,53 +2,51 @@
 
 use std::sync::Arc;
 
-use crate::models::{PgDescription, PgType, Table};
+use crate::{
+    model_metadata::PgTable,
+    models::{PgDescription, PgType},
+};
 
 #[derive(Clone, Debug)]
 /// Rich metadata about a `PostgreSQL` table column.
-///
-/// This struct wraps a column model with additional metadata loaded from
-/// related system catalog tables, including:
-/// - The table that owns the column
-/// - The resolved `PostgreSQL` type ([`PgType`]) for the column
-/// - Column description from `pg_catalog.pg_description`
-///
-/// This metadata is constructed during
-/// [`PgDieselDatabase`](crate::database::PgDieselDatabase) building and cached for
-/// efficient access via the `ColumnLike`
-/// trait.
-///
-/// ## Type Resolution
-///
-/// The `pg_type` field contains the fully resolved type information from
-/// `pg_catalog.pg_type`, not just the type name from
-/// `information_schema.columns`. This provides access to:
-/// - Internal type name (`typname`)
-/// - Type category and properties
-/// - Array element types for array types
 pub struct ColumnMetadata {
     /// The table the column belongs to.
-    table: Arc<Table>,
+    table: Arc<PgTable>,
     /// The description of the column, if any.
     description: Option<PgDescription>,
     /// The associated `PgType`.
     pg_type: PgType,
+    /// Whether the collation the column declares compares deterministically,
+    /// or [`None`] when the column declares none.
+    collation_is_deterministic: Option<bool>,
 }
 
 impl ColumnMetadata {
     /// Creates a new `ColumnMetadata` instance.
     #[must_use]
-    pub fn new(table: Arc<Table>, description: Option<PgDescription>, pg_type: PgType) -> Self {
+    pub fn new(
+        table: Arc<PgTable>,
+        description: Option<PgDescription>,
+        pg_type: PgType,
+        collation_is_deterministic: Option<bool>,
+    ) -> Self {
         Self {
             table,
             description,
             pg_type,
+            collation_is_deterministic,
         }
+    }
+
+    /// Returns whether the collation the column declares is deterministic.
+    #[must_use]
+    pub fn collation_is_deterministic(&self) -> Option<bool> {
+        self.collation_is_deterministic
     }
 
     /// Returns the table the column belongs to.
     #[must_use]
-    pub fn table(&self) -> &Table {
+    pub fn table(&self) -> &PgTable {
         self.table.as_ref()
     }
 
@@ -75,21 +73,25 @@ impl ColumnMetadata {
 mod tests {
     use super::*;
 
-    fn dummy_table() -> Table {
-        Table {
-            table_catalog: "db".to_string(),
-            table_schema: "schema".to_string(),
-            table_name: "table".to_string(),
-            table_type: "BASE TABLE".to_string(),
-            self_referencing_column_name: None,
-            reference_generation: None,
-            user_defined_type_catalog: None,
-            user_defined_type_schema: None,
-            user_defined_type_name: None,
-            is_insertable_into: "YES".to_string(),
-            is_typed: "NO".to_string(),
-            commit_action: None,
-        }
+    fn dummy_table() -> PgTable {
+        PgTable::new(
+            crate::models::Table {
+                table_catalog: "db".to_string(),
+                table_schema: "schema".to_string(),
+                table_name: "table".to_string(),
+                table_type: "BASE TABLE".to_string(),
+                self_referencing_column_name: None,
+                reference_generation: None,
+                user_defined_type_catalog: None,
+                user_defined_type_schema: None,
+                user_defined_type_name: None,
+                is_insertable_into: "YES".to_string(),
+                is_typed: "NO".to_string(),
+                commit_action: None,
+            },
+            None,
+        )
+        .expect("a table with no partitioning strategy is accepted")
     }
 
     fn dummy_pg_type() -> PgType {
@@ -132,7 +134,6 @@ mod tests {
             typcollation: 0,
             typdefaultbin: None,
             typdefault: None,
-            typacl: None,
         }
     }
 
@@ -147,9 +148,10 @@ mod tests {
             description: "desc".to_string(),
         });
 
-        let metadata = ColumnMetadata::new(Arc::clone(&table), description, pg_type);
+        let metadata = ColumnMetadata::new(Arc::clone(&table), description, pg_type, Some(true));
 
-        assert_eq!(metadata.table().table_name, "table");
+        assert_eq!(metadata.table().name(), "table");
+        assert_eq!(metadata.collation_is_deterministic(), Some(true));
         assert_eq!(metadata.description().unwrap().description, "desc");
         assert_eq!(metadata.pg_type().typname, "int4");
         assert_eq!(metadata.normalized_data_type(), "int4");

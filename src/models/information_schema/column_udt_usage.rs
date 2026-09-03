@@ -4,9 +4,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Struct defining the `information_schema.column_udt_usage` table.
-///
-/// The `column_udt_usage` view contains one row for each column that uses
-/// a user-defined type. This tracks which columns depend on specific UDTs.
 #[derive(
     Queryable, QueryableByName, Selectable, PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Hash,
 )]

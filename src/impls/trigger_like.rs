@@ -1,6 +1,10 @@
 //! Implementation of [`TriggerLike`] for [`TriggerMetadata`].
 
-use sql_traits::traits::{DatabaseLike, Metadata, TriggerLike};
+use sql_traits::{
+    errors::LookupError,
+    structs::TargetName,
+    traits::{DatabaseLike, Metadata, TriggerLike},
+};
 use sqlparser::ast::{TriggerEvent, TriggerObjectKind, TriggerPeriod};
 
 use crate::{PgDieselDatabase, model_metadata::TriggerMetadata};
@@ -16,11 +20,19 @@ impl TriggerLike for TriggerMetadata {
         self.model.trigger_name.as_deref().unwrap_or("<unknown>")
     }
 
-    fn table<'db>(&'db self, _database: &'db Self::DB) -> &'db <Self::DB as DatabaseLike>::Table
+    fn table<'db>(
+        &'db self,
+        _database: &'db Self::DB,
+    ) -> Result<&'db <Self::DB as DatabaseLike>::Table, LookupError>
     where
         Self: 'db,
     {
-        &self.table
+        Ok(&self.table)
+    }
+
+    fn target_table_name(&self) -> TargetName<'_> {
+        // Catalog names are stored names: folding again would rename them.
+        TargetName::new(self.table.name(), true).with_schema(self.table.schema(), true)
     }
 
     fn events(&self) -> &[TriggerEvent] {
@@ -43,7 +55,7 @@ impl TriggerLike for TriggerMetadata {
         Self: 'db,
     {
         let oid = self.function_oid?;
-        database.functions().find(|f| f.oid == oid)
+        database.functions().find(|function| function.oid() == oid)
     }
 
     fn function_name(&self) -> Option<&str> {
@@ -53,13 +65,14 @@ impl TriggerLike for TriggerMetadata {
 
         // Look for "EXECUTE FUNCTION" or "EXECUTE PROCEDURE"
         let stmt_upper = stmt.to_uppercase();
-        let func_start = if let Some(pos) = stmt_upper.find("EXECUTE FUNCTION") {
-            pos + "EXECUTE FUNCTION".len()
-        } else if let Some(pos) = stmt_upper.find("EXECUTE PROCEDURE") {
-            pos + "EXECUTE PROCEDURE".len()
-        } else {
-            return None;
-        };
+        let func_start = stmt_upper
+            .find("EXECUTE FUNCTION")
+            .map(|pos| pos + "EXECUTE FUNCTION".len())
+            .or_else(|| {
+                stmt_upper
+                    .find("EXECUTE PROCEDURE")
+                    .map(|pos| pos + "EXECUTE PROCEDURE".len())
+            })?;
 
         // Extract the function name (everything before the opening parenthesis)
         let remaining = stmt[func_start..].trim();

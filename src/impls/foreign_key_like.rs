@@ -1,48 +1,56 @@
-//! Implementation of [`ForeignKeyLike`] for [`KeyColumnUsage`].
-//!
-//! This module implements the
-//! [`ForeignKeyLike`] trait
-//! for the [`KeyColumnUsage`] model from `information_schema.key_column_usage`,
-//! enabling generic introspection of foreign key relationships.
-//!
-//! The implementation provides access to:
-//! - Foreign key constraint name
-//! - Host (referencing) table and columns
-//! - Referenced (target) table and columns
-//! - Referential action rules (ON DELETE CASCADE, MATCH kind)
-//!
-//! Metadata is loaded from [`KeyColumnUsageMetadata`] which is constructed
-//! during database building.
+//! Implementation of [`ForeignKeyLike`] for [`PgForeignKey`].
 
-use sql_traits::traits::{ForeignKeyLike, Metadata};
+use sql_traits::{
+    errors::{LookupError, ObjectKind},
+    structs::TargetName,
+    traits::{DatabaseLike, ForeignKeyLike, Metadata},
+};
 
-use crate::{PgDieselDatabase, database::KeyColumnUsageMetadata, models::KeyColumnUsage};
+use crate::{PgDieselDatabase, database::KeyColumnUsageMetadata, model_metadata::PgForeignKey};
 
-impl Metadata for KeyColumnUsage {
+impl Metadata for PgForeignKey {
     type Meta = KeyColumnUsageMetadata;
 }
 
-impl ForeignKeyLike for KeyColumnUsage {
+/// Returns the metadata `database` holds for `key`.
+fn metadata<'db>(
+    key: &PgForeignKey,
+    database: &'db PgDieselDatabase,
+) -> Result<&'db KeyColumnUsageMetadata, LookupError> {
+    database
+        .foreign_key_metadata(key)
+        .ok_or_else(|| LookupError::ObjectNotInDatabase {
+            object_kind: ObjectKind::Table,
+            object: key.model().constraint_name.clone(),
+        })
+}
+
+impl ForeignKeyLike for PgForeignKey {
     type DB = PgDieselDatabase;
 
     fn foreign_key_name(&self) -> Option<&str> {
-        Some(&self.constraint_name)
+        Some(&self.model().constraint_name)
+    }
+
+    fn referenced_table_name(&self) -> TargetName<'_> {
+        TargetName::new(self.referenced_name(), true).with_schema(self.referenced_schema(), true)
     }
 
     fn referenced_table<'db>(
         &self,
         database: &'db Self::DB,
-    ) -> &'db <Self::DB as sql_traits::traits::DatabaseLike>::Table {
+    ) -> Result<&'db <Self::DB as DatabaseLike>::Table, LookupError> {
         database
-            .foreign_key_metadata(self)
-            .expect("Foreign key must exist in database")
-            .referenced_table()
+            .tables()
+            .find(|table| {
+                table.schema() == self.referenced_schema() && table.name() == self.referenced_name()
+            })
+            .ok_or_else(|| LookupError::TableNotFound {
+                object_name: format!("{}.{}", self.referenced_schema(), self.referenced_name()),
+            })
     }
 
-    fn host_table<'db>(
-        &'db self,
-        database: &'db Self::DB,
-    ) -> &'db <Self::DB as sql_traits::traits::DatabaseLike>::Table
+    fn host_table<'db>(&'db self, database: &'db Self::DB) -> &'db <Self::DB as DatabaseLike>::Table
     where
         Self: 'db,
     {
@@ -69,28 +77,20 @@ impl ForeignKeyLike for KeyColumnUsage {
     fn host_columns<'db>(
         &'db self,
         database: &'db Self::DB,
-    ) -> impl Iterator<Item = &'db <Self::DB as sql_traits::traits::DatabaseLike>::Column>
+    ) -> Result<impl Iterator<Item = &'db <Self::DB as DatabaseLike>::Column>, LookupError>
     where
         Self: 'db,
     {
-        database
-            .foreign_key_metadata(self)
-            .expect("Foreign key must exist in database")
-            .host_columns()
-            .iter()
+        Ok(metadata(self, database)?.host_columns().iter())
     }
 
     fn referenced_columns<'db>(
         &'db self,
         database: &'db Self::DB,
-    ) -> impl Iterator<Item = &'db <Self::DB as sql_traits::traits::DatabaseLike>::Column>
+    ) -> Result<impl Iterator<Item = &'db <Self::DB as DatabaseLike>::Column>, LookupError>
     where
         Self: 'db,
     {
-        database
-            .foreign_key_metadata(self)
-            .expect("Foreign key must exist in database")
-            .referenced_columns()
-            .iter()
+        Ok(metadata(self, database)?.referenced_columns().iter())
     }
 }

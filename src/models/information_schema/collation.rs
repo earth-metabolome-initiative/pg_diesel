@@ -3,11 +3,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Struct defining the `information_schema.collations` table.
-///
-/// The `collations` view contains one row for each collation available in the
-/// current database. Collations define the rules for sorting and comparison
-/// operations on text data, including case sensitivity, accent sensitivity,
-/// and locale-specific ordering rules.
 #[derive(
     Queryable, QueryableByName, Selectable, PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Hash,
 )]

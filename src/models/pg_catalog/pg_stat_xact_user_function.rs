@@ -4,14 +4,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_stat_xact_user_functions` view.
-///
-/// The `pg_stat_xact_user_functions` view shows statistics about executions of
-/// user-defined functions within the current transaction.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-USER-FUNCTIONS-VIEW).
-///
-/// Note: This struct does not derive `Hash`, `Eq`, or `Ord` because it contains
-/// `f64` fields.
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_stat_xact_user_functions::pg_stat_xact_user_functions)]

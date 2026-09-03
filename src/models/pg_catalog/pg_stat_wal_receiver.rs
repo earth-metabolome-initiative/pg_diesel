@@ -6,11 +6,6 @@ use std::time::SystemTime;
 use diesel::{Queryable, QueryableByName, Selectable, data_types::PgLsn};
 
 /// Represents a row from the `pg_stat_wal_receiver` view.
-///
-/// The `pg_stat_wal_receiver` view shows information about the WAL receiver
-/// process on a standby server.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-WAL-RECEIVER-VIEW).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
 #[diesel(table_name = crate::schema::pg_catalog::pg_stat_wal_receiver::pg_stat_wal_receiver)]
 pub struct PgStatWalReceiver {

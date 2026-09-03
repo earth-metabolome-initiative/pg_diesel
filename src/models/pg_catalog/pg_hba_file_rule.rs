@@ -4,12 +4,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_hba_file_rules` view.
-///
-/// The `pg_hba_file_rules` view provides a summary of the contents of the
-/// client authentication configuration file (`pg_hba.conf`). A row appears in
-/// this view for each non-empty, non-comment line in the file.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/view-pg-hba-file-rules.html).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_hba_file_rules::pg_hba_file_rules)]
@@ -40,12 +34,6 @@ pub struct PgHbaFileRule {
 }
 
 /// Represents a row from the `pg_hba_file_rules` view.
-///
-/// The `pg_hba_file_rules` view provides a summary of the contents of the
-/// client authentication configuration file (`pg_hba.conf`). A row appears in
-/// this view for each non-empty, non-comment line in the file.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/view-pg-hba-file-rules.html).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_hba_file_rules::pg_hba_file_rules)]

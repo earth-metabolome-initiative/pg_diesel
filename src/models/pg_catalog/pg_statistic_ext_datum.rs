@@ -5,11 +5,6 @@ use diesel::{Identifiable, Queryable, QueryableByName, Selectable};
 
 #[cfg(feature = "postgres-14")]
 /// Represents a row from the `pg_statistic_ext_data` table (`PostgreSQL` 14).
-///
-/// The `pg_statistic_ext_data` table holds data for extended planner statistics
-/// objects, containing the actual statistical values.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/catalog-pg-statistic-ext-data.html).
 #[derive(
     Identifiable, Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash,
 )]
@@ -31,11 +26,6 @@ pub struct PgStatisticExtDatum {
 
 #[cfg(not(feature = "postgres-14"))]
 /// Represents a row from the `pg_statistic_ext_data` table (`PostgreSQL` 15+).
-///
-/// The `pg_statistic_ext_data` table holds data for extended planner statistics
-/// objects, containing the actual statistical values.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/catalog-pg-statistic-ext-data.html).
 #[derive(
     Identifiable, Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash,
 )]

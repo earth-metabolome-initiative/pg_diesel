@@ -4,12 +4,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_prepared_statements` view.
-///
-/// The `pg_prepared_statements` view displays all prepared statements that are
-/// available in the current session. Prepared statements are SQL statements
-/// that have been parsed and analyzed once and can be executed multiple times.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/view-pg-prepared-statements.html).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_prepared_statements::pg_prepared_statements)]

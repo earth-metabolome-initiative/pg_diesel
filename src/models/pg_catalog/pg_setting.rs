@@ -61,10 +61,6 @@ pub struct PgSetting {
 impl PgSetting {
     /// Returns the TIME ZONE setting for the provided `PostgreSQL` connection.
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - A reference to a `PostgreSQL` connection.
-    ///
     /// # Errors
     ///
     /// This function will return an error if the query to fetch the TIME ZONE

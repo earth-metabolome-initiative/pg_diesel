@@ -4,9 +4,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Struct defining the `information_schema.data_type_privileges` table.
-///
-/// The `data_type_privileges` view contains one row for each data type
-/// privilege. This provides information about data type access permissions.
 #[derive(
     Queryable, QueryableByName, Selectable, PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Hash,
 )]

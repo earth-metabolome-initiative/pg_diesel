@@ -1,23 +1,4 @@
 //! Model structs for the SQL standard `information_schema` views.
-//!
-//! This module contains Diesel-queryable structs representing rows from the
-//! ANSI SQL standard `information_schema` views. These views provide portable,
-//! database-independent metadata about database objects.
-//!
-//! ## Key Models
-//!
-//! - [`Table`]: Represents a row from `information_schema.tables`
-//! - [`Column`]: Represents a row from `information_schema.columns`
-//! - [`CheckConstraint`]: Represents a row from
-//!   `information_schema.check_constraints`
-//! - [`KeyColumnUsage`]: Represents foreign key information from
-//!   `information_schema.key_column_usage`
-//! - [`ReferentialConstraint`]: Represents foreign key constraints from
-//!   `information_schema.referential_constraints`
-//!
-//! All structs implement `Queryable`, `QueryableByName`, and `Selectable` from
-//! Diesel, and many implement additional traits from the `sql_traits` crate for
-//! database introspection.
 
 mod administrable_role_authorizations;
 mod applicable_roles;

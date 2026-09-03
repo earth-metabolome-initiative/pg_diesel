@@ -4,9 +4,6 @@ diesel::table! {
     use diesel::sql_types::Oid;
 
     /// Type transformations
-    ///
-    /// The catalog `pg_transform` stores information about transforms, which are
-    /// mechanisms for converting data between SQL types and procedural language types.
     pg_catalog.pg_transform (oid) {
         /// Row identifier
         oid -> Oid,

@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-diesel = { git = "https://github.com/LucaCappelletti94/diesel", branch = "future3", features = [
+diesel = { git = "https://github.com/diesel-rs/diesel", branch = "main", features = [
   "postgres",
   "extras",
   "64-column-tables",
@@ -14,9 +14,7 @@ ipnetwork = { version = "0.21.1", features = ["serde"] }
 serde = { version = "1.0", features = ["derive"], optional = true }
 bigdecimal = { version = "0.4", features = ["serde"] }
 sql-traits = { git = "https://github.com/earth-metabolome-initiative/sql-traits", branch = "main" }
-sqlparser = { features = [
-  "serde",
-], git = "https://github.com/apache/datafusion-sqlparser-rs", branch = "main" }
+sqlparser = { version = "0.62", features = ["serde", "visitor"] }
 thiserror = "2.0.17"
 
 [dev-dependencies]
@@ -26,6 +24,14 @@ syn = { version = "2.0", features = ["full", "parsing", "visit"] }
 quote = "1.0"
 proc-macro2 = "1.0"
 tempfile = "3.20"
+
+# `sql-traits` main tracks `sqlparser` upstream main, which carries AST changes
+# not yet in the 0.62 release (`CheckConstraint::no_inherit`,
+# `AlterTableOperation::SetLogged`, `ArrayElemTypeDef::Qualified`, ...).
+# Patching at the workspace root keeps every dependent on one `sqlparser`, so
+# AST types stay compatible across crate boundaries.
+[patch.crates-io]
+sqlparser = { git = "https://github.com/apache/datafusion-sqlparser-rs", branch = "main" }
 
 [lints.rust]
 missing_docs = "forbid"

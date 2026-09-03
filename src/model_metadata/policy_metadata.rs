@@ -1,18 +1,16 @@
 //! `PolicyMetadata` struct.
 
-use crate::models::{PgProc, Table};
+use crate::model_metadata::PgFunction;
 use sqlparser::ast::{Expr, Owner};
 use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 /// Metadata for a policy.
 pub struct PolicyMetadata {
-    /// The table the policy belongs to.
-    pub table: Arc<Table>,
     /// Functions used in USING expression.
-    pub using_functions: Vec<Arc<PgProc>>,
+    pub using_functions: Vec<Arc<PgFunction>>,
     /// Functions used in WITH CHECK expression.
-    pub check_functions: Vec<Arc<PgProc>>,
+    pub check_functions: Vec<Arc<PgFunction>>,
     /// Parsed USING expression.
     pub using_expression: Option<Expr>,
     /// Parsed WITH CHECK expression.
@@ -25,15 +23,13 @@ impl PolicyMetadata {
     /// Creates a new `PolicyMetadata`.
     #[must_use]
     pub fn new(
-        table: Arc<Table>,
-        using_functions: Vec<Arc<PgProc>>,
-        check_functions: Vec<Arc<PgProc>>,
+        using_functions: Vec<Arc<PgFunction>>,
+        check_functions: Vec<Arc<PgFunction>>,
         using_expression: Option<Expr>,
         check_expression: Option<Expr>,
         roles: Vec<Owner>,
     ) -> Self {
         Self {
-            table,
             using_functions,
             check_functions,
             using_expression,
@@ -42,19 +38,13 @@ impl PolicyMetadata {
         }
     }
 
-    /// Returns the table.
-    #[must_use]
-    pub fn table(&self) -> &Table {
-        &self.table
-    }
-
     /// Returns using functions.
-    pub fn using_functions(&self) -> impl Iterator<Item = &Arc<PgProc>> {
+    pub fn using_functions(&self) -> impl Iterator<Item = &Arc<PgFunction>> {
         self.using_functions.iter()
     }
 
     /// Returns check functions.
-    pub fn check_functions(&self) -> impl Iterator<Item = &Arc<PgProc>> {
+    pub fn check_functions(&self) -> impl Iterator<Item = &Arc<PgFunction>> {
         self.check_functions.iter()
     }
 

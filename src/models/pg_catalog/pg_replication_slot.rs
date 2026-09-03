@@ -4,12 +4,6 @@
 use diesel::{Queryable, QueryableByName, Selectable, data_types::PgLsn};
 
 /// Represents a row from the `pg_replication_slots` view.
-///
-/// The `pg_replication_slots` view provides information about all replication
-/// slots that currently exist on the database cluster, along with their current
-/// state.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/view-pg-replication-slots.html).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
 #[diesel(table_name = crate::schema::pg_catalog::pg_replication_slots::pg_replication_slots)]
 pub struct PgReplicationSlot {

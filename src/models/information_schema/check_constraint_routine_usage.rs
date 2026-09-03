@@ -5,12 +5,6 @@ use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Struct defining the `information_schema.check_constraint_routine_usage`
 /// table.
-///
-/// The `check_constraint_routine_usage` view contains one row for each routine
-/// (function or procedure) that is used in a check constraint. This view
-/// establishes the dependency relationship between check constraints and the
-/// functions they call, providing essential information for understanding
-/// constraint dependencies and impact analysis when modifying functions.
 #[derive(
     Queryable, QueryableByName, Selectable, PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Hash,
 )]

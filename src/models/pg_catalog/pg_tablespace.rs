@@ -4,11 +4,6 @@
 use diesel::{Identifiable, Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_tablespace` table.
-///
-/// The `pg_tablespace` table stores information about the available
-/// tablespaces.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/catalog-pg-tablespace.html).
 #[derive(
     Identifiable, Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash,
 )]
@@ -22,8 +17,6 @@ pub struct PgTablespace {
     pub spcname: String,
     /// Owner OID.
     pub spcowner: u32,
-    /// Access control list.
-    pub spcacl: Option<Vec<String>>,
     /// Tablespace options.
     pub spcoptions: Option<Vec<String>>,
 }

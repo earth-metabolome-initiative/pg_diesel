@@ -4,9 +4,6 @@
 use diesel::prelude::*;
 
 /// Model struct for `information_schema.role_column_grants`.
-///
-/// This view contains one row for each column privilege granted to or by a role
-/// in the current database.
 #[derive(
     Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, Queryable, QueryableByName, Selectable,
 )]
@@ -33,12 +30,6 @@ pub struct RoleColumnGrants {
 
 impl RoleColumnGrants {
     /// Load all column grants for the given catalog and schemas.
-    ///
-    /// # Arguments
-    ///
-    /// * `table_catalog` - The catalog (database) name.
-    /// * `table_schemas` - The schemas to filter by.
-    /// * `conn` - The database connection.
     ///
     /// # Errors
     ///

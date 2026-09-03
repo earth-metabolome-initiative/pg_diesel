@@ -1,106 +1,122 @@
 //! `PolicyLike` implementation.
 
-use sql_traits::traits::{DocumentationMetadata, Metadata, PolicyLike};
-use sqlparser::ast::{CreatePolicyCommand, Owner};
+use sql_traits::{
+    errors::{LookupError, ObjectKind},
+    structs::TargetName,
+    traits::{DatabaseLike, DocumentationMetadata, Metadata, PolicyLike},
+};
+use sqlparser::ast::{CreatePolicyCommand, CreatePolicyType, Expr, Owner};
 
-use crate::database::PgDieselDatabase;
-use crate::model_metadata::PolicyMetadata;
-use crate::models::PgPolicyTable;
+use crate::{
+    database::PgDieselDatabase,
+    model_metadata::{PgPolicy, PolicyMetadata},
+};
 
-impl Metadata for PgPolicyTable {
+impl Metadata for PgPolicy {
     type Meta = PolicyMetadata;
 }
 
-impl DocumentationMetadata for PgPolicyTable {
+impl DocumentationMetadata for PgPolicy {
     type Documentation = ();
 }
 
-impl PolicyLike for PgPolicyTable {
+/// Returns the metadata `database` holds for `policy`.
+fn metadata<'db>(
+    policy: &PgPolicy,
+    database: &'db PgDieselDatabase,
+) -> Result<&'db PolicyMetadata, LookupError> {
+    database
+        .policy_metadata(policy)
+        .ok_or_else(|| LookupError::ObjectNotInDatabase {
+            object_kind: ObjectKind::Policy,
+            object: policy.model().polname.clone(),
+        })
+}
+
+impl PolicyLike for PgPolicy {
     type DB = PgDieselDatabase;
+
+    fn name(&self) -> &str {
+        &self.model().polname
+    }
 
     fn table<'db>(
         &'db self,
-        database: &'db Self::DB,
-    ) -> &'db <Self::DB as sql_traits::prelude::DatabaseLike>::Table
+        _database: &'db Self::DB,
+    ) -> Result<&'db <Self::DB as DatabaseLike>::Table, LookupError>
     where
         Self: 'db,
     {
-        database
-            .policy_metadata(self)
-            .expect("Policy must exist in database")
-            .table()
+        Ok(PgPolicy::table(self))
+    }
+
+    fn target_table_name(&self) -> TargetName<'_> {
+        let table = PgPolicy::table(self);
+        // Catalog names are stored names: folding again would rename them.
+        TargetName::new(table.name(), true).with_schema(table.schema(), true)
+    }
+
+    fn command(&self) -> CreatePolicyCommand {
+        match self.model().polcmd.as_str() {
+            "r" => CreatePolicyCommand::Select,
+            "a" => CreatePolicyCommand::Insert,
+            "w" => CreatePolicyCommand::Update,
+            "d" => CreatePolicyCommand::Delete,
+            _ => CreatePolicyCommand::All,
+        }
+    }
+
+    fn policy_type(&self) -> CreatePolicyType {
+        if self.model().polpermissive {
+            CreatePolicyType::Permissive
+        } else {
+            CreatePolicyType::Restrictive
+        }
+    }
+
+    fn applies_to_public(&self) -> bool {
+        // `polroles` holds OID zero for `TO PUBLIC`, and for an absent clause.
+        self.model().polroles.contains(&0)
     }
 
     fn roles<'db>(&'db self, database: &'db Self::DB) -> impl Iterator<Item = &'db Owner>
     where
         Self: 'db,
     {
-        database
-            .policy_metadata(self)
-            .expect("Policy metadata")
-            .roles()
+        metadata(self, database)
+            .into_iter()
+            .flat_map(PolicyMetadata::roles)
     }
 
-    fn using_expression<'db>(
-        &'db self,
-        database: &'db Self::DB,
-    ) -> Option<&'db sqlparser::ast::Expr>
+    fn using_expression<'db>(&'db self, database: &'db Self::DB) -> Option<&'db Expr>
     where
         Self: 'db,
     {
-        database
-            .policy_metadata(self)
-            .expect("Policy metadata")
-            .using_expression()
+        metadata(self, database).ok()?.using_expression()
     }
 
-    fn check_expression<'db>(
-        &'db self,
-        database: &'db Self::DB,
-    ) -> Option<&'db sqlparser::ast::Expr>
+    fn check_expression<'db>(&'db self, database: &'db Self::DB) -> Option<&'db Expr>
     where
         Self: 'db,
     {
-        database
-            .policy_metadata(self)
-            .expect("Policy metadata")
-            .check_expression()
-    }
-
-    fn command(&self) -> CreatePolicyCommand {
-        match self.polcmd.as_str() {
-            "r" => CreatePolicyCommand::Select,
-            "a" => CreatePolicyCommand::Insert,
-            "w" => CreatePolicyCommand::Update,
-            "d" => CreatePolicyCommand::Delete,
-            "*" => CreatePolicyCommand::All,
-            _ => panic!("Unknown policy command: {}", self.polcmd),
-        }
-    }
-
-    fn name(&self) -> &str {
-        &self.polname
+        metadata(self, database).ok()?.check_expression()
     }
 
     fn using_functions<'db>(
         &'db self,
         database: &'db Self::DB,
-    ) -> impl Iterator<Item = &'db <Self::DB as sql_traits::prelude::DatabaseLike>::Function> {
-        database
-            .policy_metadata(self)
-            .expect("Policy")
+    ) -> Result<impl Iterator<Item = &'db <Self::DB as DatabaseLike>::Function>, LookupError> {
+        Ok(metadata(self, database)?
             .using_functions()
-            .map(std::convert::AsRef::as_ref)
+            .map(AsRef::as_ref))
     }
 
     fn check_functions<'db>(
         &'db self,
         database: &'db Self::DB,
-    ) -> impl Iterator<Item = &'db <Self::DB as sql_traits::prelude::DatabaseLike>::Function> {
-        database
-            .policy_metadata(self)
-            .expect("Policy")
+    ) -> Result<impl Iterator<Item = &'db <Self::DB as DatabaseLike>::Function>, LookupError> {
+        Ok(metadata(self, database)?
             .check_functions()
-            .map(std::convert::AsRef::as_ref)
+            .map(AsRef::as_ref))
     }
 }

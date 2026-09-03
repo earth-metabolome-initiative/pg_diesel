@@ -1,24 +1,74 @@
 //! Builder pattern for constructing a [`PgDieselDatabase`] instance.
 
-use std::sync::Arc;
+use std::{collections::HashMap, ops::ControlFlow, sync::Arc};
 
 use diesel::PgConnection;
 use sql_traits::{
-    structs::generic_db::GenericDBBuilder,
-    traits::{ColumnLike, TableLike},
+    errors::LookupError, structs::generic_db::GenericDBBuilder, traits::FunctionLike,
+    utils::identifier_resolution::identifiers_match,
 };
 use sqlparser::{
-    ast::{Grantee, GranteeName, GranteesType, Ident, ObjectName, ObjectNamePart, Owner},
+    ast::{
+        Expr, Grantee, GranteeName, GranteesType, Ident, ObjectName, ObjectNamePart, Owner,
+        visit_expressions,
+    },
     dialect::PostgreSqlDialect,
     parser::Parser,
 };
 
 use crate::{
     PgDieselDatabase,
+    database::CatalogCache,
+    dialect::PostgresDialect,
     impls::{RoleColumnGrantsMetadata, RoleTableGrantsMetadata, string_to_action},
-    model_metadata::TriggerMetadata,
-    models::{Column, PgProc, PgRole, RoleColumnGrants, RoleTableGrants, Table},
+    model_metadata::{
+        PgFunction, PgPolicy, PgTable, PgViewDefinition, TriggerMetadata, UnknownPartitionStrategy,
+        ViewDefinitionError,
+    },
+    models::{
+        Column, PgMatview, PgProc, PgRole, PgView, RoleColumnGrants, RoleTableGrants, Schemata,
+        Table,
+    },
 };
+
+/// Returns the loaded functions `expression` calls, each once.
+///
+/// A call is matched on the last part of its name, so a call written with a
+/// schema qualifier and one written without resolve to the same function.
+fn called_functions(
+    expression: Option<&Expr>,
+    functions: &[Arc<PgFunction>],
+) -> Vec<Arc<PgFunction>> {
+    let Some(expression) = expression else {
+        return Vec::new();
+    };
+
+    let mut called: Vec<Arc<PgFunction>> = Vec::new();
+    let _: ControlFlow<()> = visit_expressions(expression, |expr| {
+        if let Expr::Function(function) = expr
+            && let Some(ObjectNamePart::Identifier(ident)) = function.name.0.last()
+        {
+            called.extend(
+                functions
+                    .iter()
+                    .filter(|candidate| {
+                        identifiers_match(
+                            candidate.name(),
+                            candidate.name_is_quoted(),
+                            &ident.value,
+                            ident.quote_style.is_some(),
+                        )
+                    })
+                    .cloned(),
+            );
+        }
+        ControlFlow::Continue(())
+    });
+
+    called.sort_unstable_by_key(|function| function.oid());
+    called.dedup_by_key(|function| function.oid());
+    called
+}
 
 #[derive(Default)]
 /// Builder for constructing a [`PgDieselDatabase`] instance from `PostgreSQL` metadata.
@@ -35,12 +85,6 @@ pub struct PgDieselDatabaseBuilder<'conn> {
 
 #[derive(Debug, thiserror::Error)]
 /// Errors that can occur when building a [`PgDieselDatabase`] instance.
-///
-/// This error type encompasses all failure modes during database metadata
-/// loading:
-/// - Missing required builder attributes
-/// - Database query failures
-/// - Invalid denylist configurations
 pub enum PgDatabaseBuildError {
     #[error("Missing required builder attribute: {0}")]
     /// An attribute was missing.
@@ -51,6 +95,15 @@ pub enum PgDatabaseBuildError {
     #[error("Duplicate denylisted type: {0}")]
     /// A deny-listed type was inserted multiple times.
     DuplicateDenylistedType(String),
+    #[error("Unknown partitioning strategy: {0}")]
+    /// A table reported a partitioning strategy this crate does not know.
+    UnknownPartitionStrategy(#[from] UnknownPartitionStrategy),
+    #[error("View definition: {0}")]
+    /// A view could not be read from the catalogs.
+    ViewDefinition(#[from] ViewDefinitionError),
+    #[error("Lookup error: {0}")]
+    /// Adding an object left the database unable to resolve a name.
+    Lookup(#[from] LookupError),
 }
 
 impl<'conn> PgDieselDatabaseBuilder<'conn> {
@@ -142,75 +195,73 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
             value.schemas
         };
 
-        let mut generic_builder = GenericDBBuilder::new(table_catalog.clone());
+        let mut generic_builder = GenericDBBuilder::new(table_catalog.clone(), PostgresDialect);
 
-        // Load all functions first as they may be referenced by other objects
-        for function in PgProc::load_all(connection)? {
-            let metadata = crate::database::PgProcMetadata::new(&function, connection)?;
-            generic_builder = generic_builder.add_function(std::sync::Arc::new(function), metadata);
+        for schema in Schemata::load_all(&table_catalog, &table_schemas, connection)? {
+            generic_builder = generic_builder.add_schema(Arc::new(schema), ());
         }
 
-        // Load all roles
+        let cache = CatalogCache::load(connection)?;
+
         let roles: Vec<Arc<PgRole>> = PgRole::load_all(connection)?
             .into_iter()
             .map(Arc::new)
             .collect();
 
-        let mut tables = Vec::new();
-        for table_schema in &table_schemas {
-            tables.extend(
-                Table::load_all(connection, &table_catalog, table_schema)?
-                    .into_iter()
-                    .map(Arc::new),
+        // Functions come first: other objects reference them.
+        for function in PgProc::load_all(connection)? {
+            let metadata = crate::database::PgProcMetadata::new(&function, &cache);
+            let schema = cache
+                .namespace(function.pronamespace)
+                .unwrap_or_default()
+                .to_owned();
+            let language = cache.language(function.prolang).map(ToOwned::to_owned);
+            generic_builder = generic_builder.add_function(
+                Arc::new(PgFunction::new(function, schema, language)),
+                metadata,
             );
         }
 
-        // We sort the tables by schema and name to enable efficient binary search
-        // later.
-        tables.sort_by_key(|table| {
-            (
-                table.as_ref().table_schema().unwrap_or("").to_owned(),
-                table.table_name().to_owned(),
-            )
+        let mut tables = Vec::new();
+        for table_schema in &table_schemas {
+            for row in Table::load_all(connection, &table_catalog, table_schema)? {
+                let partition_strategy = row.partition_strategy(connection)?;
+                tables.push(Arc::new(PgTable::new(row, partition_strategy.as_deref())?));
+            }
+        }
+
+        tables.sort_by(|left, right| {
+            (left.schema(), left.name()).cmp(&(right.schema(), right.name()))
         });
 
-        // Create lookup maps for tables and columns for grant metadata
-        let mut tables_by_schema_name: std::collections::HashMap<(String, String), Arc<Table>> =
-            std::collections::HashMap::new();
-        let mut columns_by_table_column: std::collections::HashMap<
-            (String, String, String),
-            Arc<Column>,
-        > = std::collections::HashMap::new();
+        let mut tables_by_schema_name: HashMap<(String, String), Arc<PgTable>> = HashMap::new();
+        let mut columns_by_table_column: HashMap<(String, String, String), Arc<Column>> =
+            HashMap::new();
+        let mut policies_by_role: HashMap<String, Vec<Arc<PgPolicy>>> = HashMap::new();
 
-        // For each table, we determine all of the foreign keys and for each foreign key
-        // we determine which table it references.
         for table in tables {
-            // Add to lookup map
             tables_by_schema_name.insert(
-                (
-                    table.table_schema().unwrap_or("").to_string(),
-                    table.table_name().to_string(),
-                ),
+                (table.schema().to_string(), table.name().to_string()),
                 Arc::clone(&table),
             );
 
-            let table_metadata = table.metadata(connection, &value.denylist_types)?;
+            let table_metadata = table.metadata(connection, &value.denylist_types, &cache)?;
 
             for column in table_metadata.column_arcs() {
-                // Add to column lookup map
                 columns_by_table_column.insert(
                     (
-                        table.table_schema().unwrap_or("").to_string(),
-                        table.table_name().to_string(),
-                        column.column_name().to_string(),
+                        table.schema().to_string(),
+                        table.name().to_string(),
+                        column.column_name.clone(),
                     ),
-                    Arc::clone(&column),
+                    Arc::clone(column),
                 );
 
-                generic_builder = generic_builder.add_column(
-                    Arc::clone(&column),
-                    column.metadata(Arc::clone(&table), connection)?,
-                );
+                let metadata = table_metadata
+                    .column_metadata(&column.column_name)
+                    .expect("a column of the table carries the metadata read with it")
+                    .clone();
+                generic_builder = generic_builder.add_column(Arc::clone(column), metadata);
             }
 
             for check_constraint in table_metadata.check_constraint_arcs() {
@@ -221,19 +272,24 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
                     connection,
                 )?;
                 generic_builder =
-                    generic_builder.add_check_constraint(Arc::clone(&check_constraint), metadata);
+                    generic_builder.add_check_constraint(Arc::clone(check_constraint), metadata);
             }
 
             for fk in table_metadata.foreign_key_arcs() {
-                generic_builder = generic_builder.add_foreign_key(
-                    Arc::clone(&fk),
-                    fk.metadata(Arc::clone(&table), connection)?,
-                );
+                let metadata = fk.model().metadata(Arc::clone(&table), connection)?;
+                generic_builder = generic_builder.add_foreign_key(Arc::clone(fk), metadata);
             }
 
             for index in table_metadata.unique_index_arcs() {
                 generic_builder = generic_builder.add_unique_index(
-                    Arc::clone(&index),
+                    Arc::clone(index),
+                    index.metadata(Arc::clone(&table), connection)?,
+                );
+            }
+
+            for index in table_metadata.index_arcs() {
+                generic_builder = generic_builder.add_index(
+                    Arc::clone(index),
                     index.metadata(Arc::clone(&table), connection)?,
                 );
             }
@@ -248,30 +304,37 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
             }
 
             for policy in table_metadata.policies() {
-                let parse_expr = |sql: &Option<String>| -> Option<sqlparser::ast::Expr> {
-                    sql.as_ref().and_then(|s| {
-                        Parser::new(&PostgreSqlDialect {})
-                            .try_with_sql(s)
-                            .ok()?
-                            .parse_expr()
-                            .ok()
-                    })
+                let parse_expr = |sql: Option<String>| -> Option<Expr> {
+                    Parser::new(&PostgreSqlDialect {})
+                        .try_with_sql(&sql?)
+                        .ok()?
+                        .parse_expr()
+                        .ok()
                 };
 
-                let using_expression = parse_expr(&policy.polqual);
-                let check_expression = parse_expr(&policy.polwithcheck);
+                let (using, check) = crate::models::pg_policy_table::cached_queries::expressions(
+                    policy.model(),
+                    connection,
+                )?;
+                let using_expression = parse_expr(using);
+                let check_expression = parse_expr(check);
 
-                let roles: Vec<Owner> =
-                    crate::models::pg_policy_table::cached_queries::roles(policy, connection)?
-                        .into_iter()
-                        .map(|r| Owner::Ident(Ident::new(r.rolname)))
-                        .collect();
+                let mut roles = Vec::new();
+                for role in crate::models::pg_policy_table::cached_queries::roles(
+                    policy.model(),
+                    connection,
+                )? {
+                    policies_by_role
+                        .entry(role.rolname.clone())
+                        .or_default()
+                        .push(Arc::clone(policy));
+                    roles.push(Owner::Ident(Ident::new(role.rolname)));
+                }
 
-                // Initialize Metadata with empty dependencies and table (functions will be filled later if we had logic for it)
+                let functions = generic_builder.function_arc_vec();
                 let metadata = crate::model_metadata::PolicyMetadata::new(
-                    Arc::clone(&table),
-                    Vec::new(), // using_functions
-                    Vec::new(), // check_functions
+                    called_functions(using_expression.as_ref(), &functions),
+                    called_functions(check_expression.as_ref(), &functions),
                     using_expression,
                     check_expression,
                     roles,
@@ -280,23 +343,29 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
                 generic_builder = generic_builder.add_policy(Arc::clone(policy), metadata);
             }
 
-            generic_builder = generic_builder.add_table(table, table_metadata);
+            generic_builder = generic_builder.add_table(table, table_metadata)?;
         }
 
-        // Collect all roles' membership data and prepare role Rcs
+        for view in PgView::load_all(&table_schemas, connection)? {
+            generic_builder =
+                generic_builder.add_view(Arc::new(PgViewDefinition::plain(view)?), ());
+        }
+        for view in PgMatview::load_all(&table_schemas, connection)? {
+            generic_builder = generic_builder
+                .add_materialized_view(Arc::new(PgViewDefinition::materialized(view)?), ());
+        }
+
         let mut role_memberships: std::collections::HashMap<u32, Vec<u32>> =
             std::collections::HashMap::new();
         let mut roles_map: std::collections::HashMap<u32, Arc<PgRole>> =
             std::collections::HashMap::new();
 
-        // First, create Arc for all roles and query their memberships
         for role in roles {
             let role_rc = Arc::clone(&role);
 
             if let Some(role_oid) = role.oid {
                 roles_map.insert(role_oid, Arc::clone(&role_rc));
 
-                // Query pg_auth_members for this role's memberships
                 let member_of_oids =
                     crate::models::pg_role::cached_queries::member_of(&role, connection)
                         .unwrap_or_default();
@@ -305,31 +374,28 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
             }
         }
 
-        // Now add roles with their metadata
-        // Note: We cannot populate policies here because policies reference roles by name,
-        // and we'd need to query the already-built database. For now, we leave policies empty.
         for (role_oid, role_rc) in &roles_map {
             let Some(member_of_oids) = role_memberships.get(role_oid) else {
                 continue;
             };
 
-            // Find the actual role Rcs from our map
             let member_of: Vec<Arc<PgRole>> = member_of_oids
                 .iter()
                 .filter_map(|oid| roles_map.get(oid).cloned())
                 .collect();
 
-            // For now, we don't populate policies (would require post-build processing)
-            let policies = Vec::new();
+            let policies = role_rc
+                .rolname
+                .as_ref()
+                .and_then(|name| policies_by_role.remove(name))
+                .unwrap_or_default();
 
             let metadata = crate::model_metadata::RoleMetadata::new(member_of, policies);
             generic_builder = generic_builder.add_role(Arc::clone(role_rc), metadata);
         }
 
-        // Load table grants
         let table_grants = RoleTableGrants::load_all(&table_catalog, &table_schemas, connection)?;
         for grant in table_grants {
-            // Find the table this grant applies to
             let table_rc = tables_by_schema_name
                 .get(&(
                     grant.table_schema.clone().unwrap_or_default(),
@@ -337,10 +403,8 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
                 ))
                 .cloned();
 
-            // Parse the privilege type into an Action
             let privilege = grant.privilege_type.as_deref().map(string_to_action);
 
-            // Create the grantee
             let grantee = grant.grantee.as_deref().map(|name| Grantee {
                 grantee_type: GranteesType::None,
                 name: Some(GranteeName::ObjectName(ObjectName(vec![
@@ -352,10 +416,8 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
             generic_builder = generic_builder.add_table_grant(Arc::new(grant), metadata);
         }
 
-        // Load column grants
         let column_grants = RoleColumnGrants::load_all(&table_catalog, &table_schemas, connection)?;
         for grant in column_grants {
-            // Find the table this grant applies to
             let table_rc = tables_by_schema_name
                 .get(&(
                     grant.table_schema.clone().unwrap_or_default(),
@@ -363,21 +425,18 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
                 ))
                 .cloned();
 
-            // Find the column this grant applies to
             let column_rc = table_rc.as_ref().and_then(|t| {
                 columns_by_table_column
                     .get(&(
-                        t.table_schema().unwrap_or_default().to_string(),
-                        t.table_name().to_string(),
+                        t.schema().to_string(),
+                        t.name().to_string(),
                         grant.column_name.clone().unwrap_or_default(),
                     ))
                     .cloned()
             });
 
-            // Parse the privilege type into an Action
             let privilege = grant.privilege_type.as_deref().map(string_to_action);
 
-            // Create the grantee
             let grantee = grant.grantee.as_deref().map(|name| Grantee {
                 grantee_type: GranteesType::None,
                 name: Some(GranteeName::ObjectName(ObjectName(vec![

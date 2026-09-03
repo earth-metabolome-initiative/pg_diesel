@@ -4,11 +4,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Struct defining the `information_schema.column_domain_usage` table.
-///
-/// The `column_domain_usage` view contains one row for each column that is
-/// based on a domain. This tracks which table columns use specific domains
-/// as their data type, providing essential information for domain dependency
-/// analysis and impact assessment when modifying domains.
 #[derive(
     Queryable, QueryableByName, Selectable, PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Hash,
 )]

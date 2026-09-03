@@ -3,15 +3,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Struct defining the `information_schema.attributes` table.
-///
-/// The `attributes` view contains one row for each attribute of composite types
-/// in the current database that the current user has access to. This includes
-/// attributes of user-defined types, providing detailed metadata about their
-/// structure, data types, constraints, and other properties.
-///
-/// This view is essential for understanding the composition and schema of
-/// custom composite types, including their attribute names, types, default
-/// values, nullability, and various type-specific metadata.
 #[derive(
     Queryable, QueryableByName, Selectable, PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Hash,
 )]

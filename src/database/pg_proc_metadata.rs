@@ -1,16 +1,9 @@
 //! Metadata for `PostgreSQL` functions and procedures.
-//!
-//! This module provides [`PgProcMetadata`], which encapsulates type information
-//! for a `PostgreSQL` function or procedure, including:
-//! - Argument types (from `pg_proc.proargtypes`)
-//! - Return type (from `pg_proc.prorettype`)
-//!
-//! This metadata is used by the [`PgDieselDatabase`](crate::database::PgDieselDatabase) to
-//! provide function introspection through the `sql_traits` trait system.
 
-use diesel::PgConnection;
-
-use crate::models::{PgProc, PgType};
+use crate::{
+    database::CatalogCache,
+    models::{PgProc, PgType},
+};
 
 #[derive(Debug, Clone)]
 /// Struct collecting metadata about a `PostgreSQL` function represented by a
@@ -20,34 +13,30 @@ pub struct PgProcMetadata {
     argument_types: Vec<PgType>,
     /// The return type.
     return_type: Option<PgType>,
+    /// The role owning the function.
+    owner: Option<String>,
 }
 
 impl PgProcMetadata {
-    /// Creates a new `PgProcMetadata` instance from a `PgProc` and database
-    /// connection.
+    /// Reads the metadata of `pg_proc` from the catalogs already loaded.
     ///
-    /// # Arguments
-    ///
-    /// * `pg_proc` - The `PostgreSQL` function to get metadata for.
-    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if the type information cannot be retrieved from the
-    /// database.
-    pub fn new(pg_proc: &PgProc, conn: &mut PgConnection) -> Result<Self, diesel::result::Error> {
-        let argument_types = pg_proc.argument_types(conn)?;
+    /// A type or role the cache does not hold is left out rather than looked
+    /// up: the cache reads whole catalogs, so a miss means the object is gone.
+    #[must_use]
+    pub fn new(pg_proc: &PgProc, cache: &CatalogCache) -> Self {
+        let argument_types = pg_proc
+            .proargtypes
+            .iter()
+            .filter_map(|oid| cache.pg_type(*oid).cloned())
+            .collect();
+        let return_type = cache.pg_type(pg_proc.prorettype).cloned();
+        let owner = cache.role(pg_proc.proowner).map(ToOwned::to_owned);
 
-        let return_type = if pg_proc.prorettype == 0 {
-            None
-        } else {
-            Some(pg_proc.return_type(conn)?)
-        };
-
-        Ok(Self {
+        Self {
             argument_types,
             return_type,
-        })
+            owner,
+        }
     }
 
     /// Returns the argument types.
@@ -60,6 +49,12 @@ impl PgProcMetadata {
     #[must_use]
     pub fn return_type(&self) -> Option<&PgType> {
         self.return_type.as_ref()
+    }
+
+    /// Returns the role owning the function.
+    #[must_use]
+    pub fn owner(&self) -> Option<&str> {
+        self.owner.as_deref()
     }
 }
 
@@ -107,7 +102,6 @@ mod tests {
             typcollation: 0,
             typdefaultbin: None,
             typdefault: None,
-            typacl: None,
         }
     }
 
@@ -119,10 +113,12 @@ mod tests {
         let metadata = PgProcMetadata {
             argument_types: vec![arg_type],
             return_type: Some(ret_type),
+            owner: Some("app_owner".to_string()),
         };
 
         assert_eq!(metadata.argument_types().len(), 1);
         assert_eq!(metadata.argument_types()[0].typname, "int4");
         assert_eq!(metadata.return_type().unwrap().typname, "int4");
+        assert_eq!(metadata.owner(), Some("app_owner"));
     }
 }
