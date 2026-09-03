@@ -60,6 +60,10 @@ diesel::table! {
         /// `true` if the column is locally defined (not inherited).
         attislocal -> Bool,
         /// Number of times this column is inherited from parent tables.
+        #[cfg(not(any(feature = "postgres-16", feature = "postgres-17", feature = "postgres-18")))]
+        attinhcount -> Integer,
+        /// Number of times this column is inherited from parent tables.
+        #[cfg(any(feature = "postgres-16", feature = "postgres-17", feature = "postgres-18"))]
         attinhcount -> SmallInt,
         /// OID of the collation of the column, or 0 if not collatable.
         attcollation -> Oid,

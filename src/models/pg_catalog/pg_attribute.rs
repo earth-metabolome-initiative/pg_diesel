@@ -50,6 +50,18 @@ pub struct PgAttribute {
     pub attisdropped: bool,
     /// Whether the column is a local definition.
     pub attislocal: bool,
+    #[cfg(not(any(
+        feature = "postgres-16",
+        feature = "postgres-17",
+        feature = "postgres-18"
+    )))]
+    /// The number of times the column is inherited.
+    pub attinhcount: i32,
+    #[cfg(any(
+        feature = "postgres-16",
+        feature = "postgres-17",
+        feature = "postgres-18"
+    ))]
     /// The number of times the column is inherited.
     pub attinhcount: i16,
     /// The collation of the column.
