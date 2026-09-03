@@ -66,8 +66,6 @@ diesel::table! {
         /// Target number of statistics samples for `ANALYZE`;
         /// -1 uses default setting; `NULL` if not set.
         attstattarget -> Nullable<SmallInt>,
-        /// Column-level access privileges (ACL); `NULL` if none.
-        attacl -> Nullable<Array<Text>>,
         /// Column-level options (e.g., for storage parameters); `NULL` if none.
         attoptions -> Nullable<Array<Text>>,
         /// Options for foreign data wrapper columns; `NULL` if none.

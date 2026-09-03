@@ -31,7 +31,12 @@ async fn test_schema_completeness() {
     struct ColumnInfo {
         #[diesel(sql_type = Text)]
         column_name: String,
+        #[diesel(sql_type = Text)]
+        udt_name: String,
     }
+
+    /// Types PostgreSQL has no binary output function for.
+    const UNREADABLE_UDT_NAMES: [&str; 2] = ["aclitem", "_aclitem"];
 
     let database_name = "test_schema_completeness";
     let port = 35433;
@@ -111,7 +116,7 @@ async fn test_schema_completeness() {
         };
 
         let query = format!(
-            "SELECT column_name FROM information_schema.columns WHERE table_schema = '{table_schema}' AND table_name = '{table_name}' ORDER BY ordinal_position"
+            "SELECT column_name, udt_name FROM information_schema.columns WHERE table_schema = '{table_schema}' AND table_name = '{table_name}' ORDER BY ordinal_position"
         );
         let columns: Vec<ColumnInfo> =
             diesel::sql_query(&query)
@@ -120,7 +125,11 @@ async fn test_schema_completeness() {
                     panic!("Failed to load columns for {table_schema}.{table_name}: {e}")
                 });
 
-        let db_columns: HashSet<String> = columns.into_iter().map(|col| col.column_name).collect();
+        let db_columns: HashSet<String> = columns
+            .into_iter()
+            .filter(|col| !UNREADABLE_UDT_NAMES.contains(&col.udt_name.as_str()))
+            .map(|col| col.column_name)
+            .collect();
 
         for db_col in &db_columns {
             let schema_col_candidates =
@@ -191,10 +200,6 @@ async fn test_schema_completeness() {
 }
 
 /// Test that `test_load_all.rs` has test blocks for all tables in the schema.
-///
-/// This test parses the `test_load_all.rs` file and verifies that:
-/// 1. All schema files have corresponding test blocks
-/// 2. Feature-gated tables have correctly feature-gated test blocks
 #[test]
 fn test_load_all_coverage() {
     use std::collections::HashMap;

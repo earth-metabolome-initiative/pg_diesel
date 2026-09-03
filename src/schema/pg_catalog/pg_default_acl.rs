@@ -18,7 +18,5 @@ diesel::table! {
         /// 'T' = type,
         /// 'n' = schema.
         defaclobjtype -> Text,
-        /// Access privileges to be granted by default (ACL entries).
-        defaclacl -> Array<Text>,
     }
 }

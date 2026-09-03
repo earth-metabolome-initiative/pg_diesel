@@ -53,7 +53,5 @@ diesel::table! {
         /// Version of the collation.
         #[cfg(not(feature = "postgres-14"))]
         datcollversion -> Nullable<Text>,
-        /// Access privileges (ACL) for the database.
-        datacl -> Nullable<Array<Text>>,
     }
 }

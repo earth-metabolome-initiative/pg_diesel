@@ -13,7 +13,5 @@ diesel::table! {
         objsubid -> Integer,
         /// Type of privilege: 'i' = initial privileges, 'e' = extension privileges.
         privtype -> Text,
-        /// Access privileges as originally assigned (ACL array).
-        initprivs -> Array<Text>,
     }
 }
