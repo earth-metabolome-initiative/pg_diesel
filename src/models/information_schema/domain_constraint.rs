@@ -3,10 +3,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a domain constraint in the database.
-///
-/// A domain constraint is a rule that restricts the values that can be stored
-/// in a domain. This struct maps to the `domain_constraints` table in the
-/// database.
 #[derive(
     Queryable, QueryableByName, Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Selectable,
 )]

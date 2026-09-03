@@ -4,9 +4,6 @@
 use diesel::prelude::*;
 
 /// Model struct for `information_schema.role_routine_grants`.
-///
-/// This view contains one row for each routine privilege granted to or by a
-/// role in the current database.
 #[derive(
     Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, Queryable, QueryableByName, Selectable,
 )]

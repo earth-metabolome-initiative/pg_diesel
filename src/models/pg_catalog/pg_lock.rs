@@ -4,15 +4,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_locks` view.
-///
-/// The `pg_locks` view provides information about the locks held by active
-/// processes within the database server. Each row represents an active lockable
-/// object, a requested lock mode, and relevant process information.
-///
-/// This is a view, not a table, so it has no persistent storage and no primary
-/// key.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/view-pg-locks.html).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_locks::pg_locks)]

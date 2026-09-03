@@ -1,13 +1,6 @@
 //! `PostgreSQL` access method support procedures catalog model.
-//!
-//! This module provides the `PgAmproc` struct for working with the
-//! `pg_catalog.pg_amproc` system catalog table.
 
 /// Represents a row from the `pg_catalog.pg_amproc` table.
-///
-/// Contains information about support procedures used by access method operator
-/// families. These procedures provide the functionality needed by index access
-/// methods to operate.
 #[derive(diesel::Queryable, diesel::QueryableByName, diesel::Selectable)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]

@@ -4,10 +4,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Struct defining the `information_schema.column_privileges` table.
-///
-/// The `column_privileges` view contains one row for each privilege granted
-/// on a column to a user or role. This provides access control information
-/// for column-level security.
 #[derive(
     Queryable, QueryableByName, Selectable, PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Hash,
 )]

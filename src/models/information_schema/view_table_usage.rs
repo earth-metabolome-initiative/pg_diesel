@@ -1,8 +1,4 @@
 //! Model struct for the `information_schema.view_table_usage` view.
-//!
-//! This view contains one row for each table that is referenced in the query
-//! expression of a view, showing the relationship between views and the
-//! underlying tables.
 
 use diesel::prelude::*;
 

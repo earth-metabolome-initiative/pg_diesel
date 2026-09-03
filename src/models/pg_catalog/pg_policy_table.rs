@@ -6,12 +6,6 @@ use diesel::{Queryable, QueryableByName, Selectable};
 pub mod cached_queries;
 
 /// Represents a row from the `pg_policy` table.
-///
-/// The `pg_policy` catalog stores row-level security policies. Note that this
-/// is the underlying table, distinct from the `pg_policies` view which provides
-/// a more user-friendly representation.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/catalog-pg-policy.html).
 #[derive(
     Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash, PartialOrd, Ord,
 )]

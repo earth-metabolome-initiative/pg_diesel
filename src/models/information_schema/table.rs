@@ -1,12 +1,15 @@
 //! Table model and related cached queries.
 
-use std::fmt::Display;
+use std::{collections::HashMap, fmt::Display, sync::Arc};
 
-use diesel::{OptionalExtension, PgConnection, Queryable, QueryableByName, Selectable};
+use diesel::{PgConnection, Queryable, QueryableByName, Selectable};
 
 use crate::{
-    model_metadata::TableMetadata,
-    models::{CheckConstraint, Column, PgIndex, Triggers},
+    database::CatalogCache,
+    model_metadata::{
+        ColumnMetadata, PgForeignKey, PgIndexEntry, PgPolicy, PgTable, TableMetadata,
+    },
+    models::{CheckConstraint, Column, Triggers},
 };
 
 mod cached_queries;
@@ -55,41 +58,78 @@ impl Display for Table {
 impl Table {
     /// Initializes and returns the metadata for the table.
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - The database connection.
-    /// * `denylist_types` - The list of types to denylist.
-    ///
     /// # Errors
     ///
     /// * If the metadata cannot be loaded from the database.
+    #[allow(clippy::too_many_lines)]
     pub fn metadata(
         &self,
+        table: &Arc<PgTable>,
         conn: &mut PgConnection,
         denylist_types: &[String],
+        cache: &CatalogCache,
     ) -> Result<TableMetadata, diesel::result::Error> {
+        let facts = cached_queries::catalog_facts(self, conn)?;
+        let attributes = cached_queries::attributes(facts.oid, conn)?;
+        let descriptions = cached_queries::descriptions(facts.oid, conn)?;
+
         let mut sql_metadata = sql_traits::structs::TableMetadata::default();
+        let mut column_metadata = HashMap::new();
         for column in cached_queries::columns(self, conn)? {
-            if denylist_types.contains(&column.pg_type(conn)?.typname) {
+            let Some(attribute) = attributes
+                .iter()
+                .find(|attribute| attribute.name == column.column_name)
+            else {
+                continue;
+            };
+            let Some(pg_type) = cache.pg_type(attribute.type_oid) else {
+                continue;
+            };
+            if denylist_types.contains(&pg_type.typname) {
                 continue;
             }
-            sql_metadata.add_column(std::sync::Arc::new(column));
+            let description = descriptions
+                .iter()
+                .find(|description| description.objsubid == i32::from(attribute.number))
+                .cloned();
+            let collation = column
+                .collation_schema
+                .as_deref()
+                .zip(column.collation_name.as_deref())
+                .and_then(|(schema, name)| cache.collation_is_deterministic(schema, name));
+            column_metadata.insert(
+                column.column_name.clone(),
+                ColumnMetadata::new(Arc::clone(table), description, pg_type.clone(), collation),
+            );
+            sql_metadata.add_column(Arc::new(column));
         }
         for check_constraint in cached_queries::check_constraints(self, conn)? {
-            sql_metadata.add_check_constraint(std::sync::Arc::new(check_constraint));
+            sql_metadata.add_check_constraint(Arc::new(check_constraint));
         }
         for foreign_key in cached_queries::foreign_keys(self, conn)? {
-            sql_metadata.add_foreign_key(std::sync::Arc::new(foreign_key));
+            let (schema, name) = foreign_key.referenced_relation(conn)?;
+            sql_metadata.add_foreign_key(Arc::new(PgForeignKey::new(foreign_key, schema, name)));
         }
-        for index in cached_queries::unique_indices(self, conn)? {
-            sql_metadata.add_unique_index(std::sync::Arc::new(index));
+        for (index, index_name) in cached_queries::unique_indices(self, conn)? {
+            sql_metadata.add_unique_index(Arc::new(PgIndexEntry::new(
+                index,
+                self.table_schema.clone(),
+                index_name,
+            )));
+        }
+        for (index, index_name) in cached_queries::non_unique_indices(self, conn)? {
+            sql_metadata.add_index(Arc::new(PgIndexEntry::new(
+                index,
+                self.table_schema.clone(),
+                index_name,
+            )));
         }
         let mut primary_key_columns = Vec::new();
         for pk_column in cached_queries::primary_key_columns(self, conn)? {
             primary_key_columns.extend(
                 sql_metadata
                     .column_arcs()
-                    .filter(|col: &&std::sync::Arc<Column>| col.as_ref() == &pk_column)
+                    .filter(|col: &&Arc<Column>| col.as_ref() == &pk_column)
                     .cloned(),
             );
         }
@@ -97,26 +137,56 @@ impl Table {
 
         let triggers = cached_queries::triggers(self, conn)?
             .into_iter()
-            .map(|(t, oid)| (std::sync::Arc::new(t), oid))
+            .map(|(trigger, oid)| (Arc::new(trigger), oid))
             .collect();
 
-        let policies = cached_queries::policies(self, conn)?
+        let policies = cached_queries::policies(facts.oid, conn)?
             .into_iter()
-            .map(std::sync::Arc::new)
+            .map(|policy| Arc::new(PgPolicy::new(policy, Arc::clone(table))))
             .collect();
 
-        let (row_security, forced_row_security) = cached_queries::pg_class(self, conn)?;
-
-        let metadata = TableMetadata::new(
-            sql_metadata,
-            cached_queries::pg_description(self, conn).optional()?,
-            triggers,
-            policies,
-            row_security,
-            forced_row_security,
+        sql_metadata.set_rls_enabled(facts.row_security);
+        sql_metadata.set_rls_forced(facts.forced_row_security);
+        sql_metadata.set_owner(cache.role(facts.owner).map(ToOwned::to_owned));
+        sql_metadata.set_inherited_column_names(
+            attributes
+                .iter()
+                .filter(|attribute| attribute.inherited)
+                .map(|attribute| attribute.name.clone())
+                .collect(),
         );
 
-        Ok(metadata)
+        let ancestors = cached_queries::parents(facts.oid, conn)?;
+        let (parents, partition_root) = if facts.is_partition {
+            (Vec::new(), ancestors.into_iter().next())
+        } else {
+            (ancestors, None)
+        };
+
+        Ok(TableMetadata::new(
+            sql_metadata,
+            descriptions
+                .into_iter()
+                .find(|description| description.objsubid == 0),
+            triggers,
+            policies,
+            parents,
+            partition_root,
+            column_metadata,
+        ))
+    }
+
+    /// Returns the partitioning strategy `pg_partitioned_table` records for
+    /// the table, or [`None`] when the table is not partitioned.
+    ///
+    /// # Errors
+    ///
+    /// * If the strategy cannot be loaded from the database.
+    pub fn partition_strategy(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Option<String>, diesel::result::Error> {
+        cached_queries::partition_strategy(cached_queries::catalog_facts(self, conn)?.oid, conn)
     }
 
     #[must_use]
@@ -127,26 +197,20 @@ impl Table {
 
     /// Returns the indices for the table.
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - The database connection.
-    ///
-    /// # Returns
-    ///
-    /// A vector of indices.
-    ///
     /// # Errors
     ///
     /// * If the indices cannot be loaded from the database.
-    pub fn indices(&self, conn: &mut PgConnection) -> Result<Vec<PgIndex>, diesel::result::Error> {
-        indices(self, conn)
+    pub fn indices(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<PgIndexEntry>, diesel::result::Error> {
+        Ok(indices(self, conn)?
+            .into_iter()
+            .map(|(index, name)| PgIndexEntry::new(index, self.table_schema.clone(), name))
+            .collect())
     }
 
     /// Returns the primary key columns for the table.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - The database connection.
     ///
     /// # Errors
     ///
@@ -160,35 +224,20 @@ impl Table {
 
     /// Returns the UNIQUE constraint indices for the table.
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - The database connection.
-    ///
-    /// # Returns
-    ///
-    /// A vector of indices.
-    ///
     /// # Errors
     ///
     /// * If the indices cannot be loaded from the database.
     pub fn unique_indices(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<PgIndex>, diesel::result::Error> {
-        unique_indices(self, conn)
+    ) -> Result<Vec<PgIndexEntry>, diesel::result::Error> {
+        Ok(unique_indices(self, conn)?
+            .into_iter()
+            .map(|(index, name)| PgIndexEntry::new(index, self.table_schema.clone(), name))
+            .collect())
     }
 
     /// Returns all tables in the database.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - The database connection.
-    /// * `table_catalog` - The table catalog.
-    /// * `table_schema` - The table schema.
-    ///
-    /// # Returns
-    ///
-    /// A vector of all tables in the database.
     ///
     /// # Errors
     ///
@@ -202,17 +251,6 @@ impl Table {
     }
 
     /// Returns the table by name.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - The database connection.
-    /// * `table_name` - The name of the table.
-    /// * `table_schema` - The schema of the table.
-    /// * `table_catalog` - The catalog of the table.
-    ///
-    /// # Returns
-    ///
-    /// The table.
     ///
     /// # Errors
     ///
@@ -228,15 +266,6 @@ impl Table {
 
     /// Returns the column by name.
     ///
-    /// # Arguments
-    ///
-    /// * `column_name` - The name of the column.
-    /// * `conn` - The database connection.
-    ///
-    /// # Returns
-    ///
-    /// The column.
-    ///
     /// # Errors
     ///
     /// * If the column cannot be loaded from the database.
@@ -250,14 +279,6 @@ impl Table {
 
     /// Returns the check constraints for the table.
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - The database connection.
-    ///
-    /// # Returns
-    ///
-    /// A vector of check constraints.
-    ///
     /// # Errors
     ///
     /// * If the check constraints cannot be loaded from the database.
@@ -269,14 +290,6 @@ impl Table {
     }
 
     /// Returns the list of Triggers associates to the current table.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - The database connection.
-    ///
-    /// # Returns
-    ///
-    /// A vector of triggers.
     ///
     /// # Errors
     ///

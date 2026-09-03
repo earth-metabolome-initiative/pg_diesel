@@ -4,12 +4,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_opclass` table.
-///
-/// The `pg_opclass` system catalog defines index access method operator
-/// classes. An operator class specifies how a particular data type can be used
-/// with an index.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/catalog-pg-opclass.html).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_opclass::pg_opclass)]

@@ -3,10 +3,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents an entry in the `PostGIS` `geometry_columns` system table.
-///
-/// The `geometry_columns` table provides metadata about all geometry columns
-/// stored in the database, including their spatial reference system (SRID)
-/// and geometry type.
 #[derive(Queryable, QueryableByName, Selectable, Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::public::geometry_columns::geometry_columns)]

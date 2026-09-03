@@ -19,16 +19,6 @@ pub struct ModelParseResult {
 }
 
 /// Parse a model file and extract struct fields with their feature gates.
-///
-/// This parser uses `syn` to properly parse Rust source code and extract:
-/// - Struct name (if found)
-/// - Field names
-/// - Feature gates from `#[cfg(...)]` attributes on structs
-/// - Feature gates from `#[cfg(...)]` attributes on individual fields
-///
-/// When there are multiple struct definitions with different feature gates (e.g., for different
-/// `PostgreSQL` versions), fields from all definitions are collected. Fields appearing in multiple
-/// definitions have their feature gates combined using OR logic.
 pub fn parse_model_file(path: &Path) -> Result<ModelParseResult, String> {
     let content = std::fs::read_to_string(path).map_err(|e| format!("Failed to read file: {e}"))?;
 

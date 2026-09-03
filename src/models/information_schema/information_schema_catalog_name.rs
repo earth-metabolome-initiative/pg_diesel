@@ -4,9 +4,6 @@
 use diesel::prelude::*;
 
 /// Model struct for `information_schema.information_schema_catalog_name`.
-///
-/// This view contains the name of the catalog in which the information schema
-/// is located.
 #[derive(
     Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, Queryable, QueryableByName, Selectable,
 )]

@@ -1,8 +1,4 @@
 //! Model struct for the `information_schema.sql_parts` view.
-//!
-//! This view contains information about major parts of the SQL standard
-//! supported by the database system, showing which SQL standard parts are
-//! supported and verified.
 
 use diesel::prelude::*;
 

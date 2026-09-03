@@ -8,7 +8,5 @@ diesel::table! {
         oid -> Oid,
         /// Name of the configuration parameter.
         parname -> Text,
-        /// Access privileges for the parameter.
-        paracl -> Nullable<Array<Text>>,
     }
 }

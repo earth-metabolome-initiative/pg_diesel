@@ -4,11 +4,6 @@
 use diesel::{Identifiable, Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_subscription` table.
-///
-/// The `pg_subscription` table contains information about logical replication
-/// subscriptions.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/catalog-pg-subscription.html).
 #[derive(
     Identifiable, Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash,
 )]

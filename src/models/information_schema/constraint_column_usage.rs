@@ -3,11 +3,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row in the `constraint_column_usage` table in `PostgreSQL`
-///
-/// The `constraint_column_usage` table contains information about columns that
-/// are used in constraints.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/infoschema-constraint-column-usage.html)
 #[derive(
     Queryable, QueryableByName, Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Selectable,
 )]

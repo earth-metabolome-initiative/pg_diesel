@@ -1,13 +1,6 @@
 //! `PostgreSQL` collation catalog model.
-//!
-//! This module provides the `PgCollation` struct for working with the
-//! `pg_catalog.pg_collation` system catalog table.
 
 /// Represents a row from the `pg_catalog.pg_collation` table.
-///
-/// Contains information about collations (sorting and character classification
-/// rules). Collations define how text strings are sorted and compared in
-/// `PostgreSQL`, supporting multiple languages and cultural conventions.
 #[derive(diesel::Queryable, diesel::QueryableByName, diesel::Selectable)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]

@@ -4,11 +4,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_sequences` view.
-///
-/// The `pg_sequences` view provides a user-friendly representation of
-/// sequences, showing names and configuration parameters rather than just OIDs.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/view-pg-sequences.html).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_sequences::pg_sequences)]

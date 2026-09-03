@@ -6,9 +6,6 @@ use diesel::{
 
 /// Represents a row in the `pg_stat_statements` view, which contains
 /// performance statistics for all SQL statements executed by `PostgreSQL`.
-///
-/// Only the most relevant 32 columns are included to comply with Diesel’s
-/// default column limit.
 #[derive(Queryable, QueryableByName, Selectable, Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_stat_statements::pg_stat_statements)]
@@ -94,13 +91,6 @@ pub struct PgStatStatement {
 impl PgStatStatement {
     /// Returns the statements that caused the most compute time expenditure,
     /// meaning the total time * number of calls.
-    ///
-    /// This is useful for identifying the most expensive queries in terms of
-    /// CPU usage which are likely to benefit from optimization.
-    ///
-    /// # Arguments
-    ///
-    /// * `connection` - A reference to the database connection.
     ///
     /// # Errors
     ///

@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use sqlparser::ast::{TriggerEvent, TriggerObject, TriggerObjectKind, TriggerPeriod};
 
-use crate::models::{Table, Triggers};
+use crate::{model_metadata::PgTable, models::Triggers};
 
 #[derive(Clone, Debug)]
 /// Wrapper around [`Triggers`] model that holds parsed metadata.
@@ -12,7 +12,7 @@ pub struct TriggerMetadata {
     /// The underlying trigger model.
     pub model: Triggers,
     /// The table that the trigger is defined on.
-    pub table: Arc<Table>,
+    pub table: Arc<PgTable>,
     /// The events that fire the trigger.
     pub events: Vec<TriggerEvent>,
     /// The timing of the trigger.
@@ -26,7 +26,7 @@ pub struct TriggerMetadata {
 impl TriggerMetadata {
     /// Creates a new `TriggerMetadata` instance.
     #[must_use]
-    pub fn new(model: Triggers, table: Arc<Table>, function_oid: Option<u32>) -> Self {
+    pub fn new(model: Triggers, table: Arc<PgTable>, function_oid: Option<u32>) -> Self {
         let events = parse_events(&model);
         let timing = parse_timing(&model);
         let orientation = parse_orientation(&model);
@@ -43,7 +43,7 @@ impl TriggerMetadata {
 
     /// Returns the table that the trigger is defined on.
     #[must_use]
-    pub fn table(&self) -> &Table {
+    pub fn table(&self) -> &PgTable {
         &self.table
     }
 }

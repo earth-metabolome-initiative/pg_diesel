@@ -1,7 +1,4 @@
 //! Model struct for the `information_schema.schemata` view.
-//!
-//! This view contains metadata about database schemas including catalog, schema
-//! name, owner, and default character set information.
 
 use diesel::prelude::*;
 
@@ -28,4 +25,26 @@ pub struct Schemata {
     pub default_character_set_name: Option<String>,
     /// SQL path for the schema (typically NULL in `PostgreSQL`).
     pub sql_path: Option<String>,
+}
+
+impl Schemata {
+    /// Loads the named schemas of the given catalog.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the database query fails.
+    pub fn load_all(
+        catalog: &str,
+        schemas: &[String],
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::information_schema::schemata::schemata;
+
+        schemata::table
+            .filter(schemata::catalog_name.eq(catalog))
+            .filter(schemata::schema_name.eq_any(schemas))
+            .order_by(schemata::schema_name)
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
 }

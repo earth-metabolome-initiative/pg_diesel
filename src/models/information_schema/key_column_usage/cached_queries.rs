@@ -89,10 +89,6 @@ pub(crate) fn host_columns(
 
 /// Returns the referenced table associated with this key column usage
 ///
-/// # Arguments
-///
-/// * `conn` - A mutable reference to a `PgConnection`
-///
 /// # Errors
 ///
 /// * If an error occurs while loading the referenced table from the database

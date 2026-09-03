@@ -1,8 +1,4 @@
 //! Model struct for the `information_schema.user_mappings` view.
-//!
-//! This view contains one row for each user mapping defined in the current
-//! database that is accessible to the current user, used with foreign data
-//! wrappers for user authentication.
 
 use diesel::prelude::*;
 

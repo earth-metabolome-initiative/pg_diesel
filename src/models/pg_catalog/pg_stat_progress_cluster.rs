@@ -4,11 +4,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_stat_progress_cluster` view.
-///
-/// The `pg_stat_progress_cluster` view shows progress information for each
-/// backend running CLUSTER or VACUUM FULL.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/progress-reporting.html#CLUSTER-PROGRESS-REPORTING).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_stat_progress_cluster::pg_stat_progress_cluster)]

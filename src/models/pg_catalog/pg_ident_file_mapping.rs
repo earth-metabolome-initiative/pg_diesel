@@ -4,12 +4,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_ident_file_mappings` view.
-///
-/// The `pg_ident_file_mappings` view provides a summary of the contents of the
-/// user name mapping configuration file (`pg_ident.conf`). A row appears for each
-/// non-empty, non-comment line in the file.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/view-pg-ident-file-mappings.html).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_ident_file_mappings::pg_ident_file_mappings)]
@@ -32,12 +26,6 @@ pub struct PgIdentFileMapping {
 }
 
 /// Represents a row from the `pg_ident_file_mappings` view.
-///
-/// The `pg_ident_file_mappings` view provides a summary of the contents of the
-/// user name mapping configuration file (`pg_ident.conf`). A row appears for each
-/// non-empty, non-comment line in the file.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/view-pg-ident-file-mappings.html).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_ident_file_mappings::pg_ident_file_mappings)]

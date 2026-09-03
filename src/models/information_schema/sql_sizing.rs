@@ -1,8 +1,4 @@
 //! Model struct for the `information_schema.sql_sizing` view.
-//!
-//! This view contains information about SQL sizing limits supported by the
-//! database system, showing maximum values for various SQL constructs and
-//! implementation limits.
 
 use diesel::prelude::*;
 

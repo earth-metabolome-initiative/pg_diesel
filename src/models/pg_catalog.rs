@@ -1,33 +1,4 @@
 //! Model structs for `PostgreSQL`'s `pg_catalog` system tables.
-//!
-//! This module contains Diesel-queryable structs representing rows from
-//! `PostgreSQL`'s system catalog tables in the `pg_catalog` schema. These tables
-//! store all metadata about database objects, configuration, and runtime
-//! statistics.
-//!
-//! ## Key Models
-//!
-//! ### Core Catalog Tables
-//! - [`PGClass`]: Represents tables, indexes, sequences, etc. from
-//!   `pg_catalog.pg_class`
-//! - [`PgAttribute`]: Represents table columns from `pg_catalog.pg_attribute`
-//! - [`PgType`]: Represents data types from `pg_catalog.pg_type`
-//! - [`PgProc`]: Represents functions and procedures from `pg_catalog.pg_proc`
-//! - [`PgConstraint`]: Represents constraints from `pg_catalog.pg_constraint`
-//! - [`PgIndex`]: Represents indexes from `pg_catalog.pg_index`
-//!
-//! ### Statistics and Monitoring Views
-//! - `PgStat*` family: Runtime statistics views (activity, tables, indexes,
-//!   etc.)
-//! - `PgStatio*` family: I/O statistics views
-//!
-//! ### Configuration and Extensions
-//! - [`PgSetting`]: Configuration settings from `pg_catalog.pg_settings`
-//! - [`PgExtension`]: Installed extensions from `pg_catalog.pg_extension`
-//!
-//! All structs implement `Queryable`, `QueryableByName`, and `Selectable` from
-//! Diesel. Many also implement traits like [`HasOid`](crate::traits::HasOid)
-//! for types with Object Identifiers.
 
 mod pg_aggregate;
 #[cfg(feature = "postgres-18")]

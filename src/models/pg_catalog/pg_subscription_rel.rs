@@ -4,11 +4,6 @@
 use diesel::{Identifiable, Queryable, QueryableByName, Selectable, data_types::PgLsn};
 
 /// Represents a row from the `pg_subscription_rel` table.
-///
-/// The `pg_subscription_rel` table contains the state for each replicated
-/// relation in each subscription.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/catalog-pg-subscription-rel.html).
 #[derive(
     Identifiable, Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash,
 )]

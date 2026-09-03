@@ -4,13 +4,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_conversion` table.
-///
-/// The `pg_conversion` system catalog stores encoding conversion information.
-/// Each row describes a conversion from one character encoding to another,
-/// including the function used to perform the conversion and whether it is
-/// the default conversion for that encoding pair.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/catalog-pg-conversion.html).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_conversion::pg_conversion)]

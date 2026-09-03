@@ -6,11 +6,6 @@ use std::time::SystemTime;
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_stat_io` view.
-///
-/// The `pg_stat_io` view shows I/O statistics for different backend types,
-/// objects, and contexts.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-IO-VIEW).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_stat_io::pg_stat_io)]

@@ -4,8 +4,6 @@ diesel::table! {
     /// `pg_catalog.pg_stat_bgwriter` — view showing background writer statistics.
     /// Contains a single row showing cluster-wide background writer statistics.
     /// Uses `buffers_clean` as a nominal primary key for Diesel compatibility.
-    ///
-    /// Note: In `PostgreSQL` 17+, checkpoint-related columns were moved to `pg_stat_checkpointer`.
     pg_catalog.pg_stat_bgwriter (buffers_clean) {
         /// Number of scheduled checkpoints that have been performed.
         /// Only available in `PostgreSQL` 16 and earlier.

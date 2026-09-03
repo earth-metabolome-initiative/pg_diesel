@@ -4,10 +4,6 @@ diesel::table! {
     use diesel::sql_types::{Nullable, Oid, Text, Array};
 
     /// User mappings view
-    ///
-    /// The view `pg_user_mappings` provides access to information about user mappings.
-    /// This is essentially a publicly readable view of `pg_user_mapping` that omits
-    /// the options field if the user has no rights to the associated server.
     pg_catalog.pg_user_mappings (umid) {
         /// OID of the user mapping
         umid -> Nullable<Oid>,

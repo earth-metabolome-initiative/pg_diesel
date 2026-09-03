@@ -70,8 +70,6 @@ diesel::table! {
         typdefaultbin -> Nullable<Bytea>,
         /// Human-readable text form of the default value; `NULL` if none.
         typdefault -> Nullable<Text>,
-        /// Access privileges for the type.
-        typacl -> Nullable<Array<Text>>,
     }
 }
 

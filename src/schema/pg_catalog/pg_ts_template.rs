@@ -4,9 +4,6 @@ diesel::table! {
     use diesel::sql_types::{Oid, Text};
 
     /// Text search templates
-    ///
-    /// The catalog `pg_ts_template` contains entries defining text search templates.
-    /// A template is the implementation skeleton for a class of text search dictionaries.
     pg_catalog.pg_ts_template (oid) {
         /// Row identifier
         oid -> Oid,

@@ -4,12 +4,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_database` table.
-///
-/// The `pg_database` system catalog stores information about available
-/// databases. Most of the information shown in this catalog is also available
-/// via the `\l` command in psql.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/catalog-pg-database.html).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_database::pg_database)]
@@ -62,6 +56,4 @@ pub struct PgDatabase {
     /// Version of the collation.
     #[cfg(not(feature = "postgres-14"))]
     pub datcollversion: Option<String>,
-    /// Access privileges (ACL) for the database.
-    pub datacl: Option<Vec<String>>,
 }

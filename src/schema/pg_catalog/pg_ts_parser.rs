@@ -4,10 +4,6 @@ diesel::table! {
     use diesel::sql_types::{Oid, Text};
 
     /// Text search parsers
-    ///
-    /// The catalog `pg_ts_parser` contains entries defining text search parsers.
-    /// A parser is responsible for splitting input text into lexemes and assigning
-    /// a token type to each lexeme.
     pg_catalog.pg_ts_parser (oid) {
         /// Row identifier
         oid -> Oid,

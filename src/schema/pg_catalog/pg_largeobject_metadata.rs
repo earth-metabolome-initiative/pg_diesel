@@ -8,7 +8,5 @@ diesel::table! {
         oid -> Oid,
         /// OID of the owner of the large object.
         lomowner -> Oid,
-        /// Access privileges for the large object.
-        lomacl -> Nullable<Array<Text>>,
     }
 }

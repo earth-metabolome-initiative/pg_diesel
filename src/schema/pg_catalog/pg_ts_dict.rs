@@ -4,11 +4,6 @@ diesel::table! {
     use diesel::sql_types::{Oid, Text, Nullable};
 
     /// Text search dictionaries
-    ///
-    /// The catalog `pg_ts_dict` contains entries defining text search dictionaries.
-    /// A dictionary depends on a text search template, which specifies all the
-    /// implementation functions needed; the dictionary itself provides values for
-    /// the user-settable parameters supported by the template.
     pg_catalog.pg_ts_dict (oid) {
         /// Row identifier
         oid -> Oid,

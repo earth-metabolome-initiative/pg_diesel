@@ -1,8 +1,4 @@
 //! Model struct for the `information_schema.sql_implementation_info` view.
-//!
-//! This view contains information about implementation-specific characteristics
-//! of the SQL processor, providing details about database implementation
-//! limits, defaults, and behaviors.
 
 use diesel::prelude::*;
 

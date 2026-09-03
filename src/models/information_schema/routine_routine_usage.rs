@@ -1,14 +1,8 @@
 //! Model struct for the `information_schema.routine_routine_usage` view.
-//!
-//! This view contains one row for each routine that is used by another routine
-//! in the current database.
 
 use diesel::prelude::*;
 
 /// Model struct for `information_schema.routine_routine_usage`.
-///
-/// This view contains one row for each routine that is used by another routine
-/// in the current database.
 #[derive(
     Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, Queryable, QueryableByName, Selectable,
 )]

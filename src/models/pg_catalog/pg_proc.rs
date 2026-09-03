@@ -2,7 +2,6 @@
 
 use diesel::{PgConnection, Queryable, QueryableByName, Selectable};
 
-use super::PgType;
 use crate::models::PgExtension;
 
 mod cached_queries;
@@ -82,50 +81,10 @@ pub struct PgProc {
     pub prosqlbody: Option<String>,
     /// The configuration settings for the function.
     pub proconfig: Option<Vec<String>>,
-    /// Access privileges for the function.
-    pub proacl: Option<Vec<String>>,
 }
 
 impl PgProc {
-    /// Returns the `Vec` of [`PgType`] representing the types of the arguments
-    /// of the function.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`.
-    ///
-    /// # Errors
-    ///
-    /// * If the provided connection is invalid.
-    pub fn argument_types(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<Vec<PgType>, diesel::result::Error> {
-        self.proargtypes
-            .iter()
-            .map(|oid| PgType::from_oid(*oid, conn))
-            .collect()
-    }
-
-    /// Returns the return [`PgType`] associated to the function.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`.
-    ///
-    /// # Errors
-    ///
-    /// * If the return type does not exist.
-    pub fn return_type(&self, conn: &mut PgConnection) -> Result<PgType, diesel::result::Error> {
-        PgType::from_oid(self.prorettype, conn)
-    }
-
     /// Returns the [`PgExtension`] that contains this function, if any.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a
-    ///   [`PgConnection`].
     ///
     /// # Errors
     ///
@@ -137,10 +96,6 @@ impl PgProc {
     /// Loads all the functions from the `pg_proc` table, excluding procedures,
     /// aggregates, non-strict functions, set-returning functions, and functions
     /// returning "void".
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`.
     ///
     /// # Errors
     ///
@@ -217,7 +172,6 @@ mod tests {
             ))]
             prosqlbody: None,
             proconfig: None,
-            proacl: None,
         }
     }
 

@@ -4,14 +4,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_stats_ext_exprs` view.
-///
-/// The `pg_stats_ext_exprs` view provides access to statistics on expressions
-/// included in extended statistics objects.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/view-pg-stats-ext-exprs.html).
-///
-/// Note: This struct does not derive `Hash`, `Eq`, or `Ord` because it contains
-/// `f32` fields.
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_stats_ext_exprs::pg_stats_ext_exprs)]

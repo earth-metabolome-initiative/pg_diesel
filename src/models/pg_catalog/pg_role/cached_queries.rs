@@ -17,8 +17,6 @@ pub fn load_all(conn: &mut PgConnection) -> Result<Vec<PgRole>, diesel::result::
 
 /// Returns the role memberships for a given role.
 ///
-/// Returns the OIDs of roles that this role is a member of (i.e., roles that have been granted to this role).
-///
 /// # Errors
 ///
 /// Returns a `diesel::result::Error` if the query fails.

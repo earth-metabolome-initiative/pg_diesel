@@ -115,10 +115,6 @@ impl PgConstraint {
     /// Returns the vector of [`PgProc`] functions that are used in the
     /// constraint.
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
     /// # Errors
     ///
     /// * If an error occurs while querying the database
@@ -128,10 +124,6 @@ impl PgConstraint {
 
     /// Returns the vector of [`PgOperator`] functions that are used in the
     /// constraint.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
     ///

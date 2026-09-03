@@ -1,8 +1,4 @@
 //! Model struct for the `information_schema.triggered_update_columns` view.
-//!
-//! This view contains information about columns that are used by triggers for
-//! UPDATE events, with one row for each column that can trigger an UPDATE
-//! trigger.
 
 use diesel::prelude::*;
 

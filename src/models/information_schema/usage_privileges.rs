@@ -1,8 +1,4 @@
 //! Model struct for the `information_schema.usage_privileges` view.
-//!
-//! This view contains one row for each USAGE privilege granted on a schema,
-//! domain, collation, character set, or translation to a currently enabled
-//! role.
 
 use diesel::prelude::*;
 

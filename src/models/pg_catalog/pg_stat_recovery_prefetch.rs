@@ -6,11 +6,6 @@ use std::time::SystemTime;
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_stat_recovery_prefetch` view.
-///
-/// The `pg_stat_recovery_prefetch` view shows statistics about blocks
-/// prefetched during recovery. It contains only one row.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-RECOVERY-PREFETCH-VIEW).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_stat_recovery_prefetch::pg_stat_recovery_prefetch)]

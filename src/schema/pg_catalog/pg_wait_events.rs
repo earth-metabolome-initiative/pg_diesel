@@ -4,8 +4,6 @@ diesel::table! {
     use diesel::sql_types::{Nullable, Text};
 
     /// Wait events
-    ///
-    /// The view `pg_wait_events` provides information about wait events that can be monitored.
     pg_catalog.pg_wait_events (wait_type, name) {
         #[sql_name = "type"]
         /// Type of wait event

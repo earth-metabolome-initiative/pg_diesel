@@ -6,12 +6,6 @@ use diesel::{Queryable, QueryableByName, Selectable};
 /// Represents a `PostgreSQL` trigger, as defined in the `pg_trigger` system
 /// catalog table. This struct corresponds to the internal representation of
 /// triggers within `PostgreSQL`.
-///
-/// Triggers in `PostgreSQL` are special procedures that are automatically
-/// executed in response to certain events on a particular table or view.
-///
-/// This struct provides metadata about triggers, including their function,
-/// enabling state, constraints, and additional attributes.
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Hash, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_trigger::pg_trigger)]

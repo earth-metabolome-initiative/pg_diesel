@@ -64,8 +64,6 @@ diesel::table! {
         prosqlbody -> Nullable<Text>,
         /// Array of configuration parameters for the function; `NULL` if none.
         proconfig -> Nullable<Array<Text>>,
-        /// Access privileges for the function.
-        proacl -> Nullable<Array<Text>>,
     }
 }
 

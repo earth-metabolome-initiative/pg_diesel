@@ -4,11 +4,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_stat_progress_analyze` view.
-///
-/// The `pg_stat_progress_analyze` view shows progress information for each
-/// backend currently running ANALYZE.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/progress-reporting.html#ANALYZE-PROGRESS-REPORTING).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_stat_progress_analyze::pg_stat_progress_analyze)]

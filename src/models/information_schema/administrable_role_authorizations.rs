@@ -7,19 +7,6 @@ use diesel::{Queryable, QueryableByName, Selectable};
 #[diesel(table_name = crate::schema::information_schema::administrable_role_authorizations::administrable_role_authorizations)]
 #[diesel(primary_key(grantee, role_name))]
 /// Represents a row in `PostgreSQL`'s `administrable_role_authorizations` view.
-///
-/// Each row describes a **role authorization** that is administrable by the
-/// current user. This view shows role grants where the current user has the
-/// authority to grant or revoke the role membership. Role authorizations
-/// represent the granting of one role to another role or user, establishing a
-/// membership relationship in `PostgreSQL`'s role-based access control system.
-///
-/// Fields are nullable because `PostgreSQL`'s information schema views can
-/// contain missing or context-dependent values.
-///
-/// For more details:
-/// - `PostgreSQL` Catalog: [`pg_auth_members`](https://www.postgresql.org/docs/current/catalog-pg-auth-members.html)
-/// - Information Schema View: [`administrable_role_authorizations`](https://www.postgresql.org/docs/current/infoschema-administrable-role-authorizations.html)
 pub struct AdministrableRoleAuthorizations {
     /// Name of the role that was granted the privilege (the grantee).
     /// This is the role or user that received the role membership.

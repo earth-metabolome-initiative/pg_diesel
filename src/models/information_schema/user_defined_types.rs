@@ -1,9 +1,4 @@
 //! Model struct for the `information_schema.user_defined_types` view.
-//!
-//! This view contains one row for each user-defined type in the current
-//! database, providing comprehensive metadata about user-defined types
-//! including categorization, character sets, numeric properties, and data type
-//! information.
 
 use diesel::prelude::*;
 

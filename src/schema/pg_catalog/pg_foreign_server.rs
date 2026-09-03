@@ -17,8 +17,6 @@ diesel::table! {
         srvtype -> Nullable<Text>,
         /// Optional server version string, as defined by the foreign data wrapper.
         srvversion -> Nullable<Text>,
-        /// Access privileges for the foreign server.
-        srvacl -> Nullable<Array<Text>>,
         /// Foreign server-specific options, stored as "name=value" strings.
         srvoptions -> Nullable<Array<Text>>,
     }

@@ -10,7 +10,5 @@ diesel::table! {
         nspname -> Text,
         /// OID of the user who owns the schema.
         nspowner -> Oid,
-        /// Access privileges for the schema.
-        nspacl -> Nullable<Array<Text>>,
     }
 }

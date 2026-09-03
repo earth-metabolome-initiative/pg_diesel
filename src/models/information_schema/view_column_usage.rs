@@ -1,8 +1,4 @@
 //! Model struct for the `information_schema.view_column_usage` view.
-//!
-//! This view contains one row for each column that is referenced in the query
-//! expression of a view, showing the relationship between views and the
-//! underlying table columns.
 
 use diesel::prelude::*;
 

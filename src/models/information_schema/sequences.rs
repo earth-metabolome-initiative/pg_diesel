@@ -1,7 +1,4 @@
 //! Model struct for the `information_schema.sequences` view.
-//!
-//! This view contains metadata about sequences including data type, precision,
-//! range, increment, and cycling behavior.
 
 use diesel::prelude::*;
 

@@ -4,11 +4,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_stat_progress_vacuum` view.
-///
-/// The `pg_stat_progress_vacuum` view shows progress information for each
-/// backend running VACUUM.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/progress-reporting.html#VACUUM-PROGRESS-REPORTING).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_stat_progress_vacuum::pg_stat_progress_vacuum)]

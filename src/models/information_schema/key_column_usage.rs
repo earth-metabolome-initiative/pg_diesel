@@ -7,12 +7,10 @@ use diesel::{PgConnection, Queryable, QueryableByName, Selectable};
 mod cached_queries;
 pub(crate) use cached_queries::*;
 
-use crate::{database::KeyColumnUsageMetadata, models::Table};
+use crate::database::KeyColumnUsageMetadata;
 
 /// Represents a row in the `key_column_usage` table, which contains information
 /// about columns that are constrained by a unique or primary key constraint.
-///
-/// For more details, see [`PostgreSQL`](https://www.postgresql.org/docs/current/infoschema-key-column-usage.html)
 #[derive(
     Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Ord, PartialOrd, Clone, Hash,
 )]
@@ -44,24 +42,32 @@ impl KeyColumnUsage {
     /// [`KeyColumnUsage`], and connection to the
     /// database.
     ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
-    ///
     /// # Errors
     ///
     /// Returns a [`diesel::result::Error`] if the database query fails.
     pub fn metadata(
         &self,
-        host_table: Arc<Table>,
+        host_table: Arc<crate::model_metadata::PgTable>,
         conn: &mut PgConnection,
     ) -> Result<KeyColumnUsageMetadata, diesel::result::Error> {
         Ok(KeyColumnUsageMetadata::new(
-            referenced_table(self, conn)?,
             referenced_columns(self, conn)?,
             host_table,
             host_columns(self, conn)?,
             referential_constraint(self, conn)?,
         ))
+    }
+
+    /// Returns the schema and name of the relation the foreign key references.
+    ///
+    /// # Errors
+    ///
+    /// * If the referenced relation cannot be read from the database.
+    pub fn referenced_relation(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<(String, String), diesel::result::Error> {
+        let table = referenced_table(self, conn)?;
+        Ok((table.table_schema, table.table_name))
     }
 }

@@ -4,9 +4,6 @@ diesel::table! {
     use diesel::sql_types::{Oid, Nullable, Array, Text};
 
     /// User mappings
-    ///
-    /// The catalog `pg_user_mapping` stores the mappings from local users to
-    /// users on remote servers. Access to this catalog is restricted from normal users.
     pg_catalog.pg_user_mapping (oid) {
         /// Row identifier
         oid -> Oid,

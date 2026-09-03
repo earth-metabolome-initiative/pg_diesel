@@ -12,8 +12,6 @@ diesel::table! {
         spcname -> Text,
         /// Owner of the tablespace.
         spcowner -> Oid,
-        /// Access privileges.
-        spcacl -> Nullable<Array<Text>>,
         /// Tablespace-level options.
         spcoptions -> Nullable<Array<Text>>,
     }

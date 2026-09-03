@@ -1,8 +1,4 @@
 //! Implementation of [`SchemaLike`] for [`Schemata`].
-//!
-//! This module implements the [`SchemaLike`]
-//! trait for the [`Schemata`] model from `information_schema.schemata`,
-//! enabling generic introspection of database schemas.
 
 use crate::PgDieselDatabase;
 use crate::models::Schemata;

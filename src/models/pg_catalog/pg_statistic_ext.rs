@@ -4,11 +4,6 @@
 use diesel::{Identifiable, Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_statistic_ext` table.
-///
-/// The `pg_statistic_ext` table holds definitions of extended planner
-/// statistics, which are used for more accurate query planning.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/catalog-pg-statistic-ext.html).
 #[derive(
     Identifiable, Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash,
 )]

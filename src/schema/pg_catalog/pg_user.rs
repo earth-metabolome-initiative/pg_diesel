@@ -4,9 +4,6 @@ diesel::table! {
     use diesel::sql_types::{Nullable, Text, Oid, Bool, Timestamp, Array};
 
     /// Database users
-    ///
-    /// The view `pg_user` provides information about database users.
-    /// This is a publicly readable view of `pg_authid` that blanks out the password field.
     pg_catalog.pg_user (usename) {
         /// User name
         usename -> Nullable<Text>,

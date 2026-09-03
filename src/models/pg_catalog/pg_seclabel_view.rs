@@ -4,12 +4,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row from the `pg_seclabels` view.
-///
-/// The `pg_seclabels` view provides a user-friendly representation of security
-/// labels stored in `pg_seclabel`, showing object names and types rather than
-/// just OIDs.
-///
-/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/view-pg-seclabels.html).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_catalog::pg_seclabels::pg_seclabels)]

@@ -3,12 +3,6 @@
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a row in the `pg_aios` view.
-///
-/// This view lists all Asynchronous I/O handles that are currently in-use.
-/// An I/O handle is used to reference an I/O operation that is being prepared,
-/// executed or is in the process of completing.
-///
-/// See the [PostgreSQL documentation](https://www.postgresql.org/docs/current/view-pg-aios.html) for more details.
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq)]
 #[diesel(table_name = crate::schema::pg_catalog::pg_aios::pg_aios)]
 #[diesel(check_for_backend(diesel::pg::Pg))]

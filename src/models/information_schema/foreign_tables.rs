@@ -1,12 +1,8 @@
 //! Model struct for the `information_schema.foreign_tables` view.
-//!
-//! This view contains one row for each foreign table in the current database.
 
 use diesel::prelude::*;
 
 /// Model struct for `information_schema.foreign_tables`.
-///
-/// This view contains one row for each foreign table in the current database.
 #[derive(
     Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, Queryable, QueryableByName, Selectable,
 )]

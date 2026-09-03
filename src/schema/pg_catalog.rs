@@ -1,24 +1,4 @@
 //! Diesel schema definitions for `PostgreSQL`'s `pg_catalog` system tables.
-//!
-//! The `pg_catalog` schema contains `PostgreSQL`'s system catalog tables and
-//! views, which store all metadata about database objects, statistics, and
-//! configuration. This module provides Diesel `table!` definitions for these
-//! system tables.
-//!
-//! ## Covered Tables and Views
-//!
-//! This module includes schemas for:
-//! - Core catalog tables: `pg_class`, `pg_attribute`, `pg_type`,
-//!   `pg_namespace`, etc.
-//! - Constraint and index tables: `pg_constraint`, `pg_index`, etc.
-//! - Function and procedure tables: `pg_proc`, `pg_aggregate`, etc.
-//! - Statistics views: `pg_stat_*` family for monitoring and statistics
-//! - Configuration and settings views: `pg_settings`, `pg_file_settings`, etc.
-//! - Replication and publication tables
-//! - Extension and access method tables
-//!
-//! Each table/view is defined in its own submodule with complete column
-//! documentation.
 
 pub mod pg_aggregate;
 #[cfg(feature = "postgres-18")]

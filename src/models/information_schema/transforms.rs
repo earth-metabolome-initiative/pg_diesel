@@ -1,8 +1,4 @@
 //! Model struct for the `information_schema.transforms` view.
-//!
-//! This view contains information about transform functions for user-defined
-//! types, with one row for each transform function that transforms between a
-//! user-defined type and SQL data types.
 
 use diesel::prelude::*;
 

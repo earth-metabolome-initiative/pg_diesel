@@ -1,8 +1,4 @@
 //! Model struct for the `information_schema.sql_features` view.
-//!
-//! This view contains information about SQL features supported by the database
-//! system, showing which SQL standard features and sub-features are supported,
-//! verified, and any implementation comments.
 
 use diesel::prelude::*;
 
