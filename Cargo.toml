@@ -19,7 +19,7 @@ thiserror = "2.0.17"
 
 [dev-dependencies]
 tokio = { version = "1.49.0", features = ["full"] }
-testcontainers = { version = "0.26.3" }
+testcontainers = { version = "0.28.0" }
 syn = { version = "2.0", features = ["full", "parsing", "visit"] }
 quote = "1.0"
 proc-macro2 = "1.0"
